@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+ <head>
+<meta name="viewport" content="width=device-width">
+ <title>新着１００冊</title>
+ <link rel="stylesheet" href="ebooks.css">
+ </head>
+<body> <div class="navigation">
+  <a class="navigation" href="index.html"><div class="navbuttonb">TOP<br /></div></a>
+  <div class="searchbox" style="float: right"><form action="/search" method="post" />
+   &#x1F50D;<input type="text" name="query" />
+  </form></div>
+  </div>
+
+	 
+
+ <h2>新着１００</h2>
+<div class="titlelist">
+{{ range .Books }}
+{{ $x := . }}
+<a href="/books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+ <div class="booklink">
+  <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
+  <span class="title">{{.Title}} {{.Subtitle}}</span><br />
+	<span class="note">作者:	{{$x.FullName}}</span><br />
+ 
+  {{ with $x.Category }} <span class="note"> （{{ with $x.Kids }}児童書: {{ end }}{{.}}）</span><br />{{ end}}
+  <span class="note">（{{.KanaZukai}}）</span>
+ </div>
+</a>
+{{end}}
+</div>
+<p></p>
+</body>
+</html>
