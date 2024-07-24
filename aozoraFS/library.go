@@ -134,12 +134,13 @@ func (lib *Library) UpdateDB() {
 /*UpdateBooklist updates the booklist of lib from the locally available database.*/
 func (lib *Library) UpdateBooklist() {
 
+	lib.updating = true
 	zf, _ := os.ReadFile(filepath.Join(lib.root, "aozoradata.zip"))
 	lib.getBooklist(unzip(zf))
 	sortList(lib.booklist, byAuthor)
 	lib.lastUpdated = time.Now()
 	log.Println("sorted entries.")
-
+	lib.updating = false
 	return
 }
 

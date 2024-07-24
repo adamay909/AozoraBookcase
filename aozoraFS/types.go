@@ -22,7 +22,7 @@ type Library struct {
 	authorT,
 	bookT,
 	recentT *template.Template
-	updater       chan bool
+	updating      bool
 	kids          bool
 	strict        bool
 	lastUpdated   time.Time

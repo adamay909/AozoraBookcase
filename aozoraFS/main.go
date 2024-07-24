@@ -24,6 +24,10 @@ func NewLibrary() *Library {
  */
 func (lib *Library) Open(name string) (f fs.File, err error) {
 
+	//block Open while booklist is being updated
+	for lib.updating {
+	}
+
 	os.Chdir(lib.cache)
 
 	log.Println("requested file: ", name)
@@ -61,7 +65,6 @@ func (lib *Library) RefreshBooklist() {
 	if lib.checkInterval <= 0 {
 		return
 	}
-
 	for {
 		if lib.UpstreamUpdated(lib.lastUpdated) {
 			lib.UpdateDB()
