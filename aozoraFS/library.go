@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
@@ -137,11 +138,52 @@ func (lib *Library) UpdateBooklist() {
 	lib.updating = true
 	zf, _ := os.ReadFile(filepath.Join(lib.root, "aozoradata.zip"))
 	lib.getBooklist(unzip(zf))
+	lib.consolidateBookRecords()
 	sortList(lib.booklist, byAuthor)
 	lib.lastUpdated = time.Now()
 	log.Println("sorted entries.")
 	lib.updating = false
 	return
+}
+
+func (lib *Library) consolidateBookRecords() {
+
+	sortList(lib.booklist, byBookID)
+
+	for i, j := 0, 0; i < len(lib.booklist); {
+
+		var list []*Record
+
+		e := lib.booklist[i]
+
+		for j = i; j < len(lib.booklist) && lib.booklist[j].BookID == e.BookID; j++ {
+
+			list = append(list, lib.booklist[j])
+
+		}
+
+		for _, l := range list {
+
+			list[0].Contributors = append(list[0].Contributors, ContribRole{l.Role, l.AuthorID, l})
+		}
+		sort.Slice(list[0].Contributors, byRole(list[0].Contributors))
+
+		for _, e := range list {
+
+			if e == list[0] {
+				continue
+			}
+
+			e.Contributors = nil
+
+			e.Contributors = append(e.Contributors, list[0].Contributors...)
+
+		}
+		i = j
+	}
+
+	return
+
 }
 
 func (lib *Library) setupLogging(verbose bool) {

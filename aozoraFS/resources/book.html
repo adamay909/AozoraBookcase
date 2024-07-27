@@ -27,16 +27,16 @@
 	</div>
 
 	{{ $y := .B }}
-	{{ with eq .B.Role "著者" }} 
-	<div class="dname">作者名:</div>
-	<div class="notes"> <a href="/authors/author_{{$y.AuthorID}}.html"><ruby>{{$y.FullName}}<rt>{{$y.FullNameY}}</rt></ruby></a></div>
+
+	{{ range $y.Contributors }} 
+
+	{{ $z := . }}
+
+	<div class="dname"> {{ $z.Role }}:</div>
+		<div class="notes"> <a href="/authors/author_{{$z.AuthorID}}.html"><ruby>{{$z.B.FullName}}<rt>{{$z.B.FullNameY}}</rt></ruby></a></div>
+
 	{{ end }}
 
-	{{ $y := .B }}
-	{{ with eq .B.Role "翻訳者" }} 
-	<div class="dname">翻訳者:</div>
-	<div class="notes"> <a href="/authors/author_{{$y.AuthorID}}.html"><ruby>{{$y.FullName}}<rt>{{$y.FullNameY}}</rt></ruby></a></div>
-	{{ end }}
 	<div class="dnamex">初出:</div>
 	<div class="notesx">{{.B.PublDate}}</div>
 

@@ -2,7 +2,10 @@ module github.com/adamay909/AozoraBookcase
 
 go 1.22.4
 
-require github.com/adamay909/AozoraConvert v0.2.0
+require (
+	github.com/adamay909/AozoraConvert v0.2.0
+	github.com/nlepage/go-js-promise v1.1.0
+)
 
 require (
 	github.com/google/uuid v1.6.0 // indirect

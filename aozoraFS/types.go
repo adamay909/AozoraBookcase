@@ -16,7 +16,8 @@ type Library struct {
 	root      string
 	//	prefix    string
 	//	catalog   records
-	booklist []*Record
+	booklist   []*Record
+	authorlist map[string]*Record
 	//	size      int
 	indexT,
 	authorT,
@@ -65,4 +66,11 @@ type Record struct {
 	AuthorCopyright string
 	URI             string
 	Kids            bool
+	Contributors    []ContribRole
+}
+
+type ContribRole struct {
+	Role     string
+	AuthorID string
+	B        *Record
 }

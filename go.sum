@@ -2,6 +2,8 @@ github.com/adamay909/AozoraConvert v0.2.0 h1:IpPUCj/efpzokOfdk1Cg81b+b1sEkbvi+kR
 github.com/adamay909/AozoraConvert v0.2.0/go.mod h1:AqVFR6tTn43N3x75lUE3YWATsHcKH90CjXoZgDlgU/U=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/nlepage/go-js-promise v1.1.0 h1:BfvywsIMo4cpNOKyoReBWkxEW8f9HMwXqGc45wEKPRs=
+github.com/nlepage/go-js-promise v1.1.0/go.mod h1:bdOP0wObXu34euibyK39K1hoBCtlgTKXGc56AGflaRo=
 golang.org/x/image v0.18.0 h1:jGzIakQa/ZXI1I0Fxvaa9W7yP25TqT6cHIHn+6CqvSQ=
 golang.org/x/image v0.18.0/go.mod h1:4yyo5vMFQjVjUcVk4jEQcU9MGy/rulF5WvUILseCM2E=
 golang.org/x/net v0.27.0 h1:5K3Njcw06/l2y9vpGCSdcxWOYHOUk3dVNGDXN+FvAys=

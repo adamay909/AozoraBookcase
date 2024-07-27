@@ -3,6 +3,7 @@ package aozorafs
 import (
 	"log"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -39,6 +40,10 @@ func byAuthor(l []*Record) func(i, j int) bool {
 		}
 		return false
 	}
+}
+
+func byBookID(l []*Record) func(i, j int) bool {
+	return func(i, j int) bool { return l[i].BookID < l[j].BookID }
 }
 
 func byTitle(l []*Record) func(i, j int) bool {
@@ -85,4 +90,40 @@ func byAvailableDate(l []*Record) func(i, j int) bool {
 		return itime.After(jtime)
 
 	}
+}
+
+// 1=chosha
+// 2=hensha
+// 3=honyakusha
+// 4=kouetusha
+// 5=sonota
+func byRole(l []ContribRole) func(i, j int) bool {
+
+	return func(i, j int) bool {
+		return numOf(l[i].Role) < numOf(l[j].Role)
+	}
+}
+
+func numOf(role string) int {
+
+	switch strings.TrimSpace(role) {
+
+	case "著者":
+		return 1
+
+	case "編者":
+		return 2
+
+	case "翻訳者":
+		return 3
+
+	case "校訂者":
+		return 4
+
+	case "その他":
+		return 5
+
+	}
+
+	return 0
 }
