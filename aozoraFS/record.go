@@ -173,7 +173,7 @@ func (lib *Library) getBooksByAuthor(aID string) (list []*Record) {
 			list = append(list, e)
 		}
 	}
-
+	sortList(list, byTitle)
 	return
 }
 

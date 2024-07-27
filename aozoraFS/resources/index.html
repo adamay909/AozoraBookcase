@@ -26,8 +26,7 @@
 {{ range .List }}
 <a href="{{$p}}/authors/author_{{.AuthorID}}.html">
 <div class="authorlistbutton">
-<span class="rt">{{.FullNameY}}</span><br />
-<span class="rb">{{.FullName}}</span>
+ <ruby>{{ .FullName }}<rt>{{ .FullNameY }}</rt></ruby>
 </div>
 </a>
 {{end}}
