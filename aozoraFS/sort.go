@@ -47,7 +47,7 @@ func byBookID(l []*Record) func(i, j int) bool {
 }
 
 func byTitle(l []*Record) func(i, j int) bool {
-	return func(i, j int) bool { return l[i].TitleSort < l[j].TitleSort }
+	return func(i, j int) bool { return l[i].TitleSort+l[i].SubtitleY < l[j].TitleSort+l[j].SubtitleY }
 }
 
 func byAuthorName(l []*Record) func(i, j int) bool {
