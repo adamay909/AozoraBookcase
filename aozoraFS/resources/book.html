@@ -44,7 +44,7 @@
 	<div class="notesx">{{.B.KanaZukai}}</div>
 	
 	<div class="dnamex">分類:</div>
-	<div class="notesx">{{ with .B.Kids}}児童書: {{ end }}{{.B.Category}}</div>
+	<div class="notesx">{{ with .B.Kids}}児童書: {{ end }} {{ range .B.Categories }}<a href="/categories/ndc_{{.}}.html">{{.}}</a>&nbsp;{{ end }}</div>
  </div>
 
 <div class="downloadlinks">

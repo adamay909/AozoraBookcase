@@ -13,6 +13,7 @@ func (lib *Library) saveCSS() {
 	}
 	return
 }
+
 func (lib *Library) saveSimpleCSS() {
 	_, err := os.Stat(filepath.Join(lib.resources, "simple.css"))
 	if os.IsNotExist(err) {
@@ -63,4 +64,15 @@ func (lib *Library) bookpageTemplate() {
 		p, err = os.ReadFile(filepath.Join(lib.resources, "book.html"))
 	}
 	lib.bookT = template.Must(template.New("book.html").Parse(string(p)))
+}
+
+func (lib *Library) categorypageTemplate() {
+
+	p, err := os.ReadFile(filepath.Join(lib.resources, "category.html"))
+
+	if os.IsNotExist(err) {
+		os.WriteFile(filepath.Join(lib.resources, "category.html"), []byte(categoryTemplate(lib)), 0644)
+		p, err = os.ReadFile(filepath.Join(lib.resources, "category.html"))
+	}
+	lib.categoryT = template.Must(template.New("book.html").Parse(string(p)))
 }

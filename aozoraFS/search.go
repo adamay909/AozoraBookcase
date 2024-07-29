@@ -15,6 +15,7 @@ func SearchResultsHandler(lib *Library) func(w http.ResponseWriter, r *http.Requ
 		var R struct {
 			Authors, Titles, Categories []*Record
 			Prefix                      string
+			FoundA, FoundT, FoundC      bool
 		}
 		r.ParseForm()
 
@@ -24,25 +25,46 @@ func SearchResultsHandler(lib *Library) func(w http.ResponseWriter, r *http.Requ
 		}
 
 		R.Authors, R.Titles, R.Categories = search(r.Form["query"][0], lib)
+
+		R.FoundA = len(R.Authors) > 0
+		R.FoundT = len(R.Titles) > 0
+		R.FoundC = len(R.Categories) > 0
+
 		template.Must(template.New("result").Parse(searchResultsTemplate())).Execute(w, R)
 		return
 	}
 }
 
-func search(t string, lib *Library) (authors, titles, categories []*Record) {
+func search(q string, lib *Library) (authors, titles, categories []*Record) {
 
-	s := runes.Runes(t)
+	log.Println("seach requested for :", q)
 
-	log.Println("seach requested for :", s)
+	authors = lib.FindMatchingAuthors(q)
 
-	contains := func(s []*Record, r *Record) bool {
-		for _, c := range s {
-			if c.BookID == r.BookID {
-				return true
-			}
-		}
-		return false
+	titles = lib.FindMatchingTitles(q)
+
+	categories = lib.FindMatchingCategories(q)
+
+	//get matching titles
+	return
+}
+
+func toHiragana(s string) string {
+
+	r := []rune(s)
+
+	for i, c := range r {
+		r[i] = jptools.ToHiragana(c)
 	}
+
+	return string(r)
+}
+
+// FindMatchingAuthors finds the authors whose names include q.
+func (lib *Library) FindMatchingAuthors(q string) (authors []*Record) {
+
+	s := runes.Runes(q)
+
 	log.Println("searching through authors")
 
 	for _, b := range lib.allAuthors() {
@@ -56,9 +78,22 @@ func search(t string, lib *Library) (authors, titles, categories []*Record) {
 		}
 	}
 
+	return authors
+
+}
+
+// FindMatchingTitles finds the books whose title+subtitle contain q.
+func (lib *Library) FindMatchingTitles(q string) (titles []*Record) {
+
 	log.Println("searching through titles")
-	//get matching titles
+
+	s := runes.Runes(q)
+
 	for _, b := range lib.booklist {
+
+		if listContainsBook(titles, b) {
+			continue
+		}
 
 		switch {
 
@@ -76,30 +111,38 @@ func search(t string, lib *Library) (authors, titles, categories []*Record) {
 		}
 
 	}
-	log.Println("searching through categories")
 
-	//get matching categories
+	return titles
+}
+
+// FindMatchingCategories finds the books whose NDC category
+// include q
+func (lib *Library) FindMatchingCategories(q string) (categories []*Record) {
+
+	s := runes.Runes(q)
+
+	log.Println("searching through categories for", q)
+
 	for _, b := range lib.booklist {
 
-		if contains(categories, b) {
+		if listContainsBook(categories, b) {
 			continue
 		}
 		if runes.Contains(runes.Runes(b.Category), s) {
 			categories = append(categories, b)
 		}
-		//b = lib.NextAuthor(b)
 	}
 
-	return
+	return categories
+
 }
 
-func toHiragana(s string) string {
+func listContainsBook(l []*Record, q *Record) bool {
 
-	r := []rune(s)
-
-	for i, c := range r {
-		r[i] = jptools.ToHiragana(c)
+	for _, e := range l {
+		if e.BookID == q.BookID {
+			return true
+		}
 	}
-
-	return string(r)
+	return false
 }

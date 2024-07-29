@@ -35,7 +35,7 @@
   <span class="yomi">{{$x.TitleY}} {{.SubtitleY}}</span><br />
   <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
  
-  {{ with $x.Category }} <span class="note"> （{{ with $x.Kids }}児童書: {{ end }}{{.}}）</span><br />{{ end}}
+  <span class="note">（{{ with $x.Kids }}児童書: {{ end }}{{ .Category }})</span><br />
   <span class="note">（{{$x.KanaZukai}}）</span>
  </div>
 </a>

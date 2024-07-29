@@ -232,6 +232,7 @@ func (b *Record) FullNameY() string {
 		return b.NameSeiY + " " + b.NameMeiY
 	}
 }
+
 func (b *Record) fullNameS() string {
 	switch {
 	case len(b.NameSeiSort) == 0:
@@ -269,20 +270,21 @@ func (b *Record) setCategory() {
 		s = strings.TrimLeft(s, "K ")
 	}
 	codes := strings.Split(s, " ")
-	for i, c := range codes {
+	for _, c := range codes {
 		if len(c) != 3 {
 			continue
 		}
-		r, ok := ndc[c[:2]]
+		r, ok := ndc[c[:1]]
 		if ok {
-			if i > 0 {
-				b.Category = b.Category + "; "
-			}
-			b.Category = b.Category + r
-		} else {
-			b.Category = ""
+			b.Categories = append(b.Categories, r)
+		}
+		r, ok = ndc[c[:2]]
+		if ok {
+			b.Categories = append(b.Categories, r)
 		}
 	}
+
+	b.Category = strings.Join(b.Categories, ";")
 }
 
 func (b *Record) isChildrensBook() bool {

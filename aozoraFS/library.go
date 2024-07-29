@@ -43,25 +43,20 @@ func (lib *Library) Initialize(dir string, clean, verbose, kids, strict bool, ch
 	lib.cache = filepath.Join(lib.root, "library/")
 	lib.resources = filepath.Join(lib.root, "resources/")
 	os.RemoveAll(lib.resources)
-	os.Remove(filepath.Join(lib.cache, "index.html"))
-	os.Remove(filepath.Join(lib.cache, "recent.html"))
-	os.Remove(filepath.Join(lib.cache, "ebooks.css"))
+	os.RemoveAll(lib.cache)
 
 	if clean {
 		os.Remove(filepath.Join(lib.root, "aozoradata.zip"))
-		os.RemoveAll(filepath.Join(lib.cache, "files/"))
-
 	}
 
 	os.Mkdir(lib.resources, 0766)
-	//	if lib.kids {
-	//		lib.saveSimpleCSS()
-	//	} else {
+
 	lib.saveCSS()
 	//	}
 	lib.mainIndexTemplate()
 	lib.authorpageTemplate()
 	lib.bookpageTemplate()
+	lib.categorypageTemplate()
 	lib.recentTemplate()
 
 }
@@ -140,6 +135,7 @@ func (lib *Library) UpdateBooklist() {
 	lib.getBooklist(unzip(zf))
 	lib.consolidateBookRecords()
 	sortList(lib.booklist, byAuthor)
+	os.RemoveAll(lib.cache)
 	lib.lastUpdated = time.Now()
 	log.Println("sorted entries.")
 	lib.updating = false
@@ -330,6 +326,7 @@ func (lib *Library) updatePages() {
 	os.Mkdir(lib.cache+"/authors", 0766)
 	os.Mkdir(lib.cache+"/books", 0766)
 	os.Mkdir(lib.cache+"/files", 0766)
+	os.Mkdir(lib.cache+"/categories", 0766)
 	os.RemoveAll(lib.cache + "index.html")
 	os.RemoveAll(lib.cache + "recent.html")
 	css, _ := os.ReadFile(filepath.Join(lib.resources, "ebooks.css"))

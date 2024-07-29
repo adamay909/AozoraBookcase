@@ -14,14 +14,11 @@ type Library struct {
 	cache     string
 	resources string
 	root      string
-	//	prefix    string
-	//	catalog   records
-	booklist   []*Record
-	authorlist map[string]*Record
-	//	size      int
+	booklist  []*Record
 	indexT,
 	authorT,
 	bookT,
+	categoryT,
 	recentT *template.Template
 	updating      bool
 	kids          bool
@@ -47,6 +44,7 @@ type Record struct {
 	PublDate        string
 	NDC             string
 	Category        string
+	Categories      []string
 	KanaZukai       string
 	WorkCopyright   string
 	FirstAvailable  string
@@ -69,6 +67,7 @@ type Record struct {
 	Contributors    []ContribRole
 }
 
+// ContribRole is for storing various contributors to a book.
 type ContribRole struct {
 	Role     string
 	AuthorID string

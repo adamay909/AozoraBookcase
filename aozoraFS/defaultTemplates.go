@@ -47,6 +47,15 @@ func bookTemplate(lib *Library) string {
 	return fileBookhtml
 }
 
+//go:embed resources/category.html
+var fileCategoryhtml string
+
+func categoryTemplate(lib *Library) string {
+
+	return fileCategoryhtml
+
+}
+
 //go:embed resources/searchForm.html
 var fileSearchhtml string
 

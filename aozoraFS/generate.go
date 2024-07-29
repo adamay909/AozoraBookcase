@@ -151,6 +151,43 @@ func genBookPage(lib *Library, name string) {
 
 }
 
+func genCategoryPage(lib *Library, name string) {
+
+	type Page struct {
+		Category string
+		Books    []*Record
+	}
+
+	var P Page
+
+	q := strings.TrimSuffix(strings.TrimPrefix(name, "ndc_"), ".html")
+
+	log.Println("making category page for", q)
+
+	os.Chdir(lib.resources)
+
+	P.Books = append(P.Books, lib.FindMatchingCategories(q)...)
+
+	log.Println("found", len(P.Books), "items")
+	P.Category = q
+
+	f, err := os.Create(filepath.Join(lib.cache, "categories", "ndc_"+q+".html"))
+	if err != nil {
+		log.Println("1", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	err = lib.categoryT.Execute(f, P)
+	if err != nil {
+		log.Println("2", err)
+		os.Exit(1)
+	}
+
+	f.Sync()
+
+}
+
 func generateFiles(lib *Library, name string) {
 
 	bookID := getID(name)

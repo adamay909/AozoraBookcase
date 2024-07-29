@@ -2,7 +2,16 @@ package aozorafs
 
 func ndcmap() map[string]string {
 	ndc := make(map[string]string)
-
+	ndc["0"] = "総記"
+	ndc["1"] = "哲学"
+	ndc["2"] = "歴史"
+	ndc["3"] = "社会科学"
+	ndc["4"] = "自然科学"
+	ndc["5"] = "技術"
+	ndc["6"] = "産業"
+	ndc["7"] = "美術"
+	ndc["8"] = "言語"
+	ndc["9"] = "文学"
 	ndc["00"] = "総記"
 	ndc["01"] = "図書館、図書館情報学"
 	ndc["02"] = "図書、書誌学"
@@ -102,6 +111,14 @@ func ndcmap() map[string]string {
 	ndc["96"] = "スペイン文学、ポルトガル文学"
 	ndc["97"] = "イタリア文学、その他のロマンス文学"
 	ndc["98"] = "ロシア・ソビエト文学、その他のスラブ文学"
+
+	//	var ndcr map[string]string
+
+	for key, val := range ndc {
+
+		ndc[val] = key
+
+	}
 
 	return ndc
 }
