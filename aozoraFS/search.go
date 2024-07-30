@@ -119,8 +119,6 @@ func (lib *Library) FindMatchingTitles(q string) (titles []*Record) {
 // include q
 func (lib *Library) FindMatchingCategories(q string) (categories []*Record) {
 
-	s := runes.Runes(q)
-
 	log.Println("searching through categories for", q)
 
 	for _, b := range lib.booklist {
@@ -128,8 +126,20 @@ func (lib *Library) FindMatchingCategories(q string) (categories []*Record) {
 		if listContainsBook(categories, b) {
 			continue
 		}
-		if runes.Contains(runes.Runes(b.Category), s) {
-			categories = append(categories, b)
+
+		for _, e := range b.Categories {
+
+			if e[0] == q {
+
+				categories = append(categories, b)
+
+			}
+
+			if e[1] == q {
+				categories = append(categories, b)
+
+			}
+
 		}
 	}
 

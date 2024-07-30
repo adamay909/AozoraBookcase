@@ -135,6 +135,7 @@ func (lib *Library) UpdateBooklist() {
 	lib.getBooklist(unzip(zf))
 	lib.consolidateBookRecords()
 	sortList(lib.booklist, byAuthor)
+	lib.Categories = ndcmap()
 	os.RemoveAll(lib.cache)
 	lib.lastUpdated = time.Now()
 	log.Println("sorted entries.")

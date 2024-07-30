@@ -9,11 +9,11 @@
 <body>
  <div class="booknav">
   <a class="navigation" href="/index.html"><div class="navbuttonb">TOP<br /></div></a>
-  <a class="navigation" href="/authors/author_{{$x.PrevAuthor.AuthorID }}.html"><div class="navbuttonl">前の作家<br />(previous author)</div></a>
-  <a class="navigation" href="/books/book_{{.B.AuthorID}}_{{$x.PrevBook.BookID}}.html"><div class="navbuttonb">前の本<br />(Previous Book)</div></a>
+  <a class="navigation" href="/authors/author_{{.PrevAuthor.AuthorID }}.html"><div class="navbuttonl">前の作家<br />(previous author)</div></a>
+  <a class="navigation" href="/books/book_{{.PrevBook.AuthorID}}_{{.PrevBook.BookID}}.html"><div class="navbuttonb">前の本<br />(Previous Book)</div></a>
   <a class="navigation" href="/authors/author_{{.B.AuthorID}}.html"><div class="navbuttonl">作家ページ<br />(Author Page)</div></a>
-  <a class="navigation" href="/books/book_{{.B.AuthorID}}_{{$x.NextBook.BookID}}.html"><div class="navbuttonb">次の本<br />(Next Book)</div></a>
-  <a class="navigation" href="/authors/author_{{$x.NextAuthor.AuthorID }}.html"><div class="navbuttonl">次の作家<br />(next author)</div></a>
+  <a class="navigation" href="/books/book_{{.NextBook.AuthorID}}_{{.NextBook.BookID}}.html"><div class="navbuttonb">次の本<br />(Next Book)</div></a>
+  <a class="navigation" href="/authors/author_{{.NextAuthor.AuthorID }}.html"><div class="navbuttonl">次の作家<br />(next author)</div></a>
 <div class="searchbox" style="float: right"><form action="/search" method="post" />
    &#x1F50D;<input type="text" name="query" size="5">
   </form></div>
@@ -44,7 +44,7 @@
 	<div class="notesx">{{.B.KanaZukai}}</div>
 	
 	<div class="dnamex">分類:</div>
-	<div class="notesx">{{ with .B.Kids}}児童書: {{ end }} {{ range .B.Categories }}<a href="/categories/ndc_{{.}}.html">{{.}}</a>&nbsp;{{ end }}</div>
+	<div class="notesx">{{ with .B.Kids}}（児童書）{{ end }} {{ range .B.Categories }}<a href="/categories/ndc_{{ndc (ndc1 .) }}.html">{{ndc1 .}}--</a><a href="/categories/ndc_{{ndc (ndc2 .) }}.html">{{ndc2 .}}</a>&nbsp;{{ end }}</div>
  </div>
 
 <div class="downloadlinks">

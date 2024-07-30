@@ -126,15 +126,26 @@ func genBookPage(lib *Library, name string) {
 
 	log.Println("author: ", authorID, "; book: ", bookID)
 
-	P.B = lib.getBookRecord(authorID, bookID)
+	var k int
+
+	P.B, k = lib.getBookRecord(authorID, bookID)
 
 	if P.B.BookID != bookID {
 		log.Println("book not found:", name)
 		log.Println("\t resorting to first book in catalog")
 	}
 
-	P.PrevBook = lib.PrevBook(P.B)
-	P.NextBook = lib.NextBook(P.B)
+	if k == 0 {
+		P.PrevBook = lib.booklist[len(lib.booklist)-1]
+	} else {
+		P.PrevBook = lib.booklist[k-1]
+	}
+
+	if k == len(lib.booklist)-1 {
+		P.NextBook = lib.booklist[0]
+	} else {
+		P.NextBook = lib.booklist[k+1]
+	}
 
 	P.NextAuthor = lib.NextAuthor(P.B)
 	P.PrevAuthor = lib.PrevAuthor(P.B)
@@ -169,7 +180,7 @@ func genCategoryPage(lib *Library, name string) {
 	P.Books = append(P.Books, lib.FindMatchingCategories(q)...)
 
 	log.Println("found", len(P.Books), "items")
-	P.Category = q
+	P.Category = ndcmap()[q]
 
 	f, err := os.Create(filepath.Join(lib.cache, "categories", "ndc_"+q+".html"))
 	if err != nil {

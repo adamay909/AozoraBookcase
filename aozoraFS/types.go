@@ -25,6 +25,7 @@ type Library struct {
 	strict        bool
 	lastUpdated   time.Time
 	checkInterval time.Duration
+	Categories    map[string]string
 }
 
 // records is for storing index cards.
@@ -44,7 +45,7 @@ type Record struct {
 	PublDate        string
 	NDC             string
 	Category        string
-	Categories      []string
+	Categories      [][2]string
 	KanaZukai       string
 	WorkCopyright   string
 	FirstAvailable  string

@@ -122,5 +122,9 @@ func isValidFileName(n string) bool {
 		return true
 	}
 
+	if n == "recent.html" {
+		return true
+	}
+
 	return false
 }

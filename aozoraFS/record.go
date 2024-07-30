@@ -14,18 +14,18 @@ func hasSameAuthor(a, b *Record) bool {
 
 }
 
-func (lib *Library) getBookRecord(authorID, bookID string) *Record {
+func (lib *Library) getBookRecord(authorID, bookID string) (*Record, int) {
 
-	for _, e := range lib.booklist {
+	for i, e := range lib.booklist {
 
 		if e.BookID == bookID {
 			if e.AuthorID == authorID {
-				return e
+				return e, i
 			}
 		}
 	}
 
-	return lib.booklist[0]
+	return lib.booklist[0], 0
 
 }
 
@@ -274,17 +274,20 @@ func (b *Record) setCategory() {
 		if len(c) != 3 {
 			continue
 		}
-		r, ok := ndc[c[:1]]
+		_, ok := ndc[c[:1]]
 		if ok {
-			b.Categories = append(b.Categories, r)
-		}
-		r, ok = ndc[c[:2]]
-		if ok {
-			b.Categories = append(b.Categories, r)
+			_, ok := ndc[c[:2]]
+			if ok {
+				b.Categories = append(b.Categories, [2]string{c[:1], c[:2]})
+			}
 		}
 	}
+	for _, e := range b.Categories {
 
-	b.Category = strings.Join(b.Categories, ";")
+		b.Category = b.Category + ndc[e[0]] + "--" + ndc[e[1]] + ";"
+
+	}
+	b.Category = strings.TrimSuffix(b.Category, ";")
 }
 
 func (b *Record) isChildrensBook() bool {

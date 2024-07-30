@@ -57,13 +57,34 @@ func (lib *Library) authorpageTemplate() {
 
 func (lib *Library) bookpageTemplate() {
 
+	NdcOf := func(i string) string {
+
+		return ndcmap()[i]
+
+	}
+
+	NdcPOf := func(i [2]string) string {
+
+		return ndcmap()[i[0]]
+
+	}
+
+	NdcCOf := func(i [2]string) string {
+
+		return ndcmap()[i[1]]
+
+	}
 	p, err := os.ReadFile(filepath.Join(lib.resources, "book.html"))
 
 	if os.IsNotExist(err) {
 		os.WriteFile(filepath.Join(lib.resources, "book.html"), []byte(bookTemplate(lib)), 0644)
 		p, err = os.ReadFile(filepath.Join(lib.resources, "book.html"))
 	}
-	lib.bookT = template.Must(template.New("book.html").Parse(string(p)))
+
+	funcMap := template.FuncMap{"ndc1": NdcPOf,
+		"ndc2": NdcCOf, "ndc": NdcOf}
+
+	lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(string(p)))
 }
 
 func (lib *Library) categorypageTemplate() {
