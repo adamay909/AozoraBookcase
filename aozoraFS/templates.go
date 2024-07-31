@@ -2,58 +2,63 @@ package aozorafs
 
 import (
 	"html/template"
+	"log"
 	"os"
 	"path/filepath"
+
+	_ "embed"
 )
 
+//use this to hard code templates
+
+//go:embed resources/defaultcss.css
+var fileDefaultcss string
+
+//go:embed resources/random.html
+var randombookhtml string
+
 func (lib *Library) saveCSS() {
-	_, err := os.Stat(filepath.Join(lib.resources, "ebooks.css"))
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "ebooks.css"), []byte(defaultCSS(lib)), 0644)
+
+	f, err := os.Create(filepath.Join(lib.cache, "ebooks.css"))
+	if err != nil {
+		log.Println("1", err)
 	}
+	defer f.Close()
+	log.Println("css has", len([]byte(fileDefaultcss)))
+	n, err := f.Write([]byte(fileDefaultcss))
+	if err != nil {
+		log.Println("2", err)
+	}
+	log.Println("wrote", n, "bytes")
 	return
 }
 
-func (lib *Library) saveSimpleCSS() {
-	_, err := os.Stat(filepath.Join(lib.resources, "simple.css"))
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "ebooks.css"), []byte(simpleCSS(lib)), 0644)
-	}
-	return
-}
+//go:embed resources/index.html
+var fileIndexhtml string
 
 func (lib *Library) mainIndexTemplate() {
 
-	p, err := os.ReadFile(filepath.Join(lib.resources, "index.html"))
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "index.html"), []byte(indexTemplate(lib)), 0644)
-		p, err = os.ReadFile(filepath.Join(lib.resources, "index.html"))
-	}
-
-	lib.indexT = template.Must(template.New("index.html").Parse(string(p)))
+	lib.indexT = template.Must(template.New("index.html").Parse(fileIndexhtml))
 }
+
+//go:embed resources/recent.html
+var fileRecenthtml string
 
 func (lib *Library) recentTemplate() {
 
-	p, err := os.ReadFile(filepath.Join(lib.resources, "recent.html"))
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "recent.html"), []byte(recentTemplate(lib)), 0644)
-		p, err = os.ReadFile(filepath.Join(lib.resources, "recent.html"))
-	}
-
-	lib.recentT = template.Must(template.New("recent.html").Parse(string(p)))
+	lib.recentT = template.Must(template.New("recent.html").Parse(fileRecenthtml))
 }
+
+//go:embed resources/author.html
+var fileAuthorhtml string
 
 func (lib *Library) authorpageTemplate() {
 
-	p, err := os.ReadFile(filepath.Join(lib.resources, "author.html"))
-
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "author.html"), []byte(authorTemplate(lib)), 0644)
-		p, err = os.ReadFile(filepath.Join(lib.resources, "author.html"))
-	}
-	lib.authorT = template.Must(template.New("author.html").Parse(string(p)))
+	lib.authorT = template.Must(template.New("author.html").Parse(fileAuthorhtml))
 }
+
+//go:embed resources/book.html
+var fileBookhtml string
 
 func (lib *Library) bookpageTemplate() {
 
@@ -74,26 +79,46 @@ func (lib *Library) bookpageTemplate() {
 		return ndcmap()[i[1]]
 
 	}
-	p, err := os.ReadFile(filepath.Join(lib.resources, "book.html"))
 
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "book.html"), []byte(bookTemplate(lib)), 0644)
-		p, err = os.ReadFile(filepath.Join(lib.resources, "book.html"))
+	funcMap := template.FuncMap{"ndc1": NdcPOf,
+		"ndc2": NdcCOf, "ndc": NdcOf}
+
+	lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(fileBookhtml))
+}
+
+//go:embed resources/category.html
+var fileCategoryhtml string
+
+func (lib *Library) categorypageTemplate() {
+
+	lib.categoryT = template.Must(template.New("book.html").Parse(fileCategoryhtml))
+}
+
+//go:embed resources/random.html
+var randomBookhtml string
+
+func (lib *Library) randomBookTemplate() {
+
+	NdcOf := func(i string) string {
+
+		return ndcmap()[i]
+
+	}
+
+	NdcPOf := func(i [2]string) string {
+
+		return ndcmap()[i[0]]
+
+	}
+
+	NdcCOf := func(i [2]string) string {
+
+		return ndcmap()[i[1]]
+
 	}
 
 	funcMap := template.FuncMap{"ndc1": NdcPOf,
 		"ndc2": NdcCOf, "ndc": NdcOf}
 
-	lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(string(p)))
-}
-
-func (lib *Library) categorypageTemplate() {
-
-	p, err := os.ReadFile(filepath.Join(lib.resources, "category.html"))
-
-	if os.IsNotExist(err) {
-		os.WriteFile(filepath.Join(lib.resources, "category.html"), []byte(categoryTemplate(lib)), 0644)
-		p, err = os.ReadFile(filepath.Join(lib.resources, "category.html"))
-	}
-	lib.categoryT = template.Must(template.New("book.html").Parse(string(p)))
+	lib.randomT = template.Must(template.New("book.html").Funcs(funcMap).Parse(randomBookhtml))
 }

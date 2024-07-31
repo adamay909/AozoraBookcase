@@ -42,22 +42,34 @@ func (lib *Library) Initialize(dir string, clean, verbose, kids, strict bool, ch
 
 	lib.cache = filepath.Join(lib.root, "library/")
 	lib.resources = filepath.Join(lib.root, "resources/")
-	os.RemoveAll(lib.resources)
+
+	lib.initfs(clean)
+
+	lib.inittemplates()
+}
+
+func (lib *Library) initfs(clean bool) {
+
 	os.RemoveAll(lib.cache)
 
 	if clean {
 		os.Remove(filepath.Join(lib.root, "aozoradata.zip"))
 	}
 
-	os.Mkdir(lib.resources, 0766)
+	os.Mkdir(lib.root, 0766)
 
-	lib.saveCSS()
-	//	}
+	os.Mkdir(lib.cache, 0766)
+
+}
+
+func (lib *Library) inittemplates() {
+
 	lib.mainIndexTemplate()
 	lib.authorpageTemplate()
 	lib.bookpageTemplate()
 	lib.categorypageTemplate()
 	lib.recentTemplate()
+	lib.randomBookTemplate()
 
 }
 
@@ -330,9 +342,7 @@ func (lib *Library) updatePages() {
 	os.Mkdir(lib.cache+"/categories", 0766)
 	os.RemoveAll(lib.cache + "index.html")
 	os.RemoveAll(lib.cache + "recent.html")
-	css, _ := os.ReadFile(filepath.Join(lib.resources, "ebooks.css"))
-	os.WriteFile(filepath.Join(lib.cache, "ebooks.css"), css, 0644)
-
+	lib.saveCSS()
 	lib.genMainIndex()
 
 	lib.lastUpdated = time.Now()

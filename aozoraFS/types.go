@@ -19,7 +19,8 @@ type Library struct {
 	authorT,
 	bookT,
 	categoryT,
-	recentT *template.Template
+	recentT,
+	randomT *template.Template
 	updating      bool
 	kids          bool
 	strict        bool

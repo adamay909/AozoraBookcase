@@ -58,6 +58,8 @@ func main() {
 
 	http.HandleFunc("/search", aozorafs.SearchResultsHandler(mainLib))
 
+	http.HandleFunc("/random", aozorafs.RandomBook(mainLib))
+
 	fmt.Println("Listening on " + iface + ":" + port)
 	log.Fatal(http.ListenAndServe(iface+":"+port, nil))
 
