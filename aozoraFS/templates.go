@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "embed"
+	_ "embed" //for embedding resources
 )
 
 //use this to hard code templates

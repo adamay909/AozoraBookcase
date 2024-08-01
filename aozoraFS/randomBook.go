@@ -7,6 +7,7 @@ import (
 	"math/rand"
 )
 
+// RandomBook returns a random book from the library
 func RandomBook(lib *Library) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 

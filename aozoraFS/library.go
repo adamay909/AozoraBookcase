@@ -29,6 +29,8 @@ func (lib *Library) Initialize(dir string, clean, verbose, kids, strict bool, ch
 	lib.src = "https://www.aozora.gr.jp"
 
 	lib.root = dir
+	lib.cache = filepath.Join(lib.root, "library/")
+	lib.resources = filepath.Join(lib.root, "resources/")
 
 	os.Mkdir(lib.root, 0766)
 
@@ -40,9 +42,6 @@ func (lib *Library) Initialize(dir string, clean, verbose, kids, strict bool, ch
 
 	lib.checkInterval = checkInt
 
-	lib.cache = filepath.Join(lib.root, "library/")
-	lib.resources = filepath.Join(lib.root, "resources/")
-
 	lib.initfs(clean)
 
 	lib.inittemplates()
@@ -50,13 +49,13 @@ func (lib *Library) Initialize(dir string, clean, verbose, kids, strict bool, ch
 
 func (lib *Library) initfs(clean bool) {
 
-	os.RemoveAll(lib.cache)
+	os.RemoveAll(filepath.Join(lib.cache, "index.html"))
+	os.RemoveAll(filepath.Join(lib.cache, "authors/"))
+	os.RemoveAll(filepath.Join(lib.cache, "books/"))
 
 	if clean {
 		os.Remove(filepath.Join(lib.root, "aozoradata.zip"))
 	}
-
-	os.Mkdir(lib.root, 0766)
 
 	os.Mkdir(lib.cache, 0766)
 
@@ -343,7 +342,7 @@ func (lib *Library) updatePages() {
 	os.RemoveAll(lib.cache + "index.html")
 	os.RemoveAll(lib.cache + "recent.html")
 	lib.saveCSS()
-	lib.genMainIndex()
+	//lib.genMainIndex()
 
 	lib.lastUpdated = time.Now()
 }

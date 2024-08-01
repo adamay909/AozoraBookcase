@@ -52,6 +52,9 @@ func createFile(lib *Library, name string) {
 
 	switch {
 
+	case bname == "index.html":
+		lib.genMainIndex()
+
 	case strings.HasPrefix(bname, "author"):
 		genAuthorPage(lib, name)
 
@@ -75,14 +78,18 @@ func createFile(lib *Library, name string) {
 /*RefreshBooklist checks for updates and if necessary refreshes the database periodically as specified by lib.checkInt. If lib.checkInt <=0, then database is never refreshed. */
 func (lib *Library) RefreshBooklist() {
 
+	update := func() {
+		lib.UpdateDB()
+		lib.UpdateBooklist()
+		lib.updatePages()
+	}
+
 	if lib.checkInterval <= 0 {
 		return
 	}
 	for {
 		if lib.UpstreamUpdated(lib.lastUpdated) {
-			lib.UpdateDB()
-			lib.UpdateBooklist()
-			lib.updatePages()
+			update()
 		}
 		time.Sleep(lib.checkInterval)
 	}

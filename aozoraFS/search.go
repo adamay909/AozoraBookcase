@@ -1,7 +1,7 @@
 package aozorafs
 
 import (
-	_ "embed"
+	_ "embed" //for embedding resources
 	"html/template"
 	"log"
 	"net/http"
