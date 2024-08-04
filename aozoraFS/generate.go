@@ -124,8 +124,6 @@ func genBookPage(lib *Library, name string) {
 	authorID := id[1]
 	bookID := strings.TrimSuffix(id[2], ".html")
 
-	log.Println("author: ", authorID, "; book: ", bookID)
-
 	var k int
 
 	P.B, k = lib.getBookRecord(authorID, bookID)
@@ -154,6 +152,7 @@ func genBookPage(lib *Library, name string) {
 	defer f.Close()
 
 	err := lib.bookT.Execute(f, P)
+
 	if err != nil {
 		log.Println(err)
 	}

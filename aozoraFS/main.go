@@ -88,10 +88,11 @@ func (lib *Library) RefreshBooklist() {
 		return
 	}
 	for {
+		time.Sleep(lib.checkInterval)
+
 		if lib.UpstreamUpdated(lib.lastUpdated) {
 			update()
 		}
-		time.Sleep(lib.checkInterval)
 	}
 }
 

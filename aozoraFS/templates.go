@@ -21,15 +21,14 @@ func (lib *Library) saveCSS() {
 
 	f, err := os.Create(filepath.Join(lib.cache, "ebooks.css"))
 	if err != nil {
-		log.Println("1", err)
+		log.Println(err)
 	}
 	defer f.Close()
-	log.Println("css has", len([]byte(fileDefaultcss)))
-	n, err := f.Write([]byte(fileDefaultcss))
+
+	_, err = f.Write([]byte(fileDefaultcss))
 	if err != nil {
-		log.Println("2", err)
+		log.Println(err)
 	}
-	log.Println("wrote", n, "bytes")
 	return
 }
 
@@ -70,7 +69,7 @@ func (lib *Library) bookpageTemplate() {
 
 	NdcPOf := func(i [2]string) string {
 
-		return ndcmap()[i[0]]
+		return ndcmap()[i[0][:1]]
 
 	}
 

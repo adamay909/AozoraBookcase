@@ -1,5 +1,7 @@
 github.com/adamay909/AozoraConvert v0.2.0 h1:IpPUCj/efpzokOfdk1Cg81b+b1sEkbvi+kRktaFOKoU=
 github.com/adamay909/AozoraConvert v0.2.0/go.mod h1:AqVFR6tTn43N3x75lUE3YWATsHcKH90CjXoZgDlgU/U=
+github.com/adamay909/AozoraConvert v0.2.1 h1:hO5zPDwVmHqeFYR9fviYL/D0mgMADkN2boFnrIZEg7U=
+github.com/adamay909/AozoraConvert v0.2.1/go.mod h1:AqVFR6tTn43N3x75lUE3YWATsHcKH90CjXoZgDlgU/U=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/nlepage/go-js-promise v1.1.0 h1:BfvywsIMo4cpNOKyoReBWkxEW8f9HMwXqGc45wEKPRs=
