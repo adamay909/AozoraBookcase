@@ -112,6 +112,7 @@ func unzip(zf []byte) (d []byte) {
 	for _, z := range f.File {
 		if filepath.Ext(z.Name) == ".csv" {
 			r, err := z.Open()
+			defer r.Close()
 			if err != nil {
 				log.Println(err)
 				return
@@ -121,7 +122,6 @@ func unzip(zf []byte) (d []byte) {
 				log.Println(err)
 				return
 			}
-			r.Close()
 			break
 		}
 	}

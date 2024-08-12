@@ -5,6 +5,7 @@ go 1.22.4
 require (
 	github.com/adamay909/AozoraConvert v0.2.1
 	github.com/nlepage/go-js-promise v1.1.0
+	honnef.co/go/js/dom/v2 v2.0.0-20231112215516-51f43a291193
 )
 
 require (

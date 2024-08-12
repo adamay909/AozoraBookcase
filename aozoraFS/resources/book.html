@@ -45,9 +45,11 @@
 	
 	<div class="dnamex">分類:</div>
 	<div class="notesx">{{ with .B.Kids}}（児童書）{{ end }} {{ range .B.Categories }}<a href="/categories/ndc_{{ndc (ndc1 .) }}.html">{{ndc1 .}}--</a><a href="/categories/ndc_{{ndc (ndc2 .) }}.html">{{ndc2 .}}</a>&nbsp;{{ end }}</div>
+ 	<div class="dnamex">公開日:</div>
+ 	<div class="notesx">{{.B.FirstAvailable}}</div>
  </div>
 
-<div class="downloadlinks">
+ <div class="downloadlinks">
 
  <a href="/files/files_{{.B.RealBookID}}/{{.B.FileName}}_u.html" class="dlbutton"><div class="dlbutton">ブラウザで読む (read in browser)</div></a>
  <div class="note">縦書き表示されます。<br /> Text will be displayed vertically, right to left.</div>

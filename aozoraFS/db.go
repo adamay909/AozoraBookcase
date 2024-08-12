@@ -221,7 +221,7 @@ func (lib *Library) getBooklist(d []byte) {
 
 func (lib *Library) updatePages() {
 
-	lib.removePages(`index.html`)
+	lib.removePages(`index.html`, `recent.html`)
 	lib.removePages(lib.allUpdatedPages()...)
 	lib.lastUpdated = time.Now()
 }

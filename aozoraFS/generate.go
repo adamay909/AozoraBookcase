@@ -58,7 +58,7 @@ func (lib *Library) genRecents() {
 
 	log.Println("Creating list of recent texts.")
 	var P PageData
-	P.Books = append(P.Books, lib.getRecents(100)...)
+	P.Books = append(P.Books, lib.getRecents(1000)...)
 
 	f, _ := os.Create(filepath.Join(lib.cache, "recent.html"))
 
