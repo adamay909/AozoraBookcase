@@ -1,12 +1,13 @@
 package aozorafs
 
 import (
+	"bytes"
+	"errors"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -17,7 +18,7 @@ func jpSortOrder() []rune {
 	return []rune("あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん")
 }
 
-func (lib *Library) genMainIndex() {
+func (lib *Library) genMainIndex() (fs.File, error) {
 
 	type Sec struct {
 		Char string
@@ -35,22 +36,20 @@ func (lib *Library) genMainIndex() {
 
 	var Page PageData
 
-	f, _ := os.Create(filepath.Join(lib.cache, "index.html"))
-	defer f.Close()
-
 	for _, c := range jpSortOrder() {
 		Page.SectionData = append(Page.SectionData, Sec{string(c), lib.getAuthorsByInitial(string(c))})
 	}
 
-	err := lib.indexT.Execute(f, Page)
+	br := new(bytes.Buffer)
+	err := lib.indexT.Execute(br, Page)
 	if err != nil {
 		log.Println(err)
 	}
 
-	f.Sync()
+	return lib.cache.CreateEphemeral("index.html", br.Bytes())
 }
 
-func (lib *Library) genRecents() {
+func (lib *Library) genRecents() (fs.File, error) {
 
 	type PageData struct {
 		Books []*Record
@@ -60,20 +59,16 @@ func (lib *Library) genRecents() {
 	var P PageData
 	P.Books = append(P.Books, lib.getRecents(1000)...)
 
-	f, _ := os.Create(filepath.Join(lib.cache, "recent.html"))
-
-	defer f.Close()
-	err := lib.recentT.Execute(f, P)
-
+	br := new(bytes.Buffer)
+	err := lib.recentT.Execute(br, P)
 	if err != nil {
 		log.Println(err)
 	}
 
-	f.Sync()
-	log.Println("Created list of recent texts.")
+	return lib.cache.CreateEphemeral("recent.html", br.Bytes())
 }
 
-func genAuthorPage(lib *Library, name string) {
+func genAuthorPage(lib *Library, name string) (fs.File, error) {
 	type Page struct {
 		Books []*Record
 		NextAuthor,
@@ -83,7 +78,6 @@ func genAuthorPage(lib *Library, name string) {
 
 	var P Page
 
-	os.Chdir(lib.resources)
 	authorID := getID(name)
 	log.Println("looking for ", authorID)
 
@@ -92,22 +86,17 @@ func genAuthorPage(lib *Library, name string) {
 	P.NextAuthor = lib.NextAuthor(P.Books[0])
 	P.PrevAuthor = lib.PrevAuthor(P.Books[0])
 
-	f, err := os.Create(filepath.Join(lib.cache, "authors", "author_"+authorID+".html"))
-	if err != nil {
-		log.Println(err)
-	}
-	defer f.Close()
-
-	err = lib.authorT.Execute(f, P)
+	br := new(bytes.Buffer)
+	err := lib.authorT.Execute(br, P)
 	if err != nil {
 		log.Println(err)
 	}
 
-	f.Sync()
+	return lib.cache.CreateEphemeral(filepath.Join("authors", "author_"+authorID+".html"), br.Bytes())
 
 }
 
-func genBookPage(lib *Library, name string) {
+func genBookPage(lib *Library, name string) (fs.File, error) {
 
 	type Page struct {
 		B *Record
@@ -148,20 +137,17 @@ func genBookPage(lib *Library, name string) {
 	P.NextAuthor = lib.NextAuthor(P.B)
 	P.PrevAuthor = lib.PrevAuthor(P.B)
 
-	f, _ := os.Create(filepath.Join(lib.cache, "books", "book_"+authorID+"_"+bookID+".html"))
-	defer f.Close()
-
-	err := lib.bookT.Execute(f, P)
-
+	br := new(bytes.Buffer)
+	err := lib.bookT.Execute(br, P)
 	if err != nil {
 		log.Println(err)
 	}
 
-	f.Sync()
+	return lib.cache.CreateEphemeral(filepath.Join("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
 
 }
 
-func genCategoryPage(lib *Library, name string) {
+func genCategoryPage(lib *Library, name string) (fs.File, error) {
 
 	type Page struct {
 		Category string
@@ -174,47 +160,68 @@ func genCategoryPage(lib *Library, name string) {
 
 	log.Println("making category page for", q)
 
-	os.Chdir(lib.resources)
-
 	P.Books = append(P.Books, lib.FindMatchingCategories(q)...)
 
 	log.Println("found", len(P.Books), "items")
 	P.Category = ndcmap()[q]
 
-	f, err := os.Create(filepath.Join(lib.cache, "categories", "ndc_"+q+".html"))
+	br := new(bytes.Buffer)
+	err := lib.categoryT.Execute(br, P)
 	if err != nil {
-		log.Println("1", err)
-		os.Exit(1)
-	}
-	defer f.Close()
-
-	err = lib.categoryT.Execute(f, P)
-	if err != nil {
-		log.Println("2", err)
-		os.Exit(1)
+		log.Println(err)
 	}
 
-	f.Sync()
+	return lib.cache.CreateEphemeral(filepath.Join("categories", "ndc_"+q+".html"), br.Bytes())
 
 }
 
-func generateFiles(lib *Library, name string) {
+func generateFile(lib *Library, name string) (fs.File, error) {
 
 	bookID := getID(name)
 	bk := lib.getBookRecordSimple(bookID)
 
 	if bk.BookID != bookID {
-		log.Println("book not found:", name)
-		return
+		err := errors.New("book not found: " + name)
+		return *new(LibFile), err
 	}
 
-	path := lib.cache
-	book := getBook(lib, bk)
-	id := bk.BookID
-	err := os.Mkdir(filepath.Join(path, "files", "files_"+id), 0766)
-	if err != nil {
-		log.Println(err)
+	zn := strings.TrimSuffix(name, filepath.Ext(name)) + `.zip`
+
+	book := new(azrconvert.Book)
+
+	if lib.cache.Exists(zn) {
+		log.Println("generating file from local material.")
+		book = lib.getBookFromZip(zn)
+	} else {
+		book = lib.getBook(bk)
+		lib.cache.CreateFile(zn, book.RenderWebpagePackage())
 	}
+
+	var br []byte
+
+	switch filepath.Ext(name) {
+
+	case ".epub":
+		br = book.RenderEpub()
+
+	case ".azw3":
+		br = book.RenderAZW3()
+
+	case ".mono":
+		br = book.RenderMonolithicHTML()
+
+	default:
+		br = book.RenderWebpage()
+		for _, file := range book.Files {
+			name1 := filepath.Join(filepath.Dir(name), file.Name)
+			lib.cache.CreateEphemeral(name1, file.Data)
+		}
+	}
+
+	return lib.cache.CreateEphemeral(name, br)
+}
+
+/*
 	err = os.WriteFile(filepath.Join(path, "files", "files_"+id, bk.FileName()+"_u.html"), book.RenderWebpage(), 0644)
 	if err != nil {
 		log.Println(err)
@@ -233,6 +240,7 @@ func generateFiles(lib *Library, name string) {
 	return
 
 }
+*/
 
 func getID(name string) string {
 
@@ -256,12 +264,45 @@ func getID(name string) string {
 	return ""
 }
 
-func getBook(lib *Library, bk *Record) *azrconvert.Book {
+var Download func(path *url.URL) []byte
+
+func SetDownloader(f func(path *url.URL) []byte) {
+
+	Download = f
+
+}
+
+func (lib *Library) getBookFromZip(name string) *azrconvert.Book {
+
+	f, err := lib.cache.Open(name)
+
+	info, err := f.Stat()
+	if err != nil {
+		log.Println(err)
+
+		return new(azrconvert.Book)
+	}
+
+	d := make([]byte, info.Size())
+
+	_, err = f.Read(d)
+
+	if err != nil {
+		log.Println(err)
+
+		return new(azrconvert.Book)
+	}
+
+	return azrconvert.NewBookFromZip(d)
+}
+
+func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
 	path, _ := url.Parse(lib.src + bk.URI)
-	d := downloadFile(path)
-	book := azrconvert.NewBookFrom(d)
+	d := Download(path)
+	book := azrconvert.NewBook()
 	book.SetURI(path.String())
+	book.GetBookFrom(d)
 	if bk.Subtitle != "" {
 		book.SetTitle(bk.Title + "─" + bk.Subtitle + "─")
 	} else {
@@ -269,14 +310,11 @@ func getBook(lib *Library, bk *Record) *azrconvert.Book {
 	}
 	book.SetCreator(bk.FullName())
 	book.SetPublisher("青空文庫")
-	book.AddFiles()
+	book.GenTitlePage()
 	return book
 }
 
 func downloadFile(path *url.URL) []byte {
-	if path.Host == "" {
-		return getLocalFile(path.Path)
-	}
 	r, err := http.Get(path.String())
 	if err != nil {
 		log.Println("server download Remote:", err)
@@ -286,17 +324,10 @@ func downloadFile(path *url.URL) []byte {
 	return data
 }
 
-func getLocalFile(path string) (data []byte) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		log.Println("server retrieving local file: ", err)
-	}
-	return
-}
-
+/*
 func writeEpub(fname string, book *azrconvert.Book) {
 
-	err := os.WriteFile(fname, book.RenderEpub(), 0644)
+	err := lib.cache.CreateFile(fname, book.RenderEpub())
 	if err != nil {
 		log.Println(err)
 	}
@@ -305,41 +336,11 @@ func writeEpub(fname string, book *azrconvert.Book) {
 
 func writeAZW3(fname string, book *azrconvert.Book) {
 
-	err := os.WriteFile(fname, book.RenderAZW3(), 0644)
+	err := lib.cache.CreateFile(fname, book.RenderAZW3())
 	if err != nil {
 		log.Println(err)
 	}
 	return
 }
 
-func genAZW3(fname string, limit chan int) {
-
-	calibre := "/usr/bin/ebook-convert"
-
-	src := fname
-
-	dest := strings.TrimSuffix(src, ".epub") + ".azw3"
-
-	cmd := exec.Command(calibre, src, dest)
-
-	err := cmd.Run()
-
-	if err != nil {
-		log.Println("calibre azw3 fail", fname, "Error was", err)
-	}
-	_ = <-limit
-
-	return
-}
-
-/*
-func calibreConvert(c chan string) {
-	limit := make(chan int, 12)
-
-	for {
-		fname := <-c
-		limit <- 1
-		go genAZW3(fname, limit)
-	}
-}
 */

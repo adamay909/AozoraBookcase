@@ -2,14 +2,17 @@ package aozorafs
 
 import (
 	"encoding/csv"
+	"errors"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/adamay909/AozoraBookcase/zipfs"
 )
 
 /*
@@ -25,10 +28,10 @@ Initialize initalized the library lib to the given specifications.
 // LoadBooklist adds (and possibly updates) the list of books for lib.
 func (lib *Library) LoadBooklist() {
 
-	fi, err := os.Stat(filepath.Join(lib.root, "aozoradata.zip"))
+	fi, err := lib.cache.Stat("aozoradata.zip")
 
 	switch {
-	case os.IsNotExist(err):
+	case errors.Is(err, fs.ErrNotExist):
 		lib.UpdateDB()
 
 	case err == nil:
@@ -80,20 +83,26 @@ func (lib *Library) UpdateDB() {
 
 	data := downloadFile(path)
 
-	err = os.WriteFile(filepath.Join(lib.root, "aozoradata.zip"), data, 0644)
+	_, err = lib.cache.CreateFile("aozoradata.zip", data)
 	if err != nil {
-		log.Println(err)
+		log.Println("X", err)
 		return
 	}
-	log.Println("data saved to ", filepath.Join(lib.root, "aozoradata.zip"))
+	log.Println("data saved to ", filepath.Join(lib.cache.Path(), "aozoradata.zip"))
 }
 
 /*UpdateBooklist updates the booklist of lib from the locally available database.*/
 func (lib *Library) UpdateBooklist() {
 
 	lib.updating = true
-	zf, _ := os.ReadFile(filepath.Join(lib.root, "aozoradata.zip"))
-	lib.getBooklist(unzip(zf))
+
+	zf, _ := zipfs.OpenZipArchive(filepath.Join(lib.cache.Path(), "aozoradata.zip"))
+	zd := zf.ReadMust("list_person_all_extended_utf8.csv")
+
+	//qf, _ := os.ReadFile(filepath.Join(lib.root, "aozoradata.zip"))
+	//zd = unzip(qf)
+
+	lib.getBooklist(zd)
 	lib.consolidateBookRecords()
 	sortList(lib.booklist, byAuthor)
 	lib.Categories = ndcmap()
@@ -142,11 +151,33 @@ func (lib *Library) consolidateBookRecords() {
 	return
 
 }
+func fixLineEndings(s []byte) (out []byte) {
+	p := byte('X')
+	for _, c := range s {
+		switch c {
+		case '\r':
+			out = append(out, '\n')
+			p = c
+		case '\n':
+			if p != '\r' {
+				out = append(out, c)
+			}
+			p = c
+		default:
+			out = append(out, c)
+			p = c
+		}
+	}
+	log.Println("Fixed line endings to UNIX style.")
+
+	return
+}
 
 func (lib *Library) getBooklist(d []byte) {
 
 	rows := strings.Split(string(d), "\n")
 	log.Println("database has ", len(rows), "entries")
+
 	headings, err := csv.NewReader(strings.NewReader(rows[0])).Read()
 	if err != nil {
 		log.Println("error reading Aozora Bunko database", err)
@@ -243,7 +274,7 @@ func (lib *Library) allUpdatedPages() (list []string) {
 		}
 
 		for _, f := range fnames {
-			info, err := os.Stat(filepath.Join(lib.cache, f))
+			info, err := lib.cache.Stat(f)
 			if err == nil {
 
 				if !info.ModTime().Before(lib.lastUpdated) {
@@ -262,7 +293,7 @@ func (lib *Library) removePages(pages ...string) {
 
 	for _, p := range pages {
 
-		os.RemoveAll(filepath.Join(lib.cache, p))
+		lib.cache.RemoveAll(filepath.Join(p))
 
 	}
 

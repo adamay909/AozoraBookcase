@@ -1,123 +1,172 @@
 package aozorafs
 
 import (
+	"bytes"
+	"errors"
 	"html/template"
+	"io/fs"
 	"log"
-	"os"
 	"path/filepath"
+	"strings"
 
 	_ "embed" //for embedding resources
 )
 
-//use this to hard code templates
+var FileDefaultcss string
 
-//go:embed resources/defaultcss.css
-var fileDefaultcss string
+var Randombookhtml string
 
-//go:embed resources/random.html
-var randombookhtml string
+var FileIndexhtml string
 
-func (lib *Library) saveCSS() {
+var FileRecenthtml string
 
-	f, err := os.Create(filepath.Join(lib.cache, "ebooks.css"))
+var FileAuthorhtml string
+
+var FileBookhtml string
+
+var FileCategoryhtml string
+
+var RandomBookhtml string
+
+var FileSearchhtml string
+
+var FileSearchresultshtml string
+
+func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
+
+	entry, err := dir.ReadDir(".")
+
+	if len(entry) != 1 {
+		log.Println("templates must be inside a single subdirectory")
+		return
+	}
+
 	if err != nil {
 		log.Println(err)
+		return
 	}
-	defer f.Close()
 
-	_, err = f.Write([]byte(fileDefaultcss))
+	dirname := entry[0].Name()
+	entry, err = dir.ReadDir(dirname)
 	if err != nil {
-		log.Println(err)
+		log.Println("templates must be inside a single subdirectory")
+		return
 	}
-	return
+
+	for k := range entry {
+
+		log.Println("checking", entry[k].Name())
+
+		f, err := dir.Open(filepath.Join(dirname, entry[k].Name()))
+		defer f.Close()
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		info, err := f.Stat()
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		data := make([]byte, info.Size())
+		f.Read(data)
+		t := strings.Split(string(data), "\n")[0]
+
+		tn, err := templateName(t)
+
+		if err != nil {
+			log.Println("not a template file:", info.Name())
+			continue
+		}
+
+		NdcOf := func(i string) string {
+
+			return ndcmap()[i]
+
+		}
+
+		NdcPOf := func(i [2]string) string {
+
+			return ndcmap()[i[0][:1]]
+
+		}
+
+		NdcCOf := func(i [2]string) string {
+
+			return ndcmap()[i[1]]
+
+		}
+
+		funcMap := template.FuncMap{"ndc1": NdcPOf,
+			"ndc2": NdcCOf, "ndc": NdcOf}
+
+		//Now define the templates
+
+		log.Println("template name is ", tn)
+		switch tn {
+
+		case "defaultcss":
+			buf := new(bytes.Buffer)
+
+			err := template.Must(template.New("css").Parse(string(data))).Execute(buf, "")
+			if err != nil {
+				log.Println(err)
+			}
+			_, err = lib.cache.CreateFile("ebooks.css", buf.Bytes())
+			if err != nil {
+				log.Println(err)
+			}
+			log.Println("saved css")
+
+		case "randombook":
+			lib.randomT = template.Must(template.New("random.html").Funcs(funcMap).Parse(string(data)))
+
+		case "index":
+			lib.indexT = template.Must(template.New("index.html").Parse(string(data)))
+
+		case "recent":
+			lib.recentT = template.Must(template.New("recent.html").Parse(string(data)))
+
+		case "author":
+			lib.authorT = template.Must(template.New("author.html").Parse(string(data)))
+
+		case "book":
+			lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(string(data)))
+
+		case "category":
+			lib.categoryT = template.Must(template.New("category.html").Parse(string(data)))
+
+		case "search":
+
+		case "searchresult":
+			lib.searchresultT = template.Must(template.New("searchresult.html").Parse(string(data)))
+
+		default:
+
+		}
+
+	}
 }
 
-//go:embed resources/index.html
-var fileIndexhtml string
+func templateName(src string) (name string, err error) {
 
-func (lib *Library) mainIndexTemplate() {
+	src = strings.TrimSpace(src)
 
-	lib.indexT = template.Must(template.New("index.html").Parse(fileIndexhtml))
-}
+	name = strings.TrimPrefix(src, `{{/*`)
 
-//go:embed resources/recent.html
-var fileRecenthtml string
-
-func (lib *Library) recentTemplate() {
-
-	lib.recentT = template.Must(template.New("recent.html").Parse(fileRecenthtml))
-}
-
-//go:embed resources/author.html
-var fileAuthorhtml string
-
-func (lib *Library) authorpageTemplate() {
-
-	lib.authorT = template.Must(template.New("author.html").Parse(fileAuthorhtml))
-}
-
-//go:embed resources/book.html
-var fileBookhtml string
-
-func (lib *Library) bookpageTemplate() {
-
-	NdcOf := func(i string) string {
-
-		return ndcmap()[i]
-
+	if name == src {
+		return "", errors.New("not a template file")
 	}
 
-	NdcPOf := func(i [2]string) string {
+	name = strings.TrimSuffix(name, `*/}}`)
 
-		return ndcmap()[i[0][:1]]
-
+	if name == src {
+		return "", errors.New("not a template file")
 	}
 
-	NdcCOf := func(i [2]string) string {
-
-		return ndcmap()[i[1]]
-
-	}
-
-	funcMap := template.FuncMap{"ndc1": NdcPOf,
-		"ndc2": NdcCOf, "ndc": NdcOf}
-
-	lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(fileBookhtml))
-}
-
-//go:embed resources/category.html
-var fileCategoryhtml string
-
-func (lib *Library) categorypageTemplate() {
-
-	lib.categoryT = template.Must(template.New("book.html").Parse(fileCategoryhtml))
-}
-
-//go:embed resources/random.html
-var randomBookhtml string
-
-func (lib *Library) randomBookTemplate() {
-
-	NdcOf := func(i string) string {
-
-		return ndcmap()[i]
-
-	}
-
-	NdcPOf := func(i [2]string) string {
-
-		return ndcmap()[i[0]]
-
-	}
-
-	NdcCOf := func(i [2]string) string {
-
-		return ndcmap()[i[1]]
-
-	}
-
-	funcMap := template.FuncMap{"ndc1": NdcPOf,
-		"ndc2": NdcCOf, "ndc": NdcOf}
-
-	lib.randomT = template.Must(template.New("book.html").Funcs(funcMap).Parse(randomBookhtml))
+	return strings.TrimSpace(name), err
 }

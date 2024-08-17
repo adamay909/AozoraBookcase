@@ -21,9 +21,7 @@ var checkint string
 
 func init() {
 
-	home, _ := os.LookupEnv("HOME")
-
-	flag.StringVar(&root, "d", filepath.Join(home, "aozorabunko"), "directory containing server files. Defaults to $HOME/aozorabunko")
+	flag.StringVar(&root, "d", "aozorabunko", "directory containing server files. Defaults to $HOME/aozorabunko. Must be a relative path and is interpreted as relative to $HOME.")
 
 	flag.BoolVar(&clean, "c", false, "force re-downloading of all data from Aozora Bunko")
 	flag.BoolVar(&verbose, "v", false, "log to screen and file")
@@ -40,6 +38,19 @@ func init() {
 
 func main() {
 
+	src := "https://localhost:8888"
+
+	home, _ := os.LookupEnv("HOME")
+
+	if !rootIsSafe() {
+		log.Println("directory must be specified as relative path and be contained within $HOME.")
+		return
+	}
+
+	root = filepath.Join(home, root)
+
+	setupLogging()
+
 	mainLib := aozorafs.NewLibrary()
 
 	ci, err := time.ParseDuration(checkint)
@@ -48,7 +59,15 @@ func main() {
 		log.Println(err)
 	}
 
-	mainLib.Initialize(root, clean, verbose, kids, strict, ci)
+	//	mainLib.SetCache(NewDiskFS(filepath.Join(home, "aozorabunko")))
+
+	mainLib.SetCache(NewDiskFS(filepath.Join(root, "library")))
+
+	aozorafs.SetDownloader(DownloadFile)
+
+	SetTemplates(mainLib)
+
+	mainLib.Initialize(src, root, clean, verbose, kids, strict, ci)
 
 	mainLib.LoadBooklist()
 

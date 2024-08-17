@@ -2,25 +2,42 @@ package aozorafs
 
 import (
 	"html/template"
+	"io/fs"
 	"time"
 )
+
+type LibFile interface {
+	fs.File
+	Write(b []byte) (n int, err error)
+	// Sync() error
+}
+
+type LibFS interface {
+	fs.StatFS
+	CreateFile(name string, data []byte) (fs.File, error)
+	CreateEphemeral(name string, data []byte) (fs.File, error)
+	Exists(name string) bool
+	RemoveAll(string)
+	Path() string
+}
 
 // Library is stores basic information. Root is the path to the original
 // aozora file tree. Cache is path to the storage directory for server. Resources
 // holds the templates, css.
 // Catalog is for stroing Library information.
 type Library struct {
-	src       string
-	cache     string
-	resources string
+	src string
+	//cache string
+	cache     LibFS
 	root      string
+	resources string
 	booklist  []*Record
 	indexT,
 	authorT,
 	bookT,
 	categoryT,
 	recentT,
-	randomT *template.Template
+	randomT, searchresultT *template.Template
 	updating      bool
 	kids          bool
 	strict        bool

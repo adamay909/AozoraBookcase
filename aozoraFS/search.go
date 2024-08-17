@@ -2,19 +2,12 @@ package aozorafs
 
 import (
 	_ "embed" //for embedding resources
-	"html/template"
 	"log"
 	"net/http"
 
 	"github.com/adamay909/AozoraConvert/jptools"
 	"github.com/adamay909/AozoraConvert/runes"
 )
-
-//go:embed resources/searchForm.html
-var fileSearchhtml string
-
-//go:embed resources/searchResults.html
-var fileSearchresultshtml string
 
 // SearchResultsHandler is a handler function for search results. To be used with http.
 func SearchResultsHandler(lib *Library) func(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +30,7 @@ func SearchResultsHandler(lib *Library) func(w http.ResponseWriter, r *http.Requ
 		R.FoundT = len(R.Titles) > 0
 		R.FoundC = len(R.Categories) > 0
 
-		template.Must(template.New("result").Parse(fileSearchresultshtml)).Execute(w, R)
+		lib.searchresultT.Execute(w, R)
 		return
 	}
 }
