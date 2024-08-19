@@ -8,10 +8,9 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-
-	_ "embed" //for embedding resources
 )
 
+/*
 var FileDefaultcss string
 
 var Randombookhtml string
@@ -31,7 +30,7 @@ var RandomBookhtml string
 var FileSearchhtml string
 
 var FileSearchresultshtml string
-
+*/
 func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 	entry, err := dir.ReadDir(".")
@@ -89,20 +88,59 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 		}
 
-		NdcPOf := func(i [2]string) string {
+		NdcDOf := func(i [3]string) string {
 
-			return ndcmap()[i[0][:1]]
+			return ndcmap()[i[0]]
 
 		}
 
-		NdcCOf := func(i [2]string) string {
+		NdcCOf := func(i [3]string) string {
 
 			return ndcmap()[i[1]]
 
 		}
 
-		funcMap := template.FuncMap{"ndc1": NdcPOf,
-			"ndc2": NdcCOf, "ndc": NdcOf}
+		NdcSOf := func(i [3]string) string {
+
+			return ndcmap()[i[2]]
+
+		}
+
+		NdcNDOf := func(i [3]string) string {
+
+			return i[0]
+
+		}
+
+		NdcNCOf := func(i [3]string) string {
+
+			return i[1]
+
+		}
+
+		NdcNSOf := func(i [3]string) string {
+
+			return i[2]
+
+		}
+
+		NdcMust := func(i string) string {
+
+			if len(i) == 1 {
+
+				return ndcmap()[i]
+			}
+			if i[:1] == "9" && len(i) == 3 {
+				return ndcmap()[i[:1]] + " : " + ndcmap()[i[:2]] + " : " + ndcmap()[i[:3]]
+			} else {
+				return ndcmap()[i[:1]] + " : " + ndcmap()[i[:2]]
+			}
+
+		}
+
+		funcMap := template.FuncMap{"ndc1": NdcDOf,
+			"ndc2": NdcCOf, "ndc3": NdcSOf, "ndc": NdcOf, "ndcm": NdcMust,
+			"ndcn2": NdcNCOf, "ndcn3": NdcNSOf, "ndcn1": NdcNDOf}
 
 		//Now define the templates
 
@@ -143,7 +181,7 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 		case "search":
 
 		case "searchresult":
-			lib.searchresultT = template.Must(template.New("searchresult.html").Parse(string(data)))
+			lib.searchresultT = template.Must(template.New("searchresult.html").Funcs(funcMap).Parse(string(data)))
 
 		default:
 

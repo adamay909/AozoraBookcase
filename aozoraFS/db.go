@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/fs"
 	"log"
-	"net/http"
 	"net/url"
 	"path/filepath"
 	"sort"
@@ -56,14 +55,18 @@ func (lib *Library) LoadBooklist() {
  */
 func (lib *Library) UpstreamUpdated(t time.Time) bool {
 
-	r, err := http.Head(lib.src + filepath.Join("/index_pages", "list_person_all_extended_utf8.zip"))
+	loc, err := url.JoinPath(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
 
 	if err != nil {
 		log.Println(err)
 		return false
 	}
 
-	m, err := time.Parse(time.RFC1123, r.Header.Get("Last-Modified"))
+	path, _ := url.Parse(loc)
+
+	r := getHeader(path)
+
+	m, err := time.Parse(time.RFC1123, get(r, "Last-Modified"))
 
 	log.Println("Server reports last update time of: ", m)
 
@@ -73,15 +76,17 @@ func (lib *Library) UpstreamUpdated(t time.Time) bool {
 /*UpdateDB downloads the database from upstream.*/
 func (lib *Library) UpdateDB() {
 
-	path, err := url.Parse(lib.src + filepath.Join("/index_pages", "list_person_all_extended_utf8.zip"))
+	pathString, err := url.JoinPath(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	log.Println("requesting db", path.String())
+	log.Println("requesting db", pathString)
 
-	data := downloadFile(path)
+	path, _ := url.Parse(pathString)
+
+	data := download(path)
 
 	_, err = lib.cache.CreateFile("aozoradata.zip", data)
 	if err != nil {
@@ -151,6 +156,7 @@ func (lib *Library) consolidateBookRecords() {
 	return
 
 }
+
 func fixLineEndings(s []byte) (out []byte) {
 	p := byte('X')
 	for _, c := range s {
@@ -229,7 +235,7 @@ func (lib *Library) getBooklist(d []byte) {
 		book.DoBirth = cells[col["生年月日"]]
 		book.DoDeath = cells[col["没年月日"]]
 		book.AuthorCopyright = cells[col["人物著作権フラグ"]]
-		book.URI = strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp")
+		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
 		book.setCategory()
 
 		if lib.strict {
@@ -328,9 +334,24 @@ func (lib *Library) getRecents(n int) []*Record {
 
 	var list []*Record
 
-	list = append(list, lib.booklist...)
+	listed := make(map[string]bool)
+
+	for _, e := range lib.booklist {
+
+		if _, ok := listed[e.BookID]; ok {
+			continue
+		}
+
+		list = append(list, e)
+		listed[e.BookID] = true
+
+	}
 
 	sortList(list, byAvailableDate)
+
+	if len(list) < n {
+		return list
+	}
 
 	return list[:n]
 

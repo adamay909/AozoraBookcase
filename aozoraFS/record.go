@@ -278,13 +278,22 @@ func (b *Record) setCategory() {
 		if ok {
 			_, ok := ndc[c[:2]]
 			if ok {
-				b.Categories = append(b.Categories, [2]string{c[:1], c[:2]})
+				b.Categories = append(b.Categories, [3]string{c[:1], c[:2], c})
+			} else {
+				continue
 			}
+
 		}
 	}
 	for _, e := range b.Categories {
 
-		b.Category = b.Category + ndc[e[0]] + "--" + ndc[e[1]] + ";"
+		b.Category = b.Category + ndc[e[0]] + "--" + ndc[e[1]]
+
+		if e[0] == "9" {
+			b.Category = b.Category + "--" + ndc[e[2]]
+		}
+
+		b.Category = b.Category + ";"
 
 	}
 	b.Category = strings.TrimSuffix(b.Category, ";")

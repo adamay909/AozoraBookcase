@@ -63,7 +63,7 @@ type Record struct {
 	PublDate        string
 	NDC             string
 	Category        string
-	Categories      [][2]string
+	Categories      [][3]string
 	KanaZukai       string
 	WorkCopyright   string
 	FirstAvailable  string

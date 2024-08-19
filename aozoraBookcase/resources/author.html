@@ -1,0 +1,54 @@
+{{/* author */}}
+<!--DOCTYPE html-->
+{{ $x := index .Books 0 }}
+<html lang="ja">
+ <head>
+<meta name="viewport" content="width=device-width">
+ <title>{{$x.NameSei}} {{$x.NameMei}}</title>
+ <link rel="stylesheet" href="/ebooks.css">
+ </head>
+<body> 
+
+ <div class="sitenavigation">
+ <a href="/index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a>
+  <a class="navigation" href="/index.html"><div class="sitenavbutton">作者一覧<br /></div></a>
+<a href="/recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a>
+ <a href="/random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
+<div class="searchbox" ><form action="/search" method="post" />
+   &#x1F50D;<input type="text" name="query" />
+  </form></div>
+</div>
+
+<div class="authornavigation">
+  <a class="navigation" href="/authors/author_{{.PrevAuthor.AuthorID }}.html"><div class="navbutton">前の作家</div></a>
+  <a class="navigation" href="/authors/author_{{.NextAuthor.AuthorID }}.html"><div class="navbutton">次の作家</div></a>
+  </div>
+
+	<div class="data">
+	 <div class="dname">作家名:</div>
+	 <div class="dtitle"><ruby>{{$x.FullName}}<rt>{{$x.FullNameY}}</rt></ruby></div>
+	 
+	 <div class="dname">生没年:</div>
+	 <div class="notes">{{ $x.Dates }}</div>
+
+	</div>
+
+
+ <h2>作品リスト</h2>
+<div class="titlelist">
+{{ range .Books }}
+{{ $x := . }}
+<a href="/books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+ <div class="booklink">
+  <span class="yomi">{{$x.TitleY}} {{.SubtitleY}}</span><br />
+  <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
+ 
+  <span class="note">（{{ with $x.Kids }}児童書: {{ end }}{{ .Category }})</span><br />
+  <span class="note">（{{$x.KanaZukai}}）</span>
+ </div>
+</a>
+{{end}}
+</div>
+<p></p>
+</body>
+</html>

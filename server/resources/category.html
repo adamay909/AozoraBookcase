@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+ <head>
+<meta name="viewport" content="width=device-width">
+ <title>{{.Category}}</title>
+ <link rel="stylesheet" href="/ebooks.css">
+ </head>
+<body> <div class="navigation">
+  <a class="navigation" href="/index.html"><div class="navbuttonb">TOP<br /></div></a>
+  <div class="searchbox" style="float: right"><form action="/search" method="post" />
+   &#x1F50D;<input type="text" name="query" />
+  </form></div>
+  </div>
+
+
+
+  <h2>『{{.Category}}』に分類される本</h2>
+<div class="titlelist">
+{{ range .Books }}
+{{ $x := . }}
+<a href="/books/book_{{$x.AuthorID}}_{{$x.BookID}}.html" class="titlelist">
+ <div class="booklink">
+  <span class="yomi">{{$x.TitleY}} {{$x.SubtitleY}}</span><br />
+  <span class="title">{{$x.Title}} {{$x.Subtitle}}</span><br />
+  <span class="note">作者:{{$x.FullName}}</span><br />
+ </div>
+</a>
+{{end}}
+</div>
+<p></p>
+</body>
+</html>

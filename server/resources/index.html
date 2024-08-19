@@ -1,0 +1,41 @@
+{{ $p := .Prefix }}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="{{$p}}/ebooks.css">
+<title>作者リスト</title>
+</head>
+<body>
+ <div class="navigation">
+{{ range .SectionData}}
+<div class="navbutton"><a href="#authors_{{.Char}}" class="navigation">{{.Char}}</a></div>
+{{ end }}
+ <div class="nav-button"><a href="/recent.html" class="navigation">新着１００冊</a></div>
+ <div class="nav-button"><a href="/random" class="navigation">ランダムな一冊</a></div>
+<div class="searchbox" style="float: right"><form action="{{$p}}/search" method="post" />
+   &#x1F50D;<input type="text" name="query" />
+  </form></div>
+</div>
+
+
+<div class="authorlist">
+
+ {{ range .SectionData }}
+ <h2 class="al-header"><a id = "authors_{{.Char}}">{{.Char}}</a></h2>
+<div class="authorlistsection">
+{{ range .List }}
+<a href="{{$p}}/authors/author_{{.AuthorID}}.html">
+<div class="authorlistbutton">
+ <ruby>{{ .FullName }}<rt>{{ .FullNameY }}</rt></ruby>
+</div>
+</a>
+{{end}}
+</div>
+{{ end}}
+</div>
+<p></p>
+</body>
+
+</html>
+

@@ -1,0 +1,50 @@
+{{/* index */}}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="ebooks.css">
+<title>作者リスト</title>
+</head>
+<body>
+
+ <div class="sitenavigation">
+ <div class="sitetitle">青空文庫ブラウザ</div>
+<a href="/recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a>
+ <a href="/random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
+<div class="searchbox" ><form action="/search" method="post" />
+   &#x1F50D;<input type="text" name="query" />
+  </form></div>
+</div>
+
+<div>
+<h2>作者一覧</h2>
+<div class="navigation">
+{{ range .SectionData}}
+<a href="#authors_{{.Char}}" class="navigation"><div class="navbutton">{{.Char}}</div></a>
+{{ end }}
+</div>
+
+
+<div class="authorlist">
+
+ {{ range .SectionData }}
+ <div id = "authors_{{.Char}}"></div>
+ <h2 class="al-header">{{.Char}}</h2>
+<div class="authorlistsection">
+{{ range .List }}
+<a href="/authors/author_{{.AuthorID}}.html">
+<div class="authorlistbutton">
+ <ruby>{{ .FullName }}<rt>{{ .FullNameY }}</rt></ruby>
+</div>
+</a>
+{{end}}
+</div>
+{{ end}}
+</div>
+</div>
+<p></p>
+</body>
+
+</html>
+

@@ -1,0 +1,46 @@
+{{ $x := index .Books 0 }}
+{{ $p := .Prefix }}
+<!DOCTYPE html>
+<html lang="ja">
+ <head>
+<meta name="viewport" content="width=device-width">
+ <title>{{$x.NameSei}} {{$x.NameMei}}</title>
+ <link rel="stylesheet" href="{{$p}}/ebooks.css">
+ </head>
+<body> <div class="navigation">
+  <a class="navigation" href="{{$p}}/index.html"><div class="navbuttonb">TOP<br /></div></a>
+  <a class="navigation" href="{{$p}}/authors/author_{{.PrevAuthor.AuthorID }}.html"><div class="navbuttonb">前の作家<br />(previous author)</div></a>
+  <a class="navigation" href="{{$p}}/authors/author_{{.NextAuthor.AuthorID }}.html"><div class="navbuttonb">次の作家<br />(next author)</div></a>
+  <div class="searchbox" style="float: right"><form action="{{$p}}/search" method="post" />
+   &#x1F50D;<input type="text" name="query" />
+  </form></div>
+  </div>
+
+	<div class="data">
+	 <div class="dname">作家名:</div>
+	 <div class="dtitle"><ruby>{{$x.FullName}}<rt>{{$x.FullNameY}}</rt></ruby></div>
+	 
+	 <div class="dname">生没年:</div>
+	 <div class="notes">{{ $x.Dates }}</div>
+
+	</div>
+
+
+ <h2>作品リスト</h2>
+<div class="titlelist">
+{{ range .Books }}
+{{ $x := . }}
+<a href="{{$p}}/books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+ <div class="booklink">
+  <span class="yomi">{{$x.TitleY}} {{.SubtitleY}}</span><br />
+  <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
+ 
+  <span class="note">（{{ with $x.Kids }}児童書: {{ end }}{{ .Category }})</span><br />
+  <span class="note">（{{$x.KanaZukai}}）</span>
+ </div>
+</a>
+{{end}}
+</div>
+<p></p>
+</body>
+</html>

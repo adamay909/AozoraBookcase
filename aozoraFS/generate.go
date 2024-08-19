@@ -3,10 +3,8 @@ package aozorafs
 import (
 	"bytes"
 	"errors"
-	"io"
 	"io/fs"
 	"log"
-	"net/http"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -160,10 +158,17 @@ func genCategoryPage(lib *Library, name string) (fs.File, error) {
 
 	log.Println("making category page for", q)
 
-	P.Books = append(P.Books, lib.FindMatchingCategories(q)...)
+	P.Books = append(P.Books, lib.FindBooksWithMatchingCategories(q)...)
 
 	log.Println("found", len(P.Books), "items")
-	P.Category = ndcmap()[q]
+	//	P.Category = ndcmap()[q]
+	P.Category = ndcmap()[q[:1]]
+	if len(q) > 1 {
+		P.Category = P.Category + " : " + ndcmap()[q[:2]]
+	}
+	if q[:1] == "9" && len(q) > 2 {
+		P.Category = P.Category + " : " + ndcmap()[q[:3]]
+	}
 
 	br := new(bytes.Buffer)
 	err := lib.categoryT.Execute(br, P)
@@ -221,27 +226,6 @@ func generateFile(lib *Library, name string) (fs.File, error) {
 	return lib.cache.CreateEphemeral(name, br)
 }
 
-/*
-	err = os.WriteFile(filepath.Join(path, "files", "files_"+id, bk.FileName()+"_u.html"), book.RenderWebpage(), 0644)
-	if err != nil {
-		log.Println(err)
-	}
-	for _, file := range book.Files {
-		err = os.WriteFile(filepath.Join(path, "files", "files_"+id, file.Name), file.Data, 0644)
-		if err != nil {
-			log.Println(err)
-		}
-	}
-
-	writeEpub(filepath.Join(path, "files", "files_"+id, bk.FileName()+"_u.epub"), book)
-
-	writeAZW3(filepath.Join(path, "files", "files_"+id, bk.FileName()+"_u.azw3"), book)
-
-	return
-
-}
-*/
-
 func getID(name string) string {
 
 	dir := filepath.Dir(name)
@@ -262,14 +246,6 @@ func getID(name string) string {
 		return id[1]
 	}
 	return ""
-}
-
-var Download func(path *url.URL) []byte
-
-func SetDownloader(f func(path *url.URL) []byte) {
-
-	Download = f
-
 }
 
 func (lib *Library) getBookFromZip(name string) *azrconvert.Book {
@@ -298,8 +274,9 @@ func (lib *Library) getBookFromZip(name string) *azrconvert.Book {
 
 func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
-	path, _ := url.Parse(lib.src + bk.URI)
-	d := Download(path)
+	path, _ := url.Parse(bk.URI)
+
+	d := download(path)
 	book := azrconvert.NewBook()
 	book.SetURI(path.String())
 	book.GetBookFrom(d)
@@ -313,34 +290,3 @@ func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 	book.GenTitlePage()
 	return book
 }
-
-func downloadFile(path *url.URL) []byte {
-	r, err := http.Get(path.String())
-	if err != nil {
-		log.Println("server download Remote:", err)
-	}
-	data, _ := io.ReadAll(r.Body)
-	r.Body.Close()
-	return data
-}
-
-/*
-func writeEpub(fname string, book *azrconvert.Book) {
-
-	err := lib.cache.CreateFile(fname, book.RenderEpub())
-	if err != nil {
-		log.Println(err)
-	}
-	return
-}
-
-func writeAZW3(fname string, book *azrconvert.Book) {
-
-	err := lib.cache.CreateFile(fname, book.RenderAZW3())
-	if err != nil {
-		log.Println(err)
-	}
-	return
-}
-
-*/

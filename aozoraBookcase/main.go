@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -14,7 +15,7 @@ import (
 	aozorafs "github.com/adamay909/AozoraBookcase/aozoraFS"
 )
 
-var root string
+var src, root string
 var clean, verbose, kids, strict bool
 var iface, port string
 var checkint string
@@ -31,6 +32,8 @@ func init() {
 	flag.BoolVar(&strict, "strict", true, "set library to show only public domain texts")
 	flag.StringVar(&checkint, "refresh", "24h", "interval between library refreshes.")
 
+	flag.StringVar(&src, "src", "https://localhost:8888", "root url of aozorabunko's file")
+
 	flag.Parse()
 
 	signal.Ignore(syscall.SIGHUP)
@@ -38,7 +41,12 @@ func init() {
 
 func main() {
 
-	src := "https://localhost:8888"
+	_, err := url.Parse(src)
+
+	if err != nil {
+		log.Println("src needs to be a valid URL")
+		return
+	}
 
 	home, _ := os.LookupEnv("HOME")
 
@@ -58,12 +66,13 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-
-	//	mainLib.SetCache(NewDiskFS(filepath.Join(home, "aozorabunko")))
+	os.RemoveAll(filepath.Join(root, "library"))
 
 	mainLib.SetCache(NewDiskFS(filepath.Join(root, "library")))
 
 	aozorafs.SetDownloader(DownloadFile)
+
+	aozorafs.SetHeader(GetHeader)
 
 	SetTemplates(mainLib)
 
@@ -75,11 +84,40 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.FS(mainLib)))
 
-	http.HandleFunc("/search", aozorafs.SearchResultsHandler(mainLib))
+	http.HandleFunc("/search", SearchResultsHandler(mainLib))
 
-	http.HandleFunc("/random", aozorafs.RandomBook(mainLib))
+	http.HandleFunc("/random", RandomBookHandler(mainLib))
 
 	fmt.Println("Listening on " + iface + ":" + port)
 	log.Fatal(http.ListenAndServe(iface+":"+port, nil))
 
+}
+
+// SearchResultsHandler is a handler function for search results. To be used with http.
+func SearchResultsHandler(lib *aozorafs.Library) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		r.ParseForm()
+
+		qs := r.Form["query"]
+
+		if len(qs) > 0 {
+			log.Println("searching for", qs[0])
+		} else {
+			return
+		}
+
+		w.Write(lib.GenSearchResults(qs[0]))
+
+		return
+	}
+}
+
+// RandomBook returns a random book from the library
+func RandomBookHandler(lib *aozorafs.Library) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Write(lib.GenRandomBook())
+		return
+	}
 }
