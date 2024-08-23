@@ -13,7 +13,6 @@ import (
 	"io"
 	"io/fs"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -70,39 +69,14 @@ func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, str
 
 	lib.root = dir
 
-	os.Mkdir(lib.root, 0766)
-
 	lib.setKids(kids)
 
 	lib.setStrict(strict)
 
 	lib.checkInterval = checkInt
 
-	//	lib.initfs(clean)
-
-	// lib.inittemplates()
+	log.Println("done first phase of initialization")
 }
-
-/*
-func (lib *Library) initfs(clean bool) {
-
-	lib.saveCSS()
-
-}
-*/
-/*
-func (lib *Library) inittemplates() {
-
-	lib.mainIndexTemplate()
-	lib.authorpageTemplate()
-	lib.bookpageTemplate()
-	lib.categorypageTemplate()
-	lib.recentTemplate()
-	lib.randomBookTemplate()
-
-}
-*/
-// LoadBooklist adds (and possibly updates) the list of books for lib.
 
 // setKids sets lib to be a kids library if val is true..
 func (lib *Library) setKids(val bool) {

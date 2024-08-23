@@ -2,6 +2,7 @@ package zipfs
 
 import (
 	"archive/zip"
+	"bytes"
 	"io"
 	"io/fs"
 	"log"
@@ -9,7 +10,7 @@ import (
 )
 
 type Ziparchive struct {
-	z    *zip.ReadCloser
+	z    *zip.Reader
 	name string
 }
 
@@ -28,23 +29,48 @@ type zinfo struct {
 	isDir   bool
 }
 
-func OpenZipArchive(name string) (*Ziparchive, error) {
+func OpenZipArchive(fsys fs.FS, name string) (*Ziparchive, error) {
+
+	log.Println("attemption to open:", name)
 
 	za := new(Ziparchive)
 
-	f, err := zip.OpenReader(name)
-	za.z = f
-	za.name = name
+	fd, err := fsys.Open(name)
+
+	if err != nil {
+		log.Println("zipfs: error 1")
+		return za, err
+	}
+
+	info, _ := fd.Stat()
+
+	data := make([]byte, info.Size())
+
+	fd.Read(data)
+
+	log.Println("len of underlying data:", len(data))
+
+	r := bytes.NewReader(data)
+
+	za.z, err = zip.NewReader(r, int64(len(data)))
 
 	return za, err
+	/*
+	   f, err := zip.OpenReader(name)
+	   za.z = f
+	   za.name = name
 
+	   return za, err
+	*/
 }
 
-func (za *Ziparchive) CloseArchive() {
+func (za *Ziparchive) _CloseArchive() {
 
-	za.z.Close()
-	za = nil
-	return
+	/*
+	   za.z.Close()
+	   za = nil
+	   return
+	*/
 }
 
 func (za *Ziparchive) Open(name string) (fs.File, error) {

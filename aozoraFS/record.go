@@ -14,9 +14,9 @@ func hasSameAuthor(a, b *Record) bool {
 
 }
 
-func (lib *Library) getBookRecord(authorID, bookID string) (*Record, int) {
+func getBookRecord(booklist []*Record, authorID, bookID string) (*Record, int) {
 
-	for i, e := range lib.booklist {
+	for i, e := range booklist {
 
 		if e.BookID == bookID {
 			if e.AuthorID == authorID {
@@ -25,7 +25,7 @@ func (lib *Library) getBookRecord(authorID, bookID string) (*Record, int) {
 		}
 	}
 
-	return lib.booklist[0], 0
+	return booklist[0], 0
 
 }
 
@@ -104,46 +104,22 @@ func (lib *Library) allAuthors() (list []*Record) {
 /*NextAuthor returns the next author where the current author is the author of b. */
 func (lib *Library) NextAuthor(b *Record) *Record {
 
-	list := lib.allAuthors()
+	return lib.booksByAuthor[b.AuthorID][0].nextAuthor
 
-	for i, e := range list {
-
-		if e.AuthorID == b.AuthorID {
-
-			if i == len(list)-1 {
-				return list[0]
-			}
-			return list[i+1]
-		}
-	}
-
-	return list[0]
 }
 
 /*PrevAuthor returns the previous author where the current author is the author of b. */
 func (lib *Library) PrevAuthor(b *Record) *Record {
 
-	list := lib.allAuthors()
+	return lib.booksByAuthor[b.AuthorID][0].previousAuthor
 
-	for i, e := range list {
-
-		if e.AuthorID == b.AuthorID {
-
-			if i == 0 {
-				return list[len(list)-1]
-			}
-			return list[i-1]
-		}
-	}
-
-	return list[0]
 }
 
 func (lib *Library) getAuthorsByInitial(s string) (authorList []*Record) {
 
 	var tlist []*Record
 
-	for _, b := range lib.booklist {
+	for _, b := range lib.authorsSorted {
 
 		if strings.HasPrefix(b.NameSeiSort, s) {
 			tlist = append(tlist, b)

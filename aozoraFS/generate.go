@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/adamay909/AozoraConvert/azrconvert"
@@ -79,7 +80,9 @@ func genAuthorPage(lib *Library, name string) (fs.File, error) {
 	authorID := getID(name)
 	log.Println("looking for ", authorID)
 
-	P.Books = append(P.Books, lib.getBooksByAuthor(authorID)...)
+	sortList(lib.booksByAuthor[authorID], byTitle)
+
+	P.Books = append(P.Books, lib.booksByAuthor[authorID]...)
 	log.Println("found ", len(P.Books), "books by", authorID)
 	P.NextAuthor = lib.NextAuthor(P.Books[0])
 	P.PrevAuthor = lib.PrevAuthor(P.Books[0])
@@ -111,25 +114,59 @@ func genBookPage(lib *Library, name string) (fs.File, error) {
 	authorID := id[1]
 	bookID := strings.TrimSuffix(id[2], ".html")
 
+	log.Println("found", len(lib.booksByID[bookID]), "books with ID", bookID)
+
+	for _, l := range lib.booksByID[bookID] {
+
+		lib.booksByID[bookID][0].Contributors = append(lib.booksByID[bookID][0].Contributors, ContribRole{l.Role, l.AuthorID, l})
+	}
+
+	sort.Slice(lib.booksByID[bookID][0].Contributors, byRole(lib.booksByID[bookID][0].Contributors))
+
+	for k, e := range lib.booksByID[bookID] {
+
+		if k == 0 {
+			continue
+		}
+
+		e.Contributors = nil
+
+		e.Contributors = append(e.Contributors, lib.booksByID[bookID][0].Contributors...)
+
+	}
+
 	var k int
 
-	P.B, k = lib.getBookRecord(authorID, bookID)
+	booklist := lib.booksByAuthor[authorID]
 
-	if P.B.BookID != bookID {
-		log.Println("book not found:", name)
-		log.Println("\t resorting to first book in catalog")
+	sortList(booklist, byTitle)
+
+	for k = 0; k < len(booklist); k++ {
+		if booklist[k].BookID == bookID {
+			break
+		}
 	}
+
+	P.B = booklist[k]
 
 	if k == 0 {
-		P.PrevBook = lib.booklist[len(lib.booklist)-1]
+
+		list := lib.booksByAuthor[lib.booksByAuthor[authorID][0].previousAuthor.AuthorID]
+		sortList(list, byTitle)
+		P.PrevBook = list[len(list)-1]
+
 	} else {
-		P.PrevBook = lib.booklist[k-1]
+		P.PrevBook = booklist[k-1]
 	}
 
-	if k == len(lib.booklist)-1 {
-		P.NextBook = lib.booklist[0]
+	if k == len(booklist)-1 {
+
+		list := lib.booksByAuthor[lib.booksByAuthor[authorID][0].nextAuthor.AuthorID]
+		sortList(list, byTitle)
+		P.NextBook = list[0]
+
 	} else {
-		P.NextBook = lib.booklist[k+1]
+		P.NextBook = booklist[k+1]
 	}
 
 	P.NextAuthor = lib.NextAuthor(P.B)

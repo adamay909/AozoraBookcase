@@ -2,12 +2,9 @@ package aozorafs
 
 import (
 	"encoding/csv"
-	"errors"
-	"io/fs"
 	"log"
 	"net/url"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
@@ -30,17 +27,15 @@ func (lib *Library) LoadBooklist() {
 	fi, err := lib.cache.Stat("aozoradata.zip")
 
 	switch {
-	case errors.Is(err, fs.ErrNotExist):
+	case err != nil:
+		log.Println("no local aozora database")
 		lib.UpdateDB()
 
-	case err == nil:
+	default:
 		if lib.UpstreamUpdated(fi.ModTime()) {
 			lib.UpdateDB()
 		}
 
-	default:
-		log.Println(err)
-		return
 	}
 
 	lib.UpdateBooklist()
@@ -101,15 +96,17 @@ func (lib *Library) UpdateBooklist() {
 
 	lib.updating = true
 
-	zf, _ := zipfs.OpenZipArchive(filepath.Join(lib.cache.Path(), "aozoradata.zip"))
-	zd := zf.ReadMust("list_person_all_extended_utf8.csv")
+	zf, err := zipfs.OpenZipArchive(lib.cache, "aozoradata.zip")
 
-	//qf, _ := os.ReadFile(filepath.Join(lib.root, "aozoradata.zip"))
-	//zd = unzip(qf)
+	if err != nil {
+		log.Println("some error:", err)
+		return
+	}
+
+	zd := zf.ReadMust("list_person_all_extended_utf8.csv")
 
 	lib.getBooklist(zd)
 	lib.consolidateBookRecords()
-	sortList(lib.booklist, byAuthor)
 	lib.Categories = ndcmap()
 	lib.lastUpdated = time.Now()
 	log.Println("sorted entries.")
@@ -119,42 +116,41 @@ func (lib *Library) UpdateBooklist() {
 
 func (lib *Library) consolidateBookRecords() {
 
-	sortList(lib.booklist, byBookID)
+	lib.booksByID = make(map[string][]*Record)
+	lib.booksByAuthor = make(map[string][]*Record)
 
-	for i, j := 0, 0; i < len(lib.booklist); {
+	for _, e := range lib.booklist {
 
-		var list []*Record
+		lib.booksByID[e.BookID] = append(lib.booksByID[e.BookID], e)
+		lib.booksByAuthor[e.AuthorID] = append(lib.booksByAuthor[e.AuthorID], e)
 
-		e := lib.booklist[i]
+	}
 
-		for j = i; j < len(lib.booklist) && lib.booklist[j].BookID == e.BookID; j++ {
+	for _, e := range lib.booksByAuthor {
+		lib.authorsSorted = append(lib.authorsSorted, e[0])
+	}
 
-			list = append(list, lib.booklist[j])
+	sortList(lib.authorsSorted, byAuthor)
 
+	for k, b := range lib.authorsSorted {
+
+		if k == 0 {
+			b.previousAuthor = lib.authorsSorted[len(lib.authorsSorted)-1]
+			b.nextAuthor = lib.authorsSorted[k+1]
+			continue
 		}
 
-		for _, l := range list {
-
-			list[0].Contributors = append(list[0].Contributors, ContribRole{l.Role, l.AuthorID, l})
+		if k == len(lib.authorsSorted)-1 {
+			b.previousAuthor = lib.authorsSorted[k-1]
+			b.nextAuthor = lib.authorsSorted[0]
+			continue
 		}
-		sort.Slice(list[0].Contributors, byRole(list[0].Contributors))
 
-		for _, e := range list {
-
-			if e == list[0] {
-				continue
-			}
-
-			e.Contributors = nil
-
-			e.Contributors = append(e.Contributors, list[0].Contributors...)
-
-		}
-		i = j
+		b.previousAuthor = lib.authorsSorted[k-1]
+		b.nextAuthor = lib.authorsSorted[k+1]
 	}
 
 	return
-
 }
 
 func fixLineEndings(s []byte) (out []byte) {
@@ -258,9 +254,12 @@ func (lib *Library) getBooklist(d []byte) {
 
 func (lib *Library) updatePages() {
 
+	log.Println("Updating pages")
+
 	lib.removePages(`index.html`, `recent.html`)
 	lib.removePages(lib.allUpdatedPages()...)
 	lib.lastUpdated = time.Now()
+	log.Println("pages updated")
 }
 
 func (lib *Library) allUpdatedPages() (list []string) {
