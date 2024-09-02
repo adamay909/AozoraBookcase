@@ -104,14 +104,45 @@ func (lib *Library) allAuthors() (list []*Record) {
 /*NextAuthor returns the next author where the current author is the author of b. */
 func (lib *Library) NextAuthor(b *Record) *Record {
 
-	return lib.booksByAuthor[b.AuthorID][0].nextAuthor
+	k := lib.posOfAuthor[b.AuthorID] + 1
+
+	if k == len(lib.authorsSorted) {
+
+		k = 0
+
+	}
+	return lib.authorsSorted[k]
 
 }
 
 /*PrevAuthor returns the previous author where the current author is the author of b. */
 func (lib *Library) PrevAuthor(b *Record) *Record {
 
-	return lib.booksByAuthor[b.AuthorID][0].previousAuthor
+	k := lib.posOfAuthor[b.AuthorID] - 1
+
+	if k == -1 {
+
+		k = len(lib.authorsSorted) - 1
+
+	}
+
+	return lib.authorsSorted[k]
+
+}
+
+func (lib *Library) FirstBookBy(b *Record) *Record {
+
+	sortList(lib.booksByAuthor[b.AuthorID], byAuthor)
+
+	return lib.booksByAuthor[b.AuthorID][0]
+
+}
+
+func (lib *Library) LastBookBy(b *Record) *Record {
+
+	sortList(lib.booksByAuthor[b.AuthorID], byAuthor)
+
+	return lib.booksByAuthor[b.AuthorID][len(lib.booksByAuthor[b.AuthorID])-1]
 
 }
 

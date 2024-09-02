@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -40,9 +41,9 @@ func (lib *Library) LoadBooklist() {
 
 	lib.UpdateBooklist()
 
-	lib.updatePages()
+	//	lib.updatePages()
 
-	go lib.RefreshBooklist()
+	//	go lib.RefreshBooklist()
 
 }
 
@@ -68,6 +69,12 @@ func (lib *Library) UpstreamUpdated(t time.Time) bool {
 	return m.After(t)
 }
 
+func zeroByte(b []byte) {
+
+	b = []byte("")
+
+}
+
 /*UpdateDB downloads the database from upstream.*/
 func (lib *Library) UpdateDB() {
 
@@ -83,7 +90,13 @@ func (lib *Library) UpdateDB() {
 
 	data := download(path)
 
-	_, err = lib.cache.CreateFile("aozoradata.zip", data)
+	defer zeroByte(data)
+
+	f, err := lib.cache.CreateFile("aozoradata.zip", data)
+
+	//	fd := f.(*cacheFile)
+	defer f.Close()
+
 	if err != nil {
 		log.Println("X", err)
 		return
@@ -98,6 +111,8 @@ func (lib *Library) UpdateBooklist() {
 
 	zf, err := zipfs.OpenZipArchive(lib.cache, "aozoradata.zip")
 
+	defer zf.CloseArchive()
+
 	if err != nil {
 		log.Println("some error:", err)
 		return
@@ -105,26 +120,18 @@ func (lib *Library) UpdateBooklist() {
 
 	zd := zf.ReadMust("list_person_all_extended_utf8.csv")
 
+	defer zeroByte(zd)
+
 	lib.getBooklist(zd)
-	lib.consolidateBookRecords()
+	lib.setupAuthorsList()
 	lib.Categories = ndcmap()
-	lib.lastUpdated = time.Now()
+	//lib.lastUpdated = time.Now()
 	log.Println("sorted entries.")
 	lib.updating = false
 	return
 }
 
-func (lib *Library) consolidateBookRecords() {
-
-	lib.booksByID = make(map[string][]*Record)
-	lib.booksByAuthor = make(map[string][]*Record)
-
-	for _, e := range lib.booklist {
-
-		lib.booksByID[e.BookID] = append(lib.booksByID[e.BookID], e)
-		lib.booksByAuthor[e.AuthorID] = append(lib.booksByAuthor[e.AuthorID], e)
-
-	}
+func (lib *Library) setupAuthorsList() {
 
 	for _, e := range lib.booksByAuthor {
 		lib.authorsSorted = append(lib.authorsSorted, e[0])
@@ -134,23 +141,38 @@ func (lib *Library) consolidateBookRecords() {
 
 	for k, b := range lib.authorsSorted {
 
-		if k == 0 {
-			b.previousAuthor = lib.authorsSorted[len(lib.authorsSorted)-1]
-			b.nextAuthor = lib.authorsSorted[k+1]
-			continue
-		}
+		lib.posOfAuthor[b.AuthorID] = k
 
-		if k == len(lib.authorsSorted)-1 {
-			b.previousAuthor = lib.authorsSorted[k-1]
-			b.nextAuthor = lib.authorsSorted[0]
-			continue
-		}
-
-		b.previousAuthor = lib.authorsSorted[k-1]
-		b.nextAuthor = lib.authorsSorted[k+1]
 	}
 
 	return
+}
+
+func (lib *Library) consolidateRecords(bookID string) {
+
+	log.Println("found", len(lib.booksByID[bookID]), "books with ID", bookID)
+
+	for _, l := range lib.booksByID[bookID] {
+
+		lib.booksByID[bookID][0].Contributors = append(lib.booksByID[bookID][0].Contributors, ContribRole{l.Role, l.AuthorID, l})
+	}
+
+	sort.Slice(lib.booksByID[bookID][0].Contributors, byRole(lib.booksByID[bookID][0].Contributors))
+
+	for k, e := range lib.booksByID[bookID] {
+
+		if k == 0 {
+			continue
+		}
+
+		e.Contributors = nil
+
+		e.Contributors = append(e.Contributors, lib.booksByID[bookID][0].Contributors...)
+
+	}
+
+	return
+
 }
 
 func fixLineEndings(s []byte) (out []byte) {
@@ -193,6 +215,8 @@ func (lib *Library) getBooklist(d []byte) {
 		col[h] = i
 	}
 
+	var book *Record
+
 	//read into records
 	for i := 1; i < len(rows)-1; i++ {
 
@@ -203,7 +227,24 @@ func (lib *Library) getBooklist(d []byte) {
 			break
 		}
 
-		book := new(Record)
+		book = new(Record)
+
+		book.WorkCopyright = cells[col["作品著作権フラグ"]]
+
+		if lib.strict {
+			if book.WorkCopyright == "あり" || book.AuthorCopyright == "あり" {
+				continue
+			}
+		}
+
+		book.NDC = cells[col["分類番号"]]
+		book.setCategory()
+
+		if lib.kids {
+			if !book.isChildrensBook() {
+				continue
+			}
+		}
 
 		book.BookID = cells[col["作品ID"]]
 		book.Title = cells[col["作品名"]]
@@ -213,9 +254,7 @@ func (lib *Library) getBooklist(d []byte) {
 		book.SubtitleY = cells[col["副題読み"]]
 		book.OriginalTitle = cells[col["原題"]]
 		book.PublDate = cells[col["初出"]]
-		book.NDC = cells[col["分類番号"]]
 		book.KanaZukai = cells[col["文字遣い種別"]]
-		book.WorkCopyright = cells[col["作品著作権フラグ"]]
 		book.FirstAvailable = cells[col["公開日"]]
 		book.ModTime = cells[col["最終更新日"]]
 		book.AuthorID = cells[col["人物ID"]]
@@ -232,22 +271,20 @@ func (lib *Library) getBooklist(d []byte) {
 		book.DoDeath = cells[col["没年月日"]]
 		book.AuthorCopyright = cells[col["人物著作権フラグ"]]
 		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
-		book.setCategory()
 
-		if lib.strict {
-			if book.WorkCopyright == "あり" || book.AuthorCopyright == "あり" {
-				continue
-			}
-		}
-
-		if lib.kids {
-			if !book.isChildrensBook() {
-				continue
-			}
-		}
 		lib.booklist = append(lib.booklist, book)
 
+		//		lib.booksByID[book.BookID] = append(lib.booksByID[book.BookID], book)
+		//		lib.booksByAuthor[book.AuthorID] = append(lib.booksByAuthor[book.AuthorID], book)
+
 	}
+	rows = nil
+
+	for _, e := range lib.booklist {
+		lib.booksByID[e.BookID] = append(lib.booksByID[e.BookID], e)
+		lib.booksByAuthor[e.AuthorID] = append(lib.booksByAuthor[e.AuthorID], e)
+	}
+
 	log.Println("finished parsing db.")
 	return
 }

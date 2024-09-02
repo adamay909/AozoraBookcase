@@ -39,8 +39,10 @@ func NewLibrary() *Library {
 func (lib *Library) Open(name string) (f fs.File, err error) {
 
 	//block Open while booklist is being updated
-	for lib.updating {
-	}
+	//	for lib.updating {
+	//	}
+
+	log.Println("requested file: ", name)
 
 	if !isValidFileName(name) {
 		name = "index.html"
@@ -58,8 +60,13 @@ func (lib *Library) Open(name string) (f fs.File, err error) {
 			log.Println(err)
 		}
 
+	} else {
+		log.Println("file found")
+		f, err = lib.cache.Open(name)
+
 	}
-	return lib.cache.Open(name)
+
+	return f, err
 
 }
 
@@ -74,6 +81,14 @@ func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, str
 	lib.setStrict(strict)
 
 	lib.checkInterval = checkInt
+
+	lib.booksByID = make(map[string][]*Record)
+
+	lib.booksByAuthor = make(map[string][]*Record)
+
+	lib.posOfAuthor = make(map[string]int)
+
+	lib.updating = false
 
 	log.Println("done first phase of initialization")
 }

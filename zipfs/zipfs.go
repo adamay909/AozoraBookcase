@@ -55,22 +55,14 @@ func OpenZipArchive(fsys fs.FS, name string) (*Ziparchive, error) {
 	za.z, err = zip.NewReader(r, int64(len(data)))
 
 	return za, err
-	/*
-	   f, err := zip.OpenReader(name)
-	   za.z = f
-	   za.name = name
 
-	   return za, err
-	*/
 }
 
-func (za *Ziparchive) _CloseArchive() {
+func (za *Ziparchive) CloseArchive() {
 
-	/*
-	   za.z.Close()
-	   za = nil
-	   return
-	*/
+	za.z = nil
+
+	za = nil
 }
 
 func (za *Ziparchive) Open(name string) (fs.File, error) {

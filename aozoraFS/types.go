@@ -35,6 +35,7 @@ type Library struct {
 	booksByID     map[string][]*Record
 	booksByAuthor map[string][]*Record
 	authorsSorted []*Record
+	posOfAuthor   map[string]int
 	indexT,
 	authorT,
 	bookT,
@@ -54,40 +55,40 @@ type records map[string]*Record
 
 // Record is for storing information about individual books.
 type Record struct {
-	count                      int
-	BookID                     string
-	Title                      string
-	TitleY                     string
-	TitleSort                  string
-	Subtitle                   string
-	SubtitleY                  string
-	SubtitleSort               string
-	OriginalTitle              string
-	PublDate                   string
-	NDC                        string
-	Category                   string
-	Categories                 [][3]string
-	KanaZukai                  string
-	WorkCopyright              string
-	FirstAvailable             string
-	ModTime                    string
-	AuthorID                   string
-	NameSei                    string
-	NameMei                    string
-	NameSeiY                   string
-	NameMeiY                   string
-	NameSeiSort                string
-	NameMeiSort                string
-	NameSeiR                   string
-	NameMeiR                   string
-	Role                       string
-	DoBirth                    string
-	DoDeath                    string
-	AuthorCopyright            string
-	URI                        string
-	Kids                       bool
-	Contributors               []ContribRole
-	nextAuthor, previousAuthor *Record
+	count           int
+	BookID          string
+	Title           string
+	TitleY          string
+	TitleSort       string
+	Subtitle        string
+	SubtitleY       string
+	SubtitleSort    string
+	OriginalTitle   string
+	PublDate        string
+	NDC             string
+	Category        string
+	Categories      [][3]string
+	KanaZukai       string
+	WorkCopyright   string
+	FirstAvailable  string
+	ModTime         string
+	AuthorID        string
+	NameSei         string
+	NameMei         string
+	NameSeiY        string
+	NameMeiY        string
+	NameSeiSort     string
+	NameMeiSort     string
+	NameSeiR        string
+	NameMeiR        string
+	Role            string
+	DoBirth         string
+	DoDeath         string
+	AuthorCopyright string
+	URI             string
+	Kids            bool
+	Contributors    []ContribRole
+	// nextAuthor, previousAuthor *Record
 }
 
 // ContribRole is for storing various contributors to a book.

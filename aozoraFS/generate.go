@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/url"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/adamay909/AozoraConvert/azrconvert"
@@ -114,57 +113,28 @@ func genBookPage(lib *Library, name string) (fs.File, error) {
 	authorID := id[1]
 	bookID := strings.TrimSuffix(id[2], ".html")
 
-	log.Println("found", len(lib.booksByID[bookID]), "books with ID", bookID)
-
-	for _, l := range lib.booksByID[bookID] {
-
-		lib.booksByID[bookID][0].Contributors = append(lib.booksByID[bookID][0].Contributors, ContribRole{l.Role, l.AuthorID, l})
-	}
-
-	sort.Slice(lib.booksByID[bookID][0].Contributors, byRole(lib.booksByID[bookID][0].Contributors))
-
-	for k, e := range lib.booksByID[bookID] {
-
-		if k == 0 {
-			continue
-		}
-
-		e.Contributors = nil
-
-		e.Contributors = append(e.Contributors, lib.booksByID[bookID][0].Contributors...)
-
-	}
-
-	var k int
+	lib.consolidateRecords(bookID)
 
 	booklist := lib.booksByAuthor[authorID]
 
 	sortList(booklist, byTitle)
 
+	k := 0
 	for k = 0; k < len(booklist); k++ {
 		if booklist[k].BookID == bookID {
+			P.B = booklist[k]
 			break
 		}
 	}
 
-	P.B = booklist[k]
-
 	if k == 0 {
-
-		list := lib.booksByAuthor[lib.booksByAuthor[authorID][0].previousAuthor.AuthorID]
-		sortList(list, byTitle)
-		P.PrevBook = list[len(list)-1]
-
+		P.PrevBook = lib.LastBookBy(lib.PrevAuthor(P.B))
 	} else {
 		P.PrevBook = booklist[k-1]
 	}
 
 	if k == len(booklist)-1 {
-
-		list := lib.booksByAuthor[lib.booksByAuthor[authorID][0].nextAuthor.AuthorID]
-		sortList(list, byTitle)
-		P.NextBook = list[0]
-
+		P.NextBook = lib.FirstBookBy(lib.NextAuthor(P.B))
 	} else {
 		P.NextBook = booklist[k+1]
 	}
