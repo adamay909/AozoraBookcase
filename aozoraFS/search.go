@@ -71,8 +71,6 @@ func (lib *Library) FindMatchingAuthors(q string) (authors []*Record) {
 
 	s := runes.Runes(q)
 
-	log.Println("searching through authors")
-
 	for _, b := range lib.allAuthors() {
 
 		if runes.Contains(runes.Runes(b.FullName()), s) {
@@ -90,8 +88,6 @@ func (lib *Library) FindMatchingAuthors(q string) (authors []*Record) {
 
 // FindMatchingTitles finds the books whose title+subtitle contain q.
 func (lib *Library) FindMatchingTitles(q string) (titles []*Record) {
-
-	log.Println("searching through titles")
 
 	s := runes.Runes(q)
 
@@ -130,30 +126,28 @@ func (lib *Library) FindMatchingTitles(q string) (titles []*Record) {
 // include q
 func (lib *Library) FindMatchingCategories(q string) (categories []string) {
 
-	log.Println("searching through categories for", q)
-
 	for n := 1; n < 1000; n++ {
 
 		code := ndcNumeric(n)
 
-		if _, ok := ndcmap()[code]; !ok {
+		if _, ok := lib.Categories[code]; !ok {
 			continue
 		}
 
 		found := false
 
-		if strings.Contains(ndcmap()[code[:1]], q) {
+		if strings.Contains(lib.Categories[code[:1]], q) {
 			found = true
 		}
 		if len(code) > 1 {
 
-			if strings.Contains(ndcmap()[code[:2]], q) {
+			if strings.Contains(lib.Categories[code[:2]], q) {
 				found = true
 			}
 		}
 		if len(code) > 2 {
 
-			if strings.Contains(ndcmap()[code], q) {
+			if strings.Contains(lib.Categories[code], q) {
 				found = true
 			}
 		}
@@ -188,8 +182,6 @@ func (lib *Library) categoryHasBooks(code string) bool {
 }
 
 func (lib *Library) FindBooksWithMatchingCategories(q string) (categories []*Record) {
-
-	log.Println("searching through categories for", q)
 
 	var matched map[*Record]bool
 

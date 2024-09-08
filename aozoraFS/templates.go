@@ -3,34 +3,13 @@ package aozorafs
 import (
 	"bytes"
 	"errors"
-	"html/template"
 	"io/fs"
 	"log"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
-/*
-var FileDefaultcss string
-
-var Randombookhtml string
-
-var FileIndexhtml string
-
-var FileRecenthtml string
-
-var FileAuthorhtml string
-
-var FileBookhtml string
-
-var FileCategoryhtml string
-
-var RandomBookhtml string
-
-var FileSearchhtml string
-
-var FileSearchresultshtml string
-*/
 func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 	entry, err := dir.ReadDir(".")
@@ -53,8 +32,6 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 	}
 
 	for k := range entry {
-
-		log.Println("checking", entry[k].Name())
 
 		f, err := dir.Open(filepath.Join(dirname, entry[k].Name()))
 		defer f.Close()
@@ -84,25 +61,25 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 		NdcOf := func(i string) string {
 
-			return ndcmap()[i]
+			return lib.Categories[i]
 
 		}
 
 		NdcDOf := func(i [3]string) string {
 
-			return ndcmap()[i[0]]
+			return lib.Categories[i[0]]
 
 		}
 
 		NdcCOf := func(i [3]string) string {
 
-			return ndcmap()[i[1]]
+			return lib.Categories[i[1]]
 
 		}
 
 		NdcSOf := func(i [3]string) string {
 
-			return ndcmap()[i[2]]
+			return lib.Categories[i[2]]
 
 		}
 
@@ -128,12 +105,12 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 			if len(i) == 1 {
 
-				return ndcmap()[i]
+				return lib.Categories[i]
 			}
 			if i[:1] == "9" && len(i) == 3 {
-				return ndcmap()[i[:1]] + " : " + ndcmap()[i[:2]] + " : " + ndcmap()[i[:3]]
+				return lib.Categories[i[:1]] + " : " + lib.Categories[i[:2]] + " : " + lib.Categories[i[:3]]
 			} else {
-				return ndcmap()[i[:1]] + " : " + ndcmap()[i[:2]]
+				return lib.Categories[i[:1]] + " : " + lib.Categories[i[:2]]
 			}
 
 		}
@@ -144,7 +121,6 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 		//Now define the templates
 
-		log.Println("template name is ", tn)
 		switch tn {
 
 		case "defaultcss":
@@ -154,11 +130,22 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 			if err != nil {
 				log.Println(err)
 			}
-			_, err = lib.cache.CreateFile("ebooks.css", buf.Bytes())
+			_, err = lib.cache.CreateEphemeral("ebooks.css", buf.Bytes())
 			if err != nil {
 				log.Println(err)
 			}
-			log.Println("saved css")
+
+		case "readingpanecss":
+			buf := new(bytes.Buffer)
+
+			err := template.Must(template.New("css").Parse(string(data))).Execute(buf, "")
+			if err != nil {
+				log.Println(err)
+			}
+			_, err = lib.cache.CreateEphemeral("readingpane.css", buf.Bytes())
+			if err != nil {
+				log.Println(err)
+			}
 
 		case "randombook":
 			lib.randomT = template.Must(template.New("random.html").Funcs(funcMap).Parse(string(data)))
@@ -177,6 +164,9 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 		case "category":
 			lib.categoryT = template.Must(template.New("category.html").Parse(string(data)))
+
+		case "reading":
+			lib.readingT = template.Must(template.New("reading.html").Parse(string(data)))
 
 		case "search":
 

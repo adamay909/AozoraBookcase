@@ -7,10 +7,7 @@ Local files are created upon first request. Subsequent request are handled throu
 package aozorafs
 
 import (
-	"archive/zip"
-	"bytes"
 	"errors"
-	"io"
 	"io/fs"
 	"log"
 	"path/filepath"
@@ -18,15 +15,6 @@ import (
 	"time"
 )
 
-/*
-Initialize initalized the library lib to the given specifications.
-  - dir is the root directory of the library on the local file system.
-  - clean specifies whether or not to start with an empty library directory.
-  - verbose toggles verbose logging to screen. Logging to aozora.log will always take place.
-  - kids specifies toggles children's library (removes books that are not marked as children's book in the  Aozora Bunko database.
-  - strict toggles whether or not to include books that are not in the public domain.
-  - checkInt specifies the interval for checking for updates to the library upstream.
-*/
 // NewLibrary returns a new Library.
 func NewLibrary() *Library {
 
@@ -38,17 +26,11 @@ func NewLibrary() *Library {
 
 func (lib *Library) Open(name string) (f fs.File, err error) {
 
-	//block Open while booklist is being updated
-	//	for lib.updating {
-	//	}
-
 	log.Println("requested file: ", name)
 
 	if !isValidFileName(name) {
 		name = "index.html"
 	}
-
-	log.Println("requested file: ", name)
 
 	if !lib.cache.Exists(name) {
 
@@ -61,7 +43,6 @@ func (lib *Library) Open(name string) (f fs.File, err error) {
 		}
 
 	} else {
-		log.Println("file found")
 		f, err = lib.cache.Open(name)
 
 	}
@@ -70,6 +51,15 @@ func (lib *Library) Open(name string) (f fs.File, err error) {
 
 }
 
+/*
+Initialize initalized the library lib to the given specifications.
+  - dir is the root directory of the library on the local file system.
+  - clean specifies whether or not to start with an empty library directory.
+  - verbose toggles verbose logging to screen. Logging to aozora.log will always take place.
+  - kids specifies toggles children's library (removes books that are not marked as children's book in the  Aozora Bunko database.
+  - strict toggles whether or not to include books that are not in the public domain.
+  - checkInt specifies the interval for checking for updates to the library upstream.
+*/
 func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, strict bool, checkInt time.Duration) {
 
 	lib.src = src
@@ -88,9 +78,10 @@ func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, str
 
 	lib.posOfAuthor = make(map[string]int)
 
+	lib.Categories = ndcmap()
+
 	lib.updating = false
 
-	log.Println("done first phase of initialization")
 }
 
 // setKids sets lib to be a kids library if val is true..
@@ -104,43 +95,13 @@ func (lib *Library) setKids(val bool) {
 
 // setStrict sets lib to show only documents that are in the public domain.
 func (lib *Library) setStrict(val bool) {
+
 	lib.strict = val
 
 	return
 }
 
-func unzip(zf []byte) (d []byte) {
-
-	br := bytes.NewReader(zf)
-
-	f, _ := zip.NewReader(br, int64(len(zf)))
-
-	for _, z := range f.File {
-		if filepath.Ext(z.Name) == ".csv" {
-			r, err := z.Open()
-			defer r.Close()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			d, err = io.ReadAll(r)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			break
-		}
-	}
-	log.Println("received", len(zf), "bytes")
-	return d
-}
-
 func createFile(lib *Library, name string) (f fs.File, err error) {
-
-	if !isValidFileName(name) {
-		err = errors.New("invalid request 1")
-		return
-	}
 
 	dir := filepath.Dir(name)
 	bname := filepath.Base(name)
@@ -149,8 +110,6 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 
 	case bname == "index.html":
 		f, err = lib.genMainIndex()
-		info, _ := f.Stat()
-		log.Println("created", info.Name())
 
 	case strings.HasPrefix(bname, "author"):
 		f, err = genAuthorPage(lib, name)
@@ -164,13 +123,19 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 	case strings.HasPrefix(dir, "files/files"):
 		f, err = generateFile(lib, name)
 
-	case strings.Contains(bname, "recent"):
+	case strings.HasPrefix(dir, "read/files"):
+		f, err = genReadingPage(lib, name)
+
+	case bname == "recent.html":
 		f, err = lib.genRecents()
 
 	default:
-		err = errors.New("invalid request 2")
+		err = errors.New("invalid request")
 		return
 	}
+
+	info, _ := f.Stat()
+	log.Println("created", info.Name())
 
 	return
 }
@@ -206,6 +171,10 @@ func isValidFileName(n string) bool {
 		return true
 	}
 
+	if strings.HasPrefix(n, "read/files_") && len(strings.Split(n, "/")) == 3 {
+		return true
+	}
+
 	if len(strings.Split(n, "/")) > 2 {
 		return false
 	}
@@ -231,6 +200,9 @@ func isValidFileName(n string) bool {
 		return true
 	}
 
+	if n == "readingpane.css" {
+		return true
+	}
 	if n == "index.html" {
 		return true
 	}

@@ -1,5 +1,11 @@
 {{/* defaultcss */}}
 
+div.readingpane {
+ position: relative;
+ top: 5em;
+ margin-bottom: 7em;
+}
+
 div.sitenavigation {
  display: block;
  position: static;

@@ -267,9 +267,7 @@ func (b *Record) FileName() string {
 	return strings.TrimSuffix(filepath.Base(b.URI), filepath.Ext(b.URI))
 }
 
-func (b *Record) setCategory() {
-
-	ndc := ndcmap()
+func (b *Record) setCategory(ndc map[string]string) {
 
 	s := strings.TrimLeft(b.NDC, "NDC ")
 	if strings.HasPrefix(s, "K") {

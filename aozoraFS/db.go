@@ -3,6 +3,7 @@ package aozorafs
 import (
 	"encoding/csv"
 	"log"
+	"math/rand"
 	"net/url"
 	"path/filepath"
 	"sort"
@@ -11,16 +12,6 @@ import (
 
 	"github.com/adamay909/AozoraBookcase/zipfs"
 )
-
-/*
-Initialize initalized the library lib to the given specifications.
-  - dir is the root directory of the library on the local file system.
-  - clean specifies whether or not to start with an empty library directory.
-  - verbose toggles verbose logging to screen. Logging to aozora.log will always take place.
-  - kids specifies toggles children's library (removes books that are not marked as children's book in the  Aozora Bunko database.
-  - strict toggles whether or not to include books that are not in the public domain.
-  - checkInt specifies the interval for checking for updates to the library upstream.
-*/
 
 // LoadBooklist adds (and possibly updates) the list of books for lib.
 func (lib *Library) LoadBooklist() {
@@ -41,9 +32,9 @@ func (lib *Library) LoadBooklist() {
 
 	lib.UpdateBooklist()
 
-	//	lib.updatePages()
+	lib.updatePages()
 
-	//	go lib.RefreshBooklist()
+	go lib.RefreshBooklist()
 
 }
 
@@ -64,15 +55,7 @@ func (lib *Library) UpstreamUpdated(t time.Time) bool {
 
 	m, err := time.Parse(time.RFC1123, get(r, "Last-Modified"))
 
-	log.Println("Server reports last update time of: ", m)
-
 	return m.After(t)
-}
-
-func zeroByte(b []byte) {
-
-	b = []byte("")
-
 }
 
 /*UpdateDB downloads the database from upstream.*/
@@ -90,22 +73,20 @@ func (lib *Library) UpdateDB() {
 
 	data := download(path)
 
-	defer zeroByte(data)
-
 	f, err := lib.cache.CreateFile("aozoradata.zip", data)
 
-	//	fd := f.(*cacheFile)
 	defer f.Close()
 
 	if err != nil {
-		log.Println("X", err)
+		log.Println(err)
 		return
 	}
-	log.Println("data saved to ", filepath.Join(lib.cache.Path(), "aozoradata.zip"))
 }
 
 /*UpdateBooklist updates the booklist of lib from the locally available database.*/
 func (lib *Library) UpdateBooklist() {
+
+	log.Println("updating book list")
 
 	lib.updating = true
 
@@ -114,20 +95,45 @@ func (lib *Library) UpdateBooklist() {
 	defer zf.CloseArchive()
 
 	if err != nil {
-		log.Println("some error:", err)
+		log.Println(err)
 		return
 	}
 
 	zd := zf.ReadMust("list_person_all_extended_utf8.csv")
 
-	defer zeroByte(zd)
-
 	lib.getBooklist(zd)
 	lib.setupAuthorsList()
-	lib.Categories = ndcmap()
-	//lib.lastUpdated = time.Now()
-	log.Println("sorted entries.")
 	lib.updating = false
+	return
+}
+
+func (lib *Library) FetchLibrary() {
+
+	log.Println("getting library catalog information")
+
+	pathString, err := url.JoinPath(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	log.Println("requesting db", pathString)
+
+	path, _ := url.Parse(pathString)
+
+	data := download(path)
+
+	za, _ := zipfs.ZipArchiveFromData(data)
+
+	defer za.CloseArchive()
+
+	zd := za.ReadMust("list_person_all_extended_utf8.csv")
+
+	lib.getBooklist(zd)
+
+	lib.setupAuthorsList()
+
 	return
 }
 
@@ -175,28 +181,6 @@ func (lib *Library) consolidateRecords(bookID string) {
 
 }
 
-func fixLineEndings(s []byte) (out []byte) {
-	p := byte('X')
-	for _, c := range s {
-		switch c {
-		case '\r':
-			out = append(out, '\n')
-			p = c
-		case '\n':
-			if p != '\r' {
-				out = append(out, c)
-			}
-			p = c
-		default:
-			out = append(out, c)
-			p = c
-		}
-	}
-	log.Println("Fixed line endings to UNIX style.")
-
-	return
-}
-
 func (lib *Library) getBooklist(d []byte) {
 
 	rows := strings.Split(string(d), "\n")
@@ -204,7 +188,7 @@ func (lib *Library) getBooklist(d []byte) {
 
 	headings, err := csv.NewReader(strings.NewReader(rows[0])).Read()
 	if err != nil {
-		log.Println("error reading Aozora Bunko database", err)
+		log.Println("error reading Aozora Bunko database:", err)
 		return
 	}
 
@@ -230,6 +214,7 @@ func (lib *Library) getBooklist(d []byte) {
 		book = new(Record)
 
 		book.WorkCopyright = cells[col["作品著作権フラグ"]]
+		book.AuthorCopyright = cells[col["人物著作権フラグ"]]
 
 		if lib.strict {
 			if book.WorkCopyright == "あり" || book.AuthorCopyright == "あり" {
@@ -238,7 +223,7 @@ func (lib *Library) getBooklist(d []byte) {
 		}
 
 		book.NDC = cells[col["分類番号"]]
-		book.setCategory()
+		book.setCategory(lib.Categories)
 
 		if lib.kids {
 			if !book.isChildrensBook() {
@@ -269,13 +254,9 @@ func (lib *Library) getBooklist(d []byte) {
 		book.Role = cells[col["役割フラグ"]]
 		book.DoBirth = cells[col["生年月日"]]
 		book.DoDeath = cells[col["没年月日"]]
-		book.AuthorCopyright = cells[col["人物著作権フラグ"]]
 		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
 
 		lib.booklist = append(lib.booklist, book)
-
-		//		lib.booksByID[book.BookID] = append(lib.booksByID[book.BookID], book)
-		//		lib.booksByAuthor[book.AuthorID] = append(lib.booksByAuthor[book.AuthorID], book)
 
 	}
 	rows = nil
@@ -284,6 +265,8 @@ func (lib *Library) getBooklist(d []byte) {
 		lib.booksByID[e.BookID] = append(lib.booksByID[e.BookID], e)
 		lib.booksByAuthor[e.AuthorID] = append(lib.booksByAuthor[e.AuthorID], e)
 	}
+
+	lib.nextrandom = rand.Intn(len(lib.booklist))
 
 	log.Println("finished parsing db.")
 	return
@@ -353,8 +336,6 @@ func (lib *Library) ReadBooklist() (o []*Record) {
 
 /*
 WriteBooklist is for adding l as the booklist of lib.
-
-ReadBooklist and WriteBooklist are provided for manual inspection and editing of the booklist.
 */
 func (lib *Library) WriteBooklist(l []*Record) {
 

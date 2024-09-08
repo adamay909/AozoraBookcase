@@ -53,9 +53,8 @@ func (lib *Library) genRecents() (fs.File, error) {
 		Books []*Record
 	}
 
-	log.Println("Creating list of recent texts.")
 	var P PageData
-	P.Books = append(P.Books, lib.getRecents(1000)...)
+	P.Books = append(P.Books, lib.getRecents(100)...)
 
 	br := new(bytes.Buffer)
 	err := lib.recentT.Execute(br, P)
@@ -63,7 +62,7 @@ func (lib *Library) genRecents() (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral("recent.html", br.Bytes())
+	return lib.cache.CreateFile("recent.html", br.Bytes())
 }
 
 func genAuthorPage(lib *Library, name string) (fs.File, error) {
@@ -77,12 +76,10 @@ func genAuthorPage(lib *Library, name string) (fs.File, error) {
 	var P Page
 
 	authorID := getID(name)
-	log.Println("looking for ", authorID)
 
 	sortList(lib.booksByAuthor[authorID], byTitle)
 
 	P.Books = append(P.Books, lib.booksByAuthor[authorID]...)
-	log.Println("found ", len(P.Books), "books by", authorID)
 	P.NextAuthor = lib.NextAuthor(P.Books[0])
 	P.PrevAuthor = lib.PrevAuthor(P.Books[0])
 
@@ -163,18 +160,15 @@ func genCategoryPage(lib *Library, name string) (fs.File, error) {
 
 	q := strings.TrimSuffix(strings.TrimPrefix(name, "ndc_"), ".html")
 
-	log.Println("making category page for", q)
-
 	P.Books = append(P.Books, lib.FindBooksWithMatchingCategories(q)...)
 
-	log.Println("found", len(P.Books), "items")
-	//	P.Category = ndcmap()[q]
-	P.Category = ndcmap()[q[:1]]
+	//	P.Category = lib.Categories[q]
+	P.Category = lib.Categories[q[:1]]
 	if len(q) > 1 {
-		P.Category = P.Category + " : " + ndcmap()[q[:2]]
+		P.Category = P.Category + " : " + lib.Categories[q[:2]]
 	}
 	if q[:1] == "9" && len(q) > 2 {
-		P.Category = P.Category + " : " + ndcmap()[q[:3]]
+		P.Category = P.Category + " : " + lib.Categories[q[:3]]
 	}
 
 	br := new(bytes.Buffer)
@@ -187,27 +181,84 @@ func genCategoryPage(lib *Library, name string) (fs.File, error) {
 
 }
 
-func generateFile(lib *Library, name string) (fs.File, error) {
+func genReadingPage(lib *Library, name string) (fs.File, error) {
 
+	var rname string
+	var book *azrconvert.Book
+	var err error
+
+	if strings.HasSuffix(name, ".mono") {
+		rname = strings.TrimSuffix(name, ".mono") + ".html"
+	} else {
+		rname = name
+	}
+
+	book, err = getBookData(lib, rname)
+
+	var realbody string
+
+	if strings.HasSuffix(name, "mono") {
+		realbody = book.RenderBodyInnerMonolithic()
+	} else {
+		realbody = book.RenderBodyInner()
+		for _, file := range book.Files {
+			name1 := filepath.Join(filepath.Dir(rname), file.Name)
+			lib.cache.CreateEphemeral(name1, file.Data)
+		}
+	}
+	br := new(bytes.Buffer)
+	err = lib.readingT.Execute(br, book)
+
+	text := string(br.Bytes())
+
+	text = strings.Replace(text, "!!!###TEXT###!!!", realbody, 1)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return lib.cache.CreateEphemeral(name, []byte(text))
+}
+
+func (lib *Library) GetBookRecord(name string) (*Record, error) {
+
+	var err error
 	bookID := getID(name)
 	bk := lib.getBookRecordSimple(bookID)
 
 	if bk.BookID != bookID {
 		err := errors.New("book not found: " + name)
-		return *new(LibFile), err
+		return bk, err
+	}
+
+	return bk, err
+}
+
+func getBookData(lib *Library, name string) (book *azrconvert.Book, err error) {
+
+	book = new(azrconvert.Book)
+
+	bk, err := lib.GetBookRecord(name)
+
+	if err != nil {
+		return
 	}
 
 	zn := strings.TrimSuffix(name, filepath.Ext(name)) + `.zip`
-
-	book := new(azrconvert.Book)
 
 	if lib.cache.Exists(zn) {
 		log.Println("generating file from local material.")
 		book = lib.getBookFromZip(zn)
 	} else {
 		book = lib.getBook(bk)
-		lib.cache.CreateFile(zn, book.RenderWebpagePackage())
+		lib.cache.CreateEphemeral(zn, book.RenderWebpagePackage())
 	}
+
+	return
+}
+
+func generateFile(lib *Library, name string) (fs.File, error) {
+
+	book, _ := getBookData(lib, name)
 
 	var br []byte
 
@@ -219,15 +270,9 @@ func generateFile(lib *Library, name string) (fs.File, error) {
 	case ".azw3":
 		br = book.RenderAZW3()
 
-	case ".mono":
+	default:
 		br = book.RenderMonolithicHTML()
 
-	default:
-		br = book.RenderWebpage()
-		for _, file := range book.Files {
-			name1 := filepath.Join(filepath.Dir(name), file.Name)
-			lib.cache.CreateEphemeral(name1, file.Data)
-		}
 	}
 
 	return lib.cache.CreateEphemeral(name, br)
@@ -236,6 +281,10 @@ func generateFile(lib *Library, name string) (fs.File, error) {
 func getID(name string) string {
 
 	dir := filepath.Dir(name)
+	if strings.HasPrefix(dir, "read") {
+		dir = strings.ReplaceAll(dir, "read", "files")
+	}
+
 	switch {
 	case strings.HasPrefix(dir, "files/files_"):
 		name := strings.TrimSuffix(filepath.Base(name), "_u"+filepath.Ext(name))

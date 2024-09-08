@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+   <head>
+	<meta http-equiv='cache-control' content='no-cache'>
+	<title>Aozora Bookcase</title>
+      <meta charset="utf-8" />
+      <meta name="author" content="Masahiro Yamada" />
+      <meta name="copyright" content="© Masahiro Yamada" />
+	  <link rel="stylesheet" href="ebooks.css">
+	  <link rel="stylesheet" href="readingpane.css">
+      <script src="wasm_exec.js"></script>
+      <script>
+         const go = new Go();
+         WebAssembly.instantiateStreaming(fetch("bookcase.wasm"), go.importObject).then((result) => {go.run(result.instance);});
+      </script>
+   </head>
+<body>
+
+ <div class="sitenavigation">
+ <div class="sitetitle">青空文庫ブラウザ</div>
+ </div>
+ <div style="display: flex; height: 100%; padding-top: 30%; padding-left: 50%;">
+
+  起動中
+
+ </div>  
+
+</body>
+
+</html>
+

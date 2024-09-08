@@ -9,12 +9,25 @@ import (
 
 func (lib *Library) GenRandomBook() []byte {
 
+	var D struct {
+		B *Record
+	}
+
+	D.B = lib.RandomBook()
+
 	w := new(bytes.Buffer)
 
-	B := lib.booklist[rand.Intn(len(lib.booklist))]
-	log.Println("showing book", B.BookID)
+	err := lib.randomT.Execute(w, D)
 
-	lib.randomT.Execute(w, B)
+	if err != nil {
+		log.Println(err)
+	}
 
 	return w.Bytes()
+}
+
+func (lib *Library) RandomBook() *Record {
+
+	return lib.booklist[rand.Intn(len(lib.booklist))]
+
 }

@@ -1,0 +1,56 @@
+{{/* randombook */}}
+
+ <div class="sitenavigation">
+ <a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a>
+  <a class="navigation" href="#index.html"><div class="sitenavbutton">作者一覧<br /></div></a>
+<a href="#recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a>
+ <a href="#random{{ .R2 }}" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
+<div class="searchbox"> 
+   &#x1F50D;<input type="search" id="query" />
+  </div>
+</div>
+{{ with .B }}
+
+<div class="data">
+  <div class="dname">作品名:</div>
+	<div class="dtitle">
+  <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
+  <span class="title">{{.Title}} {{.Subtitle}}</span><br />
+	</div>
+
+	{{ $y := . }}
+
+	{{ range $y.Contributors }} 
+
+	{{ $z := . }}
+
+	<div class="dname"> {{ $z.Role }}:</div>
+		<div class="notes"> <a href=""#authors/author_{{$z.AuthorID}}.html"><ruby>{{$z.B.FullName}}<rt>{{$z.B.FullNameY}}</rt></ruby></a></div>
+
+	{{ end }}
+
+	<div class="dnamex">初出:</div>
+	<div class="notesx">{{.PublDate}}</div>
+
+	<div class="dnamex">文字遣い:</div>
+	<div class="notesx">{{.KanaZukai}}</div>
+	
+	<div class="dnamex">分類:</div>
+	<div class="notesx">{{ with .Kids}}（児童書）{{ end }} {{ range .Categories }}<a href="#categories/ndc_{{ndc (ndc1 .) }}.html">{{ndc1 .}}--</a><a href="#categories/ndc_{{ndc (ndc2 .) }}.html">{{ndc2 .}}</a>&nbsp;{{ end }}</div>
+ </div>
+
+<div class="downloadlinks">
+
+ <a href="#read/files_{{.RealBookID}}/{{.FileName}}_u.html" class="dlbutton"><div class="dlbutton">ブラウザで読む (read in browser)</div></a>
+ <div class="note">縦書き表示されます。<br /> Text will be displayed vertically, right to left.</div>
+ 
+ <a href="#files/files_{{.RealBookID}}/{{.FileName}}_u.epub" class="dlbutton"><div class="dlbutton">Epub</div></a>
+ <div class="note">縦書き表示に設定されています。<br /> Text will be displayed vertically, right to left.)</div>
+ 
+ <a href="#files/files_{{.RealBookID}}/{{.FileName}}_u.azw3" class="dlbutton"><div class="dlbutton">AZW3 (Kindle)</div></a>
+ <div class="note">縦書き表示に設定されています。<br /> Text will be displayed vertically, right to left.)</div>
+
+ </div>
+ <p></p>
+
+{{ end }}

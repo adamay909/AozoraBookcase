@@ -1,8 +1,8 @@
 package aozorafs
 
 import (
-	"html/template"
 	"io/fs"
+	"text/template"
 	"time"
 )
 
@@ -41,13 +41,16 @@ type Library struct {
 	bookT,
 	categoryT,
 	recentT,
-	randomT, searchresultT *template.Template
+	randomT,
+	searchresultT,
+	readingT *template.Template
 	updating      bool
 	kids          bool
 	strict        bool
 	lastUpdated   time.Time
 	checkInterval time.Duration
 	Categories    map[string]string
+	nextrandom    int
 }
 
 // records is for storing index cards.

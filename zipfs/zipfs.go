@@ -48,14 +48,23 @@ func OpenZipArchive(fsys fs.FS, name string) (*Ziparchive, error) {
 
 	fd.Read(data)
 
+	return ZipArchiveFromData(data)
+
+}
+
+func ZipArchiveFromData(data []byte) (*Ziparchive, error) {
+
+	var err error
+
 	log.Println("len of underlying data:", len(data))
+
+	za := new(Ziparchive)
 
 	r := bytes.NewReader(data)
 
 	za.z, err = zip.NewReader(r, int64(len(data)))
 
 	return za, err
-
 }
 
 func (za *Ziparchive) CloseArchive() {
