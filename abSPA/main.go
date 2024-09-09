@@ -47,7 +47,7 @@ func main() {
 
 	setHandler("#read", readBook)
 
-	setHandler("#random", randomBook)
+	//	setHandler("#random", randomBook)
 
 	setHandler("#search=", showSearchResult)
 

@@ -27,6 +27,7 @@ div.sitenavbutton {
 div.sitenavbutton:hover {
  color: darkblue;
  background-color:white;
+ cursor: pointer;
 }
 
 div.searchbox{
@@ -69,6 +70,7 @@ div.navbutton {
 div.navbutton:hover {
  color: white;
  background-color: darkslategrey;
+ cursor: pointer;
 }
 
 
@@ -92,6 +94,7 @@ div.authornavigation {
  display: inline-block;
  padding: 0.1em 1em 0.1em 1em;
  text-align: center;
+ cursor: pointer;
 }
 
 div.navbuttonl {
@@ -109,6 +112,7 @@ div.navbuttonl:hover {
  font-weight: normal;
  color: darkslategrey;
  background-color: lightgrey;
+ cursor: pointer;
 }
 
 a.navigation {
@@ -185,6 +189,7 @@ a.titlelist{
 
 a.titlelist:hover{
  background-color: MintCream;
+ cursor: pointer;
 }
 
 
@@ -223,6 +228,7 @@ color: black;
 div.authorlistsection >a:hover {
 text-decoration: none;
 background-color: MintCream;
+ cursor: pointer;
 }
 
 div.downloadlinks{
@@ -245,6 +251,7 @@ div.downloadlinks> a{
 
 div.downloadlinks>a:hover{
  text-decoration: none;
+ cursor: pointer;
 }
 
 div.dlbutton {
@@ -263,6 +270,7 @@ border: double;
 border-radius: 1em;
 background-color: darkslategray;
 color: white;
+ cursor: pointer;
 }
 
 div.dlbuttonx {
@@ -281,6 +289,7 @@ border: double;
 border-radius: 1em;
 background-color: darkslategray;
 color: white;
+ cursor: pointer;
 }
 
 div.downloadlinks > div.note {
@@ -310,6 +319,7 @@ div.categorylink{
 
 div.categorylink:hover{
  background-color: MintCream;
+ cursor: pointer;
 }
 a.categorylist{
  text-decoration: none;
@@ -318,4 +328,5 @@ a.categorylist{
 
 a.categorylist:hover{
  background-color: MintCream;
+ cursor: pointer;
 }

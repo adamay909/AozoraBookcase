@@ -75,7 +75,7 @@ func setHandler(prefix string, f handleFunc) {
 
 func mainPages(path string) {
 
-	replaceBody(string(getPageData(strings.Split(path, `::`)[0])))
+	mkpage(path, string(getPageData(strings.Split(path, `::`)[0])))
 
 	domHTML.Set("style", "writing-mode: horizontal-tb")
 
@@ -88,27 +88,9 @@ func mainPages(path string) {
 		domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
 	}
 
-	if isBookPage(path) {
-
-		setupBookPage(path)
-
-	}
-
 	log.Println("spaserver: done constructing page", path)
 
 	return
-
-}
-
-func setupBookPage(path string) {
-
-	epubdl, _ := getElementById("epubdl")
-
-	azw3dl, _ := getElementById("azw3dl")
-
-	addEventListener(epubdl, "click", serveFile, path, "epub")
-
-	addEventListener(azw3dl, "click", serveFile, path, "azw3")
 
 }
 
@@ -162,7 +144,7 @@ func readBookSvc(path string) {
 
 	path = strings.TrimSuffix(path, ".html") + ".mono"
 
-	replaceBody(string(getPageData(path)))
+	mkpage(path, string(getPageData(path)))
 
 	domHTML.Set("style", "writing-mode: vertical-rl")
 
@@ -184,13 +166,13 @@ func showSearchResult(q string) {
 
 	log.Println("lookin for", q)
 
-	replaceBody(string(globalLib.GenSearchResults(q)))
+	mkpage(q, string(globalLib.GenSearchResults(q)))
 
 	return
 
 }
 
-func randomBook(s string) {
+func randomBook(event js.Value, param ...any) {
 
 	log.Println("finding random book")
 
@@ -209,7 +191,7 @@ func showMenu(s string) {
 
 	data := readFrom(f)
 
-	replaceBody(string(data))
+	mkpage("", string(data))
 
 	return
 
@@ -271,4 +253,35 @@ func isBookPage(path string) bool {
 
 	return strings.HasPrefix(path, "books/book_")
 
+}
+
+func mkpage(path string, data string) {
+
+	replaceBody(data)
+
+	epubdl, err := getElementById("epubdl")
+
+	if err == nil {
+
+		addEventListener(epubdl, "click", serveFile, path, "epub")
+
+	}
+
+	azw3dl, err := getElementById("azw3dl")
+
+	if err == nil {
+
+		addEventListener(azw3dl, "click", serveFile, path, "azw3")
+
+	}
+
+	rndbk, err := getElementById("rndbk")
+
+	if err == nil {
+
+		addEventListener(rndbk, "click", randomBook)
+
+	}
+
+	return
 }
