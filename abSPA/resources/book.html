@@ -1,16 +1,25 @@
 {{/* book */}}
 {{ $x := . }}
+
  <div class="sitenavigation">
- <a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a>
-  <a class="navigation" href="#index.html"><div class="sitenavbutton">作者一覧<br /></div></a>
-<a href="#recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a>
- <a href="#random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
+
+ <div><a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
+
+<div><a href="#recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a></div>
+
+<div> <a href="#random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a></div>
+
 <div class="searchbox"> 
-   &#x1F50D;<input type="search" id="query" />
+   &#x1F50D;<input type="search" id="query" size="10"/>
   </div>
+
+<div>
 </div>
 
- <div class="booknav">
+</div>
+ 
+
+<div class="booknav">
   <a class="navigation" href="#authors/author_{{.PrevAuthor.AuthorID }}.html"><div class="navbutton">前の作家</div></a>
 
   <a class="navigation" href="#books/book_{{.PrevBook.AuthorID}}_{{.PrevBook.BookID}}.html"><div class="navbutton">前の本</div></a>
@@ -27,6 +36,7 @@
   <span class="yomi">{{.B.TitleY}} {{.B.SubtitleY}}</span><br />
   <span class="title">{{.B.Title}} {{.B.Subtitle}}</span><br />
 	</div>
+	<div></div>
 
 	{{ $y := .B }}
 
@@ -36,31 +46,42 @@
 
 	<div class="dname"> {{ $z.Role }}:</div>
 		<div class="notes"> <a href="#authors/author_{{$z.AuthorID}}.html"><ruby>{{$z.B.FullName}}<rt>{{$z.B.FullNameY}}</rt></ruby></a></div>
-
+	<div></div>
 	{{ end }}
 
 	<div class="dnamex">初出:</div>
 	<div class="notesx">{{.B.PublDate}}</div>
+	<div></div>
 
 	<div class="dnamex">文字遣い:</div>
 	<div class="notesx">{{.B.KanaZukai}}</div>
-	
+	<div></div>
+
+
 	<div class="dnamex">分類:</div>
 	<div class="notesx">{{ with .B.Kids}}（児童書）{{ end }} {{ range .B.Categories }}<a href="#categories/ndc_{{ndcn1 . }}.html">{{ndc1 .}}</a>--<a href="#categories/ndc_{{ndcn2 . }}.html">{{ndc2 .}}</a>{{ if eq (ndc (ndc1 .)) "9"}}--<a href= "#categories/ndc_{{ndcn3 .}}.html">{{ndc3 . }}</a>{{ end}}  &nbsp;{{ end }}</div>
+   <div></div>
+
  	<div class="dnamex">公開日:</div>
  	<div class="notesx">{{.B.FirstAvailable}}</div>
+    <div></div>
  </div>
 
  <div class="downloadlinks">
 
- <a href="#read/files_{{.B.RealBookID}}/{{.B.FileName}}_u.html" class="dlbutton"><div class="dlbutton">ブラウザで読む</div></a>
- <div class="note">縦書き表示されます。<br /> Text will be displayed vertically, right to left.</div>
+<div></div>
+ <div><a href="#read/files_{{.B.RealBookID}}/{{.B.FileName}}_u.html" class="dlbutton"><div class="dlbutton">ブラウザで読む</div></a>
+ </div>
+<div></div>
  
- <a href="#files/files_{{.B.RealBookID}}/{{.B.FileName}}_u.epub" class="dlbutton"><div class="dlbutton">Epub</div></a>
- <div class="note">縦書き表示に設定されています。<br /> Text will be displayed vertically, right to left.)</div>
+<div></div>
+<div><a href="#files/files_{{.B.RealBookID}}/{{.B.FileName}}_u.epub" class="dlbutton"><div class="dlbutton">Epub</div></a>
+ </div>
+<div></div>
  
- <a href="#files/files_{{.B.RealBookID}}/{{.B.FileName}}_u.azw3" class="dlbutton"><div class="dlbutton">Kindle用 (AZW3)</div></a>
- <div class="note">縦書き表示に設定されています。<br /> Text will be displayed vertically, right to left.)</div>
-
+<div></div>
+<div> <a href="#files/files_{{.B.RealBookID}}/{{.B.FileName}}_u.azw3" class="dlbutton"><div class="dlbutton">Kindle用 (AZW3)</div></a>
+ </div>
+<div></div>
  </div>
  <p></p>

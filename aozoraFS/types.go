@@ -91,7 +91,7 @@ type Record struct {
 	URI             string
 	Kids            bool
 	Contributors    []ContribRole
-	// nextAuthor, previousAuthor *Record
+	consolidated    bool
 }
 
 // ContribRole is for storing various contributors to a book.

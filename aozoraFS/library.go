@@ -163,6 +163,14 @@ func (lib *Library) RefreshBooklist() {
 
 func isValidFileName(n string) bool {
 
+	return true
+
+	/***********************************************************
+
+	Need a better scalable way of determining valid file names
+
+	***********************************************************/
+
 	if n == "." {
 		return true
 	}

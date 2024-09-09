@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"syscall/js"
 	"time"
 
 	aozorafs "github.com/adamay909/AozoraBookcase/aozoraFS"
@@ -52,11 +51,15 @@ func main() {
 
 	setHandler("#search=", showSearchResult)
 
+	setHandler("#menu", showMenu)
+
 	setupjs()
 
 	log.Println("main: done setting up JS")
 
-	js.Global().Get("location").Set("hash", "index.html")
+	setHash("")
+
+	setHash("index.html")
 
 	<-make(chan bool) //prevent exiting
 

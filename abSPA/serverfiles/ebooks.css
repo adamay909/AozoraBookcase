@@ -1,7 +1,8 @@
 
 
 div.sitenavigation {
- display: block;
+ display: grid;
+ grid-template-columns: 1.5fr 1fr 1fr 1fr 0.5fr;
  position: static;
  background-color: Blue;
  color: white;
@@ -14,14 +15,13 @@ div.sitetitle {
  display: inline-block;
  font-size: 1.5em;
  margin-right: 2em;
- padding-top: 0.5em;
- padding-top: 0.5em;
+ padding-top: 0.1em;
 }
 
 div.sitenavbutton {
  color: white;
  display: inline-block;
- margin-right: 3em;
+ padding-top: 0.7em;
 }
 
 div.sitenavbutton:hover {
@@ -30,7 +30,7 @@ div.sitenavbutton:hover {
 }
 
 div.searchbox{
- float: right;
+padding-top: 0.6em;
 }
 
 div.navigation {
@@ -119,7 +119,7 @@ a.navigation {
 
 div.data{
  display: grid;
- grid-template-columns: 1fr 6fr;
+ grid-template-columns: 2fr 6fr 2fr;
  row-gap:0.5em;
  column-gap: 1em;;
  padding-bottom: 1.5em;
@@ -229,7 +229,7 @@ div.downloadlinks{
  padding-top: 5em;
  display: grid;
  width: 50%;
- grid-template-columns: 1fr;
+ grid-template-columns: 2fr 6fr 2fr;
  column-gap: 2em;
  row-gap: 1em;
  justify-items: stretch;

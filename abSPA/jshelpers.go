@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"log"
 	"mime"
@@ -132,5 +133,24 @@ func fetchData(path *url.URL) (data []byte) {
 	data, _ = io.ReadAll(r.Body)
 
 	return data
+
+}
+
+func getElementById(id string) (elem js.Value, err error) {
+
+	elem = domDocument.Call("getElementById", id)
+
+	if elem.IsNull() {
+		err = errors.New("no element found with ID " + id)
+	}
+
+	return
+}
+
+func scrollTo(elem js.Value) {
+
+	elem.Call("scrollIntoView")
+
+	return
 
 }

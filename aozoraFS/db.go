@@ -158,6 +158,11 @@ func (lib *Library) consolidateRecords(bookID string) {
 
 	log.Println("found", len(lib.booksByID[bookID]), "books with ID", bookID)
 
+	if lib.booksByID[bookID][0].consolidated {
+
+		return
+	}
+
 	for _, l := range lib.booksByID[bookID] {
 
 		lib.booksByID[bookID][0].Contributors = append(lib.booksByID[bookID][0].Contributors, ContribRole{l.Role, l.AuthorID, l})
@@ -166,6 +171,8 @@ func (lib *Library) consolidateRecords(bookID string) {
 	sort.Slice(lib.booksByID[bookID][0].Contributors, byRole(lib.booksByID[bookID][0].Contributors))
 
 	for k, e := range lib.booksByID[bookID] {
+
+		e.consolidated = true
 
 		if k == 0 {
 			continue

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/fs"
 	"log"
 	"path/filepath"
 	"strings"
@@ -9,16 +10,21 @@ import (
 	"github.com/mtibben/percent"
 )
 
-type handleFunc func(string)
+type handleFunc func(newhash, oldhash string)
 
 var handler map[string]handleFunc
 
 var prefixes []string
 
+var clicked bool
+
 func setupjs() {
 
-	domWindow.Call("addEventListener", "hashchange", js.FuncOf(func(js.Value, []js.Value) any {
-		spaserver()
+	domWindow.Call("addEventListener", "hashchange", js.FuncOf(func(this js.Value, args []js.Value) any {
+
+		event := args[0]
+
+		spaserver(event)
 		return true
 	}), true)
 
@@ -27,8 +33,8 @@ func setupjs() {
 		return true
 	}), true)
 
-	domWindow.Call("addEventListener", "popstate", js.FuncOf(func(js.Value, []js.Value) any {
-		backbutton()
+	domWindow.Call("addEventListener", "click", js.FuncOf(func(js.Value, []js.Value) any {
+		click()
 		return true
 	}), true)
 
@@ -36,25 +42,40 @@ func setupjs() {
 
 }
 
-func backbutton() {
+func click() {
 
-	log.Println("backbutton pressed")
+	clicked = true
 
 }
 
-func spaserver() {
+func oldhash(event js.Value) string {
 
-	hash := getHash()
+	s := strings.Split(event.Get("oldURL").String(), "#")
+
+	if len(s) == 1 {
+		return ""
+	}
+	return s[1]
+
+}
+
+func spaserver(event js.Value) {
+
+	hash := percent.Decode(getHash())
 
 	for _, p := range prefixes {
 
 		if strings.HasPrefix(hash, p) {
 
-			handler[p](strings.TrimPrefix(hash, "#"))
+			handler[p](strings.TrimPrefix(hash, "#"), oldhash(event))
+
+			clicked = false
 
 			return
 		}
 	}
+	clicked = false
+
 	return
 }
 
@@ -74,26 +95,39 @@ func setHandler(prefix string, f handleFunc) {
 
 }
 
-func mainPages(path string) {
+func mainPages(path, oldpath string) {
 
-	f, _ := globalLib.Open(path)
-
-	defer f.Close()
-
-	fc := f.(*cacheFile)
-	defer fc.Close()
-
-	r := make([]byte, fc.Size())
-
-	fc.Read(r)
-
-	log.Println("spaserver: done constructing page", path)
-
-	replaceBody(string(r))
+	replaceBody(string(getPageData(strings.Split(path, `::`)[0])))
 
 	domHTML.Set("style", "writing-mode: horizontal-tb")
 
-	domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
+	if elem, err := getElementById(path); err == nil {
+
+		scrollTo(elem)
+
+	} else {
+
+		domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
+	}
+
+	if isBookPage(path) {
+
+		epubdl, _ := getElementById("epubdl")
+
+		azwdl, _ := getElementById("azwdl")
+
+		epubdl.Call("addEventListener", "click", js.FuncOf(func(js.Value, []js.Value) any {
+			serveFile(path, "epub")
+			return true
+		}), true)
+
+		azwdl.Call("addEventListener", "click", js.FuncOf(func(js.Value, []js.Value) any {
+			serveFile(path, "azw3")
+			return true
+		}), true)
+	}
+
+	log.Println("spaserver: done constructing page", path)
 
 	return
 
@@ -101,9 +135,22 @@ func mainPages(path string) {
 
 // Thanks to https://javascript.plainenglish.io/javascript-create-file-c36f8bccb3be for how to do this
 
-func serveFile(path string) {
+func serveFile(path string, ext string) {
+
+	path = strings.TrimSuffix(path, filepath.Ext(path))
+
+	/*
+	   ****
+	   need to do more !!!
+
+	   ****
+	*/
+	patt
+	= path + "." + ext
 
 	go serveFileSvc(path)
+
+	clicked = false
 
 	return
 }
@@ -112,32 +159,19 @@ func serveFileSvc(path string) {
 
 	log.Println("creating", filepath.Base(path))
 
-	f, err := globalLib.Open(path)
-	defer f.Close()
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	log.Println("done")
-
-	info, err := f.Stat()
-
-	data := make([]byte, info.Size())
-
-	f.Read(data)
-
 	bk, _ := globalLib.GetBookRecord(path)
 
-	fi := createJSFile(data, bk.Title+filepath.Ext(path))
+	name := bk.Title + filepath.Ext(path)
+
+	fi := createJSFile(getPageData(path), name)
 
 	saveFile(fi)
 
+	log.Println("file downloaded to", name)
 	return
 }
 
-func readBook(path string) {
+func readBook(path, oldpath string) {
 
 	go readBookSvc(path)
 
@@ -148,46 +182,11 @@ func readBookSvc(path string) {
 
 	path = strings.TrimSuffix(path, ".html") + ".mono"
 
-	f, _ := globalLib.Open(path)
-
-	defer f.Close()
-
-	fc := f.(*cacheFile)
-	defer fc.Close()
-
-	r := make([]byte, fc.Size())
-
-	fc.Read(r)
-
-	html := string(r)
-
-	log.Println("spaserver: done constructing page", path)
-
-	replaceBody(html)
+	replaceBody(string(getPageData(path)))
 
 	domHTML.Set("style", "writing-mode: vertical-rl")
 
 	return
-}
-
-func getBookFile(path string) []byte {
-
-	f, err := globalLib.Open(path)
-
-	if err != nil {
-		log.Println("something wrong")
-		log.Println(err)
-		return []byte("")
-	}
-
-	info, err := f.Stat()
-
-	data := make([]byte, info.Size())
-
-	f.Read(data)
-
-	return data
-
 }
 
 func search() {
@@ -199,7 +198,7 @@ func search() {
 	return
 }
 
-func showSearchResult(q string) {
+func showSearchResult(q, old string) {
 
 	q = percent.Decode(strings.TrimPrefix(q, "search="))
 
@@ -211,7 +210,7 @@ func showSearchResult(q string) {
 
 }
 
-func randomBook(s string) {
+func randomBook(s, old string) {
 
 	log.Println("finding random book")
 
@@ -222,6 +221,18 @@ func randomBook(s string) {
 	setHash(hash)
 
 	return
+}
+
+func showMenu(s, old string) {
+
+	f, _ := templateFiles.Open("resources/menu.html")
+
+	data := readFrom(f)
+
+	replaceBody(string(data))
+
+	return
+
 }
 
 // sort by length in descending order
@@ -251,4 +262,27 @@ func sortPrefixes(s []string) {
 	}
 
 	return
+}
+
+func getPageData(path string) []byte {
+	f, _ := globalLib.Open(path)
+
+	defer f.Close()
+
+	fc := f.(*cacheFile)
+	defer fc.Close()
+
+	return readFrom(fc)
+
+}
+
+func readFrom(f fs.File) []byte {
+
+	info, _ := f.Stat()
+
+	r := make([]byte, info.Size())
+
+	f.Read(r)
+
+	return r
 }
