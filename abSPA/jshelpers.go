@@ -73,6 +73,7 @@ func saveFile(file js.Value) {
 
 }
 
+// Thanks to https://javascript.plainenglish.io/javascript-create-file-c36f8bccb3be for how to do this
 func createJSFile(data []byte, name string) js.Value {
 
 	jsdata := uint8arrayOf(data)
@@ -142,6 +143,7 @@ func getElementById(id string) (elem js.Value, err error) {
 
 	if elem.IsNull() {
 		err = errors.New("no element found with ID " + id)
+		log.Println(err)
 	}
 
 	return
@@ -153,4 +155,17 @@ func scrollTo(elem js.Value) {
 
 	return
 
+}
+
+// addEventListener adds an event listener. The function f is called
+// with the event object as its first argument and the arguments given by params.
+func addEventListener(elem js.Value, eventType string, f func(event js.Value, args ...any), params ...any) {
+
+	elem.Call("addEventListener", eventType, js.FuncOf(func(this js.Value, margs []js.Value) any {
+
+		f(margs[0], params...)
+		return true
+	}), true)
+
+	return
 }

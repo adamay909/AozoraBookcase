@@ -43,7 +43,7 @@ func main() {
 
 	setHandler("#recent.html", mainPages)
 
-	setHandler("#files", serveFile)
+	//	setHandler("#files", serveFile)
 
 	setHandler("#read", readBook)
 

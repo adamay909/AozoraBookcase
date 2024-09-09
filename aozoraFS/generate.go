@@ -346,3 +346,15 @@ func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 	book.GenTitlePage()
 	return book
 }
+
+func (lib *Library) GetRecordWithID(authorid, bookid string) *Record {
+
+	for _, e := range lib.booksByID[bookid] {
+
+		if e.AuthorID == authorid {
+			return e
+		}
+	}
+
+	return new(Record)
+}

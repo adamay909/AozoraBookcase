@@ -10,7 +10,7 @@ import (
 	"github.com/mtibben/percent"
 )
 
-type handleFunc func(newhash, oldhash string)
+type handleFunc func(string)
 
 var handler map[string]handleFunc
 
@@ -20,31 +20,9 @@ var clicked bool
 
 func setupjs() {
 
-	domWindow.Call("addEventListener", "hashchange", js.FuncOf(func(this js.Value, args []js.Value) any {
+	addEventListener(domWindow, "hashchange", spaserver)
 
-		event := args[0]
-
-		spaserver(event)
-		return true
-	}), true)
-
-	domWindow.Call("addEventListener", "change", js.FuncOf(func(js.Value, []js.Value) any {
-		search()
-		return true
-	}), true)
-
-	domWindow.Call("addEventListener", "click", js.FuncOf(func(js.Value, []js.Value) any {
-		click()
-		return true
-	}), true)
-
-	return
-
-}
-
-func click() {
-
-	clicked = true
+	addEventListener(domWindow, "change", search)
 
 }
 
@@ -59,7 +37,7 @@ func oldhash(event js.Value) string {
 
 }
 
-func spaserver(event js.Value) {
+func spaserver(event js.Value, params ...any) {
 
 	hash := percent.Decode(getHash())
 
@@ -67,7 +45,7 @@ func spaserver(event js.Value) {
 
 		if strings.HasPrefix(hash, p) {
 
-			handler[p](strings.TrimPrefix(hash, "#"), oldhash(event))
+			handler[p](strings.TrimPrefix(hash, "#"))
 
 			clicked = false
 
@@ -95,7 +73,7 @@ func setHandler(prefix string, f handleFunc) {
 
 }
 
-func mainPages(path, oldpath string) {
+func mainPages(path string) {
 
 	replaceBody(string(getPageData(strings.Split(path, `::`)[0])))
 
@@ -112,19 +90,8 @@ func mainPages(path, oldpath string) {
 
 	if isBookPage(path) {
 
-		epubdl, _ := getElementById("epubdl")
+		setupBookPage(path)
 
-		azwdl, _ := getElementById("azwdl")
-
-		epubdl.Call("addEventListener", "click", js.FuncOf(func(js.Value, []js.Value) any {
-			serveFile(path, "epub")
-			return true
-		}), true)
-
-		azwdl.Call("addEventListener", "click", js.FuncOf(func(js.Value, []js.Value) any {
-			serveFile(path, "azw3")
-			return true
-		}), true)
 	}
 
 	log.Println("spaserver: done constructing page", path)
@@ -133,24 +100,37 @@ func mainPages(path, oldpath string) {
 
 }
 
-// Thanks to https://javascript.plainenglish.io/javascript-create-file-c36f8bccb3be for how to do this
+func setupBookPage(path string) {
 
-func serveFile(path string, ext string) {
+	epubdl, _ := getElementById("epubdl")
 
-	path = strings.TrimSuffix(path, filepath.Ext(path))
+	azw3dl, _ := getElementById("azw3dl")
 
-	/*
-	   ****
-	   need to do more !!!
+	addEventListener(epubdl, "click", serveFile, path, "epub")
 
-	   ****
-	*/
-	patt
-	= path + "." + ext
+	addEventListener(azw3dl, "click", serveFile, path, "azw3")
+
+}
+
+func serveFile(event js.Value, params ...any) {
+
+	path := params[0].(string)
+
+	ext := params[1].(string)
+
+	log.Println("creating download buttons for:", path, "type:", ext)
+
+	pparts := strings.Split(strings.TrimSuffix(filepath.Base(path), filepath.Ext(path)), "_")
+
+	authorID, bookID := pparts[1], pparts[2]
+
+	log.Println("authorID:", authorID, "bookID:", bookID)
+
+	rec := globalLib.GetRecordWithID(authorID, bookID)
+
+	path = "files/files_" + rec.RealBookID() + "/" + rec.FileName() + "_u." + ext
 
 	go serveFileSvc(path)
-
-	clicked = false
 
 	return
 }
@@ -171,7 +151,7 @@ func serveFileSvc(path string) {
 	return
 }
 
-func readBook(path, oldpath string) {
+func readBook(path string) {
 
 	go readBookSvc(path)
 
@@ -189,7 +169,7 @@ func readBookSvc(path string) {
 	return
 }
 
-func search() {
+func search(event js.Value, params ...any) {
 
 	q := domDocument.Call("getElementById", "query").Get("value").String()
 
@@ -198,7 +178,7 @@ func search() {
 	return
 }
 
-func showSearchResult(q, old string) {
+func showSearchResult(q string) {
 
 	q = percent.Decode(strings.TrimPrefix(q, "search="))
 
@@ -210,7 +190,7 @@ func showSearchResult(q, old string) {
 
 }
 
-func randomBook(s, old string) {
+func randomBook(s string) {
 
 	log.Println("finding random book")
 
@@ -223,7 +203,7 @@ func randomBook(s, old string) {
 	return
 }
 
-func showMenu(s, old string) {
+func showMenu(s string) {
 
 	f, _ := templateFiles.Open("resources/menu.html")
 
@@ -285,4 +265,10 @@ func readFrom(f fs.File) []byte {
 	f.Read(r)
 
 	return r
+}
+
+func isBookPage(path string) bool {
+
+	return strings.HasPrefix(path, "books/book_")
+
 }
