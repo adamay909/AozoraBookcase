@@ -254,6 +254,10 @@ div.downloadlinks>a:hover{
  cursor: pointer;
 }
 
+a.dlbutton {
+ text-decoration: none;
+}
+
 div.dlbutton {
 text-align: center;
 align-self:stretch;
