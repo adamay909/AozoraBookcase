@@ -220,6 +220,12 @@ func (lib *Library) getBooklist(d []byte) {
 
 		book = new(Record)
 
+		if !strings.HasPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp") {
+			continue
+		}
+
+		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
+
 		book.WorkCopyright = cells[col["作品著作権フラグ"]]
 		book.AuthorCopyright = cells[col["人物著作権フラグ"]]
 
@@ -261,7 +267,6 @@ func (lib *Library) getBooklist(d []byte) {
 		book.Role = cells[col["役割フラグ"]]
 		book.DoBirth = cells[col["生年月日"]]
 		book.DoDeath = cells[col["没年月日"]]
-		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
 
 		lib.booklist = append(lib.booklist, book)
 
