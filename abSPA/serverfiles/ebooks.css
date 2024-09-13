@@ -160,7 +160,7 @@ div.data > div.notesx{
 
 div.titlelist{
  display: grid;
- grid-template-columns: 1fr 1fr 1fr;
+ grid-template-columns: repeat(auto-fill, 18em);
  grid-auto-rows: max-content;
  row-gap: 1em;
 }
@@ -195,7 +195,7 @@ a.titlelist:hover{
 
 div.authorlistsection{
  display: grid;
- grid-template-columns: 1fr 1fr 1fr;
+ grid-template-columns: repeat(auto-fill, 18em);
  grid-auto-rows: max-content;
  overflow-wrap: anywhere;
  row-gap: 1em;

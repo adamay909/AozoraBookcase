@@ -223,6 +223,22 @@ func (b *Record) FullName() string {
 	}
 }
 
+func (b *Record) NameParts() []string {
+
+	name := b.FullName()
+
+	parts := strings.Split(name, "・")
+
+	if len(parts) > 1 {
+
+		for i := 0; i < len(parts)-1; i++ {
+			parts[i] = parts[i] + "・"
+		}
+	}
+
+	return parts
+}
+
 // FullNameY returns the yomi of full name.
 // It return a blank when there is no kanji
 // in the name.

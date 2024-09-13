@@ -33,9 +33,10 @@
  <h2 class="al-header">{{.Char}}</h2>
 <div class="authorlistsection">
 {{ range .List }}
+{{ $x := . }}
 <a href="#authors/author_{{.AuthorID}}.html">
 <div class="authorlistbutton">
- <ruby>{{ .FullName }}<rt>{{ .FullNameY }}</rt></ruby>
+{{ range .NameParts }}  <ruby>{{ . }}<rt>{{ $x.FullNameY }}</rt></ruby>{{ end }}
 </div>
 </a>
 {{end}}
