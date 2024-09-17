@@ -39,15 +39,18 @@ func handleSettings(event js.Value, param ...any) {
 
 	}
 
-	log.Println("nothing to do")
+	removeMenu()
+
+	return
+}
+
+func removeMenu() {
 
 	mn, _ := getElementById("x-menu")
 
 	mn.Call("remove")
 
-	ma, _ := getElementById("mainarea")
-
-	reactivateElement(ma)
+	uncoverScreen()
 
 }
 

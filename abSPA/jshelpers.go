@@ -261,8 +261,18 @@ func coverScreen(opacity int) {
 
 	newEl.Call("setAttribute", "class", "cover")
 
+	newEl.Call("setAttribute", "id", "x-cover")
+
 	newEl.Call("setAttribute", "style", "opacity: "+strconv.Itoa(opacity)+"%;")
 
 	domBody.Call("append", newEl)
+
+}
+
+func uncoverScreen() {
+
+	el, _ := getElementById("x-cover")
+
+	el.Call("remove")
 
 }
