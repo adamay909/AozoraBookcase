@@ -9,11 +9,35 @@ import (
 
 var globalLib *aozorafs.Library
 
+var globalSettings struct {
+	kids bool
+}
+
 func main() {
 
-	s := new(localStorage)
+	globalSettings.kids = false
+
+	initLibrary()
+
+	log.Println("main: done setting up library")
+
+	setupJS()
+
+	log.Println("main: done setting up JS")
+
+	loadMainPage()
+
+	<-make(chan bool) //prevent exiting
+
+}
+
+func initLibrary() {
+
+	log.Println("initializing library")
 
 	globalLib = aozorafs.NewLibrary()
+
+	s := new(localStorage)
 
 	globalLib.SetCache(s)
 
@@ -27,40 +51,15 @@ func main() {
 
 	log.Println("site URL is", getUrl())
 
-	globalLib.Initialize("https://"+getHost(), "", false, true, false, true, ci)
+	globalLib.Initialize("https://"+getHost(), "", false, true, globalSettings.kids, true, ci)
 
 	globalLib.FetchLibrary()
+}
 
-	log.Println("main: done setting up library")
-
-	setHandler("#index.html", mainPages)
-
-	setHandler("#authors", mainPages)
-
-	setHandler("#books", mainPages)
-
-	setHandler("#categories", mainPages)
-
-	setHandler("#recent.html", mainPages)
-
-	//	setHandler("#files", serveFile)
-
-	setHandler("#read", readBook)
-
-	//	setHandler("#random", randomBook)
-
-	setHandler("#search=", showSearchResult)
-
-	setHandler("#menu", showMenu)
-
-	setupjs()
-
-	log.Println("main: done setting up JS")
+func loadMainPage() {
 
 	setHash("")
 
 	setHash("index.html")
-
-	<-make(chan bool) //prevent exiting
 
 }

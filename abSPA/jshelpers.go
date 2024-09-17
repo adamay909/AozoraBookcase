@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"syscall/js"
 )
 
@@ -168,4 +169,100 @@ func addEventListener(elem js.Value, eventType string, f func(event js.Value, ar
 	}), true)
 
 	return
+}
+
+func jsWrapper(f func(event js.Value, args ...any), params ...any) js.Func {
+
+	return js.FuncOf(func(this js.Value, margs []js.Value) any {
+		f(margs[0], params...)
+		return true
+	})
+
+}
+
+func removeEventListener(elem js.Value, eventType string, f func(event js.Value, args ...any), params ...any) {
+
+	elem.Call("removeEventListener", eventType, js.FuncOf(func(this js.Value, margs []js.Value) any {
+		f(margs[0], params...)
+		return true
+	}), true)
+
+	return
+
+}
+
+var jsDisableClicks = jsWrapper(disableClicks)
+
+func disableClick(elem js.Value) {
+
+	elem.Call("addEventListener", "click", jsDisableClicks)
+
+}
+
+func enableClick(elem js.Value) {
+
+	elem.Call("removeEventListener", "click", jsDisableClicks)
+
+}
+
+func clickDisabled(val bool) {
+
+	if val == true {
+
+		addEventListener(domDocument, "click", disableClicks)
+
+	} else {
+
+		removeEventListener(domDocument, "click", disableClicks)
+
+	}
+
+}
+
+func disableClicks(event js.Value, args ...any) {
+
+	event.Call("stopPropagation")
+
+	event.Call("preventDefault")
+
+}
+
+func inactivateElement(elem js.Value) {
+
+	disableClick(elem)
+
+	elem.Call("setAttribute", "class", "inactive")
+
+	return
+}
+
+func reactivateElement(elem js.Value) {
+
+	elem.Call("removeAttribute", "class", "inactive")
+
+	enableClick(elem)
+
+	return
+}
+
+func createElement(tag string, innerHtml string) js.Value {
+
+	newEl := domDocument.Call("createElement", tag)
+
+	newEl.Set("innerHTML", innerHtml)
+
+	return newEl
+
+}
+
+func coverScreen(opacity int) {
+
+	newEl := createElement("div", "")
+
+	newEl.Call("setAttribute", "class", "cover")
+
+	newEl.Call("setAttribute", "style", "opacity: "+strconv.Itoa(opacity)+"%;")
+
+	domBody.Call("append", newEl)
+
 }

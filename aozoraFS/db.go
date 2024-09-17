@@ -111,6 +111,12 @@ func (lib *Library) FetchLibrary() {
 
 	log.Println("getting library catalog information")
 
+	if lib.kids {
+
+		log.Println("children's books library")
+
+	}
+
 	pathString, err := url.JoinPath(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
 
 	if err != nil {
@@ -238,6 +244,8 @@ func (lib *Library) getBooklist(d []byte) {
 		book.NDC = cells[col["分類番号"]]
 		book.setCategory(lib.Categories)
 
+		book.KanaZukai = cells[col["文字遣い種別"]]
+
 		if lib.kids {
 			if !book.isChildrensBook() {
 				continue
@@ -252,7 +260,6 @@ func (lib *Library) getBooklist(d []byte) {
 		book.SubtitleY = cells[col["副題読み"]]
 		book.OriginalTitle = cells[col["原題"]]
 		book.PublDate = cells[col["初出"]]
-		book.KanaZukai = cells[col["文字遣い種別"]]
 		book.FirstAvailable = cells[col["公開日"]]
 		book.ModTime = cells[col["最終更新日"]]
 		book.AuthorID = cells[col["人物ID"]]
@@ -278,6 +285,7 @@ func (lib *Library) getBooklist(d []byte) {
 		lib.booksByAuthor[e.AuthorID] = append(lib.booksByAuthor[e.AuthorID], e)
 	}
 
+	log.Println("library has", len(lib.booklist), "books")
 	lib.nextrandom = rand.Intn(len(lib.booklist))
 
 	log.Println("finished parsing db.")

@@ -18,11 +18,37 @@ var prefixes []string
 
 var clicked bool
 
-func setupjs() {
+func setupJS() {
+
+	setupHashHandlers()
+
+	setupGlobalEventListeners()
+
+}
+
+func setupHashHandlers() {
+
+	setHashHandler("#index.html", mainPages)
+
+	setHashHandler("#authors", mainPages)
+
+	setHashHandler("#books", mainPages)
+
+	setHashHandler("#categories", mainPages)
+
+	setHashHandler("#recent.html", mainPages)
+
+	setHashHandler("#read", readBook)
+
+	setHashHandler("#search=", showSearchResult)
+
+	setHashHandler("#about", showAbout)
+
+}
+
+func setupGlobalEventListeners() {
 
 	addEventListener(domWindow, "hashchange", spaserver)
-
-	addEventListener(domWindow, "change", search)
 
 }
 
@@ -57,7 +83,7 @@ func spaserver(event js.Value, params ...any) {
 	return
 }
 
-func setHandler(prefix string, f handleFunc) {
+func setHashHandler(prefix string, f handleFunc) {
 
 	if len(handler) == 0 {
 		handler = make(map[string]handleFunc)
@@ -100,13 +126,9 @@ func serveFile(event js.Value, params ...any) {
 
 	ext := params[1].(string)
 
-	log.Println("creating download buttons for:", path, "type:", ext)
-
 	pparts := strings.Split(strings.TrimSuffix(filepath.Base(path), filepath.Ext(path)), "_")
 
 	authorID, bookID := pparts[1], pparts[2]
-
-	log.Println("authorID:", authorID, "bookID:", bookID)
 
 	rec := globalLib.GetRecordWithID(authorID, bookID)
 
@@ -119,8 +141,11 @@ func serveFile(event js.Value, params ...any) {
 
 func serveFileSvc(path string) {
 
+	//clickDisabled(true)
+
 	log.Println("creating", filepath.Base(path))
 
+	domBody.Set("style", "cursor: wait")
 	bk, _ := globalLib.GetBookRecord(path)
 
 	name := bk.Title + filepath.Ext(path)
@@ -129,7 +154,10 @@ func serveFileSvc(path string) {
 
 	saveFile(fi)
 
+	domBody.Set("style", "cursor: default")
 	log.Println("file downloaded to", name)
+
+	//	clickDisabled(false)
 	return
 }
 
@@ -185,9 +213,9 @@ func randomBook(event js.Value, param ...any) {
 	return
 }
 
-func showMenu(s string) {
+func showAbout(s string) {
 
-	f, _ := templateFiles.Open("resources/menu.html")
+	f, _ := templateFiles.Open("resources/about.html")
 
 	data := readFrom(f)
 
@@ -259,6 +287,8 @@ func mkpage(path string, data string) {
 
 	replaceBody(data)
 
+	domBody.Call("removeAttribute", "class")
+
 	epubdl, err := getElementById("epubdl")
 
 	if err == nil {
@@ -283,5 +313,20 @@ func mkpage(path string, data string) {
 
 	}
 
+	queryBox, err := getElementById("query")
+
+	if err == nil {
+
+		addEventListener(queryBox, "change", search)
+
+	}
+
+	setbtn, err := getElementById("menubutton")
+
+	if err == nil {
+
+		addEventListener(setbtn, "click", settingsMenu)
+
+	}
 	return
 }
