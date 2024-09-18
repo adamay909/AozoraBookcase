@@ -1,12 +1,3 @@
-div.readingpane {
- position: relative;
-top: 5em;
-margin-bottom: 6em;
- line-break: normal;
- line-height: 180%;
- padding: 1em 1em;
- font-family: serif, sans-serif;
-}
 span.notes {
 display: none;
  }

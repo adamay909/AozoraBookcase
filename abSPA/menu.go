@@ -7,8 +7,6 @@ import (
 
 func settingsMenu(event js.Value, param ...any) {
 
-	//	ma, _ := getElementById("mainarea")
-
 	coverScreen(30)
 
 	showSettingsMenu()

@@ -1,27 +1,36 @@
 
+body {
+}
 
+/*Site Banner Area*/
 div.sitenavigation {
- display: grid;
- grid-template-columns: 1.5fr 1fr 1fr 1fr 0.5fr;
+ display: flex;
+ flex-flow: row wrap;
+ justify-content: space-evenly;
  position: static;
  background-color: Blue;
  color: white;
  width: 100%;
- padding-top: 0.5em;
- padding-bottom: 0.5em;
+ padding-top: 0.5rem;
+ padding-bottom: 0.5rem;
+}
+
+div.sitenavigation a {
+ text-decoration: none;
 }
 
 div.sitetitle {
+ color: white;
  display: inline-block;
- font-size: 1.5em;
- margin-right: 2em;
- padding-top: 0.1em;
+ font-size: 1.4rem;
+ margin-right: 2rem;
+ padding-top: 0.1rem;
 }
 
 div.sitenavbutton {
  color: white;
  display: inline-block;
- padding-top: 0.7em;
+ padding-top: 0.7rem;
 }
 
 div.sitenavbutton:hover {
@@ -31,40 +40,29 @@ div.sitenavbutton:hover {
 }
 
 div.searchbox{
-padding-top: 0.6em;
+padding-top: 0.6rem;
 }
 
+/*Sub-Navigation Bar*/
+
 div.navigation {
- display: block;
+ display: flex;
+ flex-flow: row wrap;
+ align-items: center;
+ justify-content: space-evenly;
  position: sticky;
- overflow: scroll;
  top: 0;
  background-color: lightgrey;
  width: 100%
 }
 
-div.navigationx{
- display: block;
- background-color: DarkSlateGray;
- color: white;
-}
-
-div.booknav{
-display: grid;
-grid-template-columns: 1fr 1fr 1fr 1fr;
-overflow-wrap: anywhere;
-position: sticky;
-top: 0;
-background-color: lightgrey;
-width: 100%;
-padding-top: 0.5em;
-padding-bottom: 0.5em;
+div.navigation a {
+ text-decoration: none;
 }
 
 div.navbutton {
  color: darkslategrey;
  background-color: lightgrey;
- display: inline-block;
 }
 
 div.navbutton:hover {
@@ -73,117 +71,167 @@ div.navbutton:hover {
  cursor: pointer;
 }
 
+/*Main Index Page*/
+
+
 div.authorlist {
- margin-bottom: 5em;
+ margin-bottom: 5rem;
 }
 
-div.authornavigation {
- display: block;
- position: sticky;
- overflow: scroll;
- top: 0;
- background-color: lightgrey;
- padding-top: 0.5em;
- padding-bottom: 0.5em;
- width: 100%
-}
-.authornavigation .navbutton{
- display: inline-block;
- padding: 0.1em 1em 0.1em 1em;
- text-align: center;
+h2.al-header {
+ font-size: 1.2rem;
 }
 
-.authornavigation .navbutton:hover {
- display: inline-block;
- padding: 0.1em 1em 0.1em 1em;
- text-align: center;
+div.authorlistsection{
+ display: grid;
+ grid-template-columns: repeat(auto-fill, 18rem);
+ grid-auto-rows: max-content;
+ overflow-wrap: anywhere;
+ row-gap: 1rem;
+ column-gap: 2rem;
+}
+
+@media screen and (max-width: 900px) {
+div.authorlistsection{
+ display: grid;
+ grid-template-columns: 1fr 1fr 1fr;
+ grid-auto-rows: max-content;
+ overflow-wrap: anywhere;
+ row-gap: 0.5rem;
+ column-gap: 0.5rem;
+}
+}
+
+div.authorlistsection a {
+text-decoration: none;
+color: black;
+}
+
+div.authorlistsection a:hover {
+text-decoration: none;
+background-color: MintCream;
  cursor: pointer;
 }
 
-div.navbuttonl {
- display: inline-block;
- padding: 0.1em 1em 0.1em 1em;
- text-align: center;
- font-weight: normal;
- color: lightgray;
+div.authorlistbutton{
+border-top: dotted;
+border-width: thin;
+padding: 0.4rem;
 }
 
-div.navbuttonl:hover {
- display: inline-block;
- padding: 0.1em 1em 0.1em 1em;
- text-align: center;
- font-weight: normal;
- color: darkslategrey;
- background-color: lightgrey;
- cursor: pointer;
+div.authorlistbutton > span.rt{
+font-size: 0.6rem;
 }
 
-a.navigation {
- color: white;
- text-decoration: none;
+div.authorlistbutton > span.rb{
+font-size: 1.1rem;
 }
 
+div.authorlistbutton > span.note{
+font-size: 0.4rem;
+}
+
+/*Individual Item Data*/
 
 div.data{
  display: grid;
- grid-template-columns: 2fr 6fr 2fr;
- row-gap:0.5em;
- column-gap: 1em;;
- padding-bottom: 1.5em;
- padding-top: 1.5em;
-}
-
-div.data > div.dname{
- justify-self: end;
- align-self: center;
-}
-
-div.data > div.dnamex{
- justify-self: end;
- align-self: center;
-}
-
-div.data > div.dtitle{
- justify-self:start;
- font-size: 1.5em;
-}
-div.data > div.dtitle > span.title{
- font-size: 1.0em;
-}
-div.data > div.dtitle > span.yomi{
- font-size: 0.6em;
-}
-
-div.data > div.notes{
- justify-self:start;
-}
-
-div.data > div.notesx{
- justify-self:start;}
-
-div.titlelist{
- display: grid;
- grid-template-columns: repeat(auto-fill, 18em);
- grid-auto-rows: max-content;
- row-gap: 1em;
- margin-bottom: 5em;
-}
-div.booklink{
- border-left: solid thick green;
- border-top: dotted thin green;
- padding: 0.4em;
- margin-right: 1em;
+ grid-template-columns: 1fr 1fr;
+ row-gap: 1rem;
  overflow-wrap: anywhere;
+ column-gap: 1rem;
+ padding-top: 1.5rem;
+ padding-bottom: 1.5rem;
 }
 
-div.booklink>span.title{
- font-size: 1.1em;
+
+@media screen and (max-width: 900px) {
+div.data{
+ display: grid;
+ grid-template-columns: 0.8fr 1fr;
+ row-gap:0.5rem;
+ column-gap: 1rem;;
+ overflow-wrap: anywhere;
+ padding-bottom: 1.5rem;
+ padding-top: 1.5rem;
 }
-div.booklink>span.yomi{
- font-size: 0.8em;
 }
-div.booklink>span.note{
- font-size: 0.8em;
+
+
+div.data div.dname{
+ justify-self: end;
+ align-self: center;
+}
+
+div.data div.dtitle{
+ justify-self:start;
+ font-size: 1.5rem;
+}
+
+div.yomi {
+ font-size: 0.8rem;
+}
+
+div.dtitle>span.yomi{
+ font-size: 0.6rem;
+}
+
+div.data div.notes{
+ justify-self:start;
+}
+
+/*Book Page Specific*/
+
+div.dllinks {
+ margin-top: 3rem;
+}
+
+div.downloadlink {
+ display: flex;
+ justify-content: center;
+}
+
+a.dlbutton {
+ text-decoration: none;
+}
+
+div.dlbutton {
+text-align: center;
+align-self:stretch;
+border: double;
+border-radius: 1rem;
+color: black;
+background-color: lightgrey;
+width: 8rem;
+margin: 1rem;
+padding: 0.5rem 1rem 0.5rem 1rem;
+}
+
+div.dlbutton:hover {
+background-color: darkslategray;
+color: white;
+cursor: pointer;
+}
+ 
+/*Author Page Specific*/
+
+ div.titlelist{
+ display: grid;
+ grid-template-columns: repeat(auto-fill, 18rem);
+ grid-auto-rows: max-content;
+ row-gap: 1rem;
+ margin-bottom: 5rem;
+}
+
+@media screen and (max-width: 900px) {
+ div.titlelist{
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ overflow-wrap: anywhere;
+ grid-auto-rows: max-content;
+ row-gap: 0.5rem;
+ margin-bottom: 2rem;
+}
+
 }
 
 a.titlelist{
@@ -196,125 +244,26 @@ a.titlelist:hover{
  cursor: pointer;
 }
 
-
-div.authorlistsection{
- display: grid;
- grid-template-columns: repeat(auto-fill, 18em);
- grid-auto-rows: max-content;
+div.booklink{
+ border-left: solid thick green;
+ border-top: dotted thin green;
+ padding: 0.4rem;
+ margin-right: 1rem;
  overflow-wrap: anywhere;
- row-gap: 1em;
- column-gap: 2em;
 }
 
-div.authorlistbutton{
-border-top: dotted;
-border-width: thin;
-padding: 0.4em;
+div.booklink>span.title{
+ font-size: 1.1rem;
 }
-
-div.authorlistbutton > span.rt{
-font-size: 0.6em;
+div.booklink>span.yomi{
+ font-size: 0.8rem;
 }
-
-div.authorlistbutton > span.rb{
-font-size: 1.1em;
-}
-
-div.authorlistbutton > span.note{
-font-size: 0.4em;
-}
-
-div.authorlistsection >a {
-text-decoration: none;
-color: black;
-}
-
-div.authorlistsection >a:hover {
-text-decoration: none;
-background-color: MintCream;
- cursor: pointer;
-}
-
-div.downloadlinks{
- padding-top: 5em;
- display: grid;
- width: 50%;
- grid-template-columns: 2fr 6fr 2fr;
- column-gap: 2em;
- row-gap: 1em;
- justify-items: stretch;
- align-items: stretch;
-
+div.booklink>span.note{
+ font-size: 0.8rem;
 }
 
 
-div.downloadlinks> a{
- text-decoration: none;
- align-self:stretch;
-}
-
-div.downloadlinks>a:hover{
- text-decoration: none;
- cursor: pointer;
-}
-
-a.dlbutton {
- text-decoration: none;
-}
-
-div.dlbutton {
-text-align: center;
-align-self:stretch;
-border: double;
-border-radius: 1em;
-color: black;
-background-color: lightgrey;
-margin: 0;
-padding: 0.5em 1em 0.5em 1em;
-}
-
-div.dlbutton:hover {
-border: double;
-border-radius: 1em;
-background-color: darkslategray;
-color: white;
- cursor: pointer;
-}
-
-div.dlbuttonx {
-text-align: center;
-align-self:stretch;
-border: double;
-border-radius: 1em;
-color: black;
-background-color: lightgrey;
-margin: 0;
-padding: 0.5em 1em 0.5em 1em;
-}
-
-div.dlbuttonx:hover {
-border: double;
-border-radius: 1em;
-background-color: darkslategray;
-color: white;
- cursor: pointer;
-}
-
-div.downloadlinks > div.note {
-display: none;
-}
-
-div.searchForm {
- height: 80%;
- display: flex;
- align-items: center;
-}
-
-div.inputBox {
-margin: 0;
-text-align: center;
-}
-
+/*Category Page Specific*/
 
 div.categorylist{
  display: block;
@@ -339,9 +288,12 @@ a.categorylist:hover{
  cursor: pointer;
 }
 
+
+/*Menu Panel*/
+
 div.menupane {
 position: fixed;
-width: 75%;
+width: 25rem;
 height: 80%;
 padding: auto;
 top: 0;
@@ -352,7 +304,7 @@ z-index: 2;
 }
 
 div.menuitem {
- margin: 0.5em;
+ margin: 0.5rem;
 }
 
 
@@ -360,12 +312,33 @@ div.cover {
  position: fixed;
  top: 0;
  left: 0;
-height: 100vh;
+height: 100%;
 width: 100%;
 padding: 100%;
 z-index: 1;
 background-color: grey;
-opacity: 50%;
-cursor: not-allowed;
+}
+
+/*Reading Page*/
+div.readingPage div.sitenavigation {
+
+ writing-mode: horizontal-tb;
+ position: fixed;
+ height: 1.5rem;
+ width: 100%;
+}
+
+div.readingPage div.sitetitle {
+  font-size: 1rem;
+}
+
+div.readingpane {
+ position: static;
+ margin-top: 3.5rem;
+ margin-bottom: 1rem;
+ line-break: normal;
+ line-height: 180%;
+ padding-right: 1rem;
+ font-family: serif, sans-serif;
 }
 

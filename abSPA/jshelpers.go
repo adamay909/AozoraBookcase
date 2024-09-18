@@ -150,6 +150,21 @@ func getElementById(id string) (elem js.Value, err error) {
 	return
 }
 
+func getElementsByClassName(elem js.Value, class string) (list []js.Value) {
+
+	htmlCollection := elem.Call("getElementsByClassName", class)
+
+	l := htmlCollection.Get("length").Int()
+
+	for i := 0; i < l; i++ {
+
+		list = append(list, htmlCollection.Call("item", i))
+	}
+
+	return list
+
+}
+
 func scrollTo(elem js.Value) {
 
 	elem.Call("scrollIntoView")
@@ -229,18 +244,19 @@ func disableClicks(event js.Value, args ...any) {
 
 func inactivateElement(elem js.Value) {
 
-	disableClick(elem)
+	newEl := createElement("div", "")
 
-	elem.Call("setAttribute", "class", "inactive")
+	newEl.Call("setAttribute", "class", "cover")
 
-	return
+	elem.Call("append", newEl)
+
 }
 
 func reactivateElement(elem js.Value) {
 
-	elem.Call("removeAttribute", "class", "inactive")
+	cover := getElementsByClassName(elem, "cover")[0]
 
-	enableClick(elem)
+	cover.Call("remove")
 
 	return
 }
@@ -257,22 +273,20 @@ func createElement(tag string, innerHtml string) js.Value {
 
 func coverScreen(opacity int) {
 
-	newEl := createElement("div", "")
+	log.Println("new methd")
 
-	newEl.Call("setAttribute", "class", "cover")
+	inactivateElement(domBody)
 
-	newEl.Call("setAttribute", "id", "x-cover")
+	cover := getElementsByClassName(domBody, "cover")[0]
 
-	newEl.Call("setAttribute", "style", "opacity: "+strconv.Itoa(opacity)+"%;")
-
-	domBody.Call("append", newEl)
+	cover.Call("setAttribute", "style", "opacity: "+strconv.Itoa(opacity)+"%;")
 
 }
 
 func uncoverScreen() {
 
-	el, _ := getElementById("x-cover")
+	cover := getElementsByClassName(domBody, "cover")[0]
 
-	el.Call("remove")
+	cover.Call("remove")
 
 }
