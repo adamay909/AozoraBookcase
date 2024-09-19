@@ -317,11 +317,65 @@ width: 100%;
 padding: 100%;
 z-index: 1;
 background-color: grey;
+display: flex;
+align-items: center;
+justify-content: center;
 }
+
+/*Hourglass*/
+
+div.waitcover {
+ position: fixed;
+ top: 0;
+ left: 0;
+height: 100%;
+width: 100%;
+padding: 100%;
+z-index: 2;
+background-color: grey;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+div.hourglass{
+ animation: 2s infinite normal wait;
+}
+
+@keyframes wait {
+
+ 0% {
+ }
+
+ 25% {
+
+  transform: rotate(0.25turn);
+
+ }
+
+ 50% {
+
+  transform: rotate(0.5turn);
+
+ }
+
+ 75% {
+
+  transform: rotate(0.75turn);
+
+ }
+
+ 100% {
+
+  transform: rotate(1turn);
+
+ }
+
+}
+
 
 /*Reading Page*/
 div.readingPage div.sitenavigation {
-
  writing-mode: horizontal-tb;
  position: fixed;
  height: 1.5rem;

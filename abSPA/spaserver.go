@@ -141,23 +141,20 @@ func serveFile(event js.Value, params ...any) {
 
 func serveFileSvc(path string) {
 
-	//clickDisabled(true)
+	coverAndWait(domBody, 20)
 
 	log.Println("creating", filepath.Base(path))
 
-	domBody.Set("style", "cursor: wait")
 	bk, _ := globalLib.GetBookRecord(path)
 
 	name := bk.Title + filepath.Ext(path)
 
-	fi := createJSFile(getPageData(path), name)
+	saveFile(createJSFile(getPageData(path), name))
 
-	saveFile(fi)
-
-	domBody.Set("style", "cursor: default")
 	log.Println("file downloaded to", name)
 
-	//	clickDisabled(false)
+	uncoverElement(domBody)
+
 	return
 }
 
@@ -215,11 +212,7 @@ func randomBook(event js.Value, param ...any) {
 
 func showAbout(s string) {
 
-	f, _ := templateFiles.Open("resources/about.html")
-
-	data := readFrom(f)
-
-	mkpage("", string(data))
+	mkpage("", string(readFromResources("about.html")))
 
 	return
 
@@ -255,6 +248,7 @@ func sortPrefixes(s []string) {
 }
 
 func getPageData(path string) []byte {
+
 	f, _ := globalLib.Open(path)
 
 	defer f.Close()
@@ -275,6 +269,17 @@ func readFrom(f fs.File) []byte {
 	f.Read(r)
 
 	return r
+
+}
+
+func readFromResources(name string) []byte {
+
+	f, _ := templateFiles.Open("resources/" + name)
+
+	defer f.Close()
+
+	return readFrom(f)
+
 }
 
 func isBookPage(path string) bool {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"syscall/js"
 )
 
@@ -21,11 +20,7 @@ func handleSettings(event js.Value, param ...any) {
 
 	kidsNew := kidsB.Get("checked").Bool()
 
-	log.Println("switch to kids library", kidsNew)
-
 	if kidsNew != globalSettings.kids {
-
-		log.Println("reloading library")
 
 		globalSettings.kids = kidsNew
 
@@ -54,11 +49,9 @@ func removeMenu() {
 
 func reloadSvc() {
 
-	f, _ := templateFiles.Open("resources/loading.html")
+	replaceBody(string(readFromResources("loading.html")))
 
-	replaceBody(string(readFrom(f)))
-
-	coverScreen(0)
+	coverAndWait(domBody, 10)
 
 	initLibrary()
 
@@ -68,11 +61,7 @@ func reloadSvc() {
 
 func showSettingsMenu() {
 
-	log.Println("showing settings")
-
-	f, _ := templateFiles.Open("resources/menu.html")
-
-	elem := createElement("div", string(readFrom(f)))
+	elem := createElement("div", string(readFromResources("menu.html")))
 
 	domBody.Call("append", elem)
 
@@ -81,7 +70,6 @@ func showSettingsMenu() {
 		elem.Call("setAttribute", "checked", true)
 	}
 
-	enableClick(elem)
 }
 
 func activateMenu() {

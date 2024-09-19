@@ -206,42 +206,6 @@ func removeEventListener(elem js.Value, eventType string, f func(event js.Value,
 
 }
 
-var jsDisableClicks = jsWrapper(disableClicks)
-
-func disableClick(elem js.Value) {
-
-	elem.Call("addEventListener", "click", jsDisableClicks)
-
-}
-
-func enableClick(elem js.Value) {
-
-	elem.Call("removeEventListener", "click", jsDisableClicks)
-
-}
-
-func clickDisabled(val bool) {
-
-	if val == true {
-
-		addEventListener(domDocument, "click", disableClicks)
-
-	} else {
-
-		removeEventListener(domDocument, "click", disableClicks)
-
-	}
-
-}
-
-func disableClicks(event js.Value, args ...any) {
-
-	event.Call("stopPropagation")
-
-	event.Call("preventDefault")
-
-}
-
 func inactivateElement(elem js.Value) {
 
 	newEl := createElement("div", "")
@@ -271,22 +235,56 @@ func createElement(tag string, innerHtml string) js.Value {
 
 }
 
-func coverScreen(opacity int) {
+func coverElement(elem js.Value, opacity int) {
 
-	log.Println("new methd")
+	inactivateElement(elem)
 
-	inactivateElement(domBody)
-
-	cover := getElementsByClassName(domBody, "cover")[0]
+	cover := getElementsByClassName(elem, "cover")[0]
 
 	cover.Call("setAttribute", "style", "opacity: "+strconv.Itoa(opacity)+"%;")
 
 }
 
+func uncoverElement(elem js.Value) {
+
+	covers := getElementsByClassName(domBody, "cover")
+
+	//just in case we covered elem multiple times
+
+	for _, c := range covers {
+
+		c.Call("remove")
+
+	}
+
+}
+
+func coverScreen(opacity int) {
+
+	coverElement(domBody, opacity)
+
+}
+
 func uncoverScreen() {
 
-	cover := getElementsByClassName(domBody, "cover")[0]
+	uncoverElement(domBody)
 
-	cover.Call("remove")
+}
+
+func coverAndWait(elem js.Value, opacity int) {
+
+	coverElement(elem, opacity)
+
+	cover := getElementsByClassName(elem, "cover")[0]
+
+	addStyle(cover, "cursor: wait;")
+
+}
+
+func addStyle(elem js.Value, css string) {
+
+	css1 := elem.Call("getAttribute", "style").String()
+
+	elem.Call("setAttribute", "style", css1+css)
 
 }
