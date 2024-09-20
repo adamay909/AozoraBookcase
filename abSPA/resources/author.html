@@ -27,7 +27,10 @@
 <div class="data">
 
 	 <div class="dname">作家名:</div>
-	 <div class="dtitle"><ruby>{{$x.FullName}}<rt>{{$x.FullNameY}}</rt></ruby></div>
+	 <div class="dtitle">
+		<div class="yomi">{{$x.FullNameY}}</div>
+		<div>{{ range $x.NameParts }}{{ . }}{{ end }}</div>
+	</div>
 	 
 	 <div class="dname">生没年:</div>
 	 <div class="notes">{{ $x.Dates }}</div>
@@ -41,8 +44,8 @@
 {{ $x := . }}
 <a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
  <div class="booklink">
-  <span class="yomi">{{$x.TitleY}} {{.SubtitleY}}</span><br />
-  <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
+  <div class="yomi">{{$x.TitleY}} {{.SubtitleY}}</div>
+  <div>{{$x.Title}} {{.Subtitle}}</div>
  
   <span class="note">（{{ with $x.Kids }}児童書: {{ end }}{{ .Category }})</span><br />
   <span class="note">（{{$x.KanaZukai}}）</span>
