@@ -61,7 +61,7 @@ func (s *localStorage) Path() string {
 	return ""
 }
 
-func (s *localStorage) RemoveAll(name string) {
+func (s *localStorage) RemoveAll() {
 
 	js.Global().Get("localStorage").Call("clear")
 

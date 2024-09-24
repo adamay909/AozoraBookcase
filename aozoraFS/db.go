@@ -5,7 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"net/url"
-	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -332,12 +331,15 @@ func (lib *Library) allUpdatedPages() (list []string) {
 }
 
 func (lib *Library) removePages(pages ...string) {
+	/*
+		for _, p := range pages {
 
-	for _, p := range pages {
+			lib.cache.RemoveAll(filepath.Join(p))
 
-		lib.cache.RemoveAll(filepath.Join(p))
+		}
+	*/
 
-	}
+	lib.cache.RemoveAll()
 
 	return
 }

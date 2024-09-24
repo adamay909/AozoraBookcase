@@ -17,7 +17,7 @@ type LibFS interface {
 	CreateFile(name string, data []byte) (fs.File, error)
 	CreateEphemeral(name string, data []byte) (fs.File, error)
 	Exists(name string) bool
-	RemoveAll(string)
+	RemoveAll()
 	Path() string
 }
 

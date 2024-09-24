@@ -39,6 +39,8 @@ func initLibrary() {
 
 	s := new(localStorage)
 
+	s.RemoveAll()
+
 	globalLib.SetCache(s)
 
 	aozorafs.SetDownloader(fetchData)
