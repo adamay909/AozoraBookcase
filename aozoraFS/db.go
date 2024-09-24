@@ -276,14 +276,11 @@ func (lib *Library) getBooklist(d []byte) {
 		book.DoDeath = cells[col["没年月日"]]
 
 		lib.booklist = append(lib.booklist, book)
+		lib.booksByID[book.BookID] = append(lib.booksByID[book.BookID], book)
+		lib.booksByAuthor[book.AuthorID] = append(lib.booksByAuthor[book.AuthorID], book)
 
 	}
 	rows = nil
-
-	for _, e := range lib.booklist {
-		lib.booksByID[e.BookID] = append(lib.booksByID[e.BookID], e)
-		lib.booksByAuthor[e.AuthorID] = append(lib.booksByAuthor[e.AuthorID], e)
-	}
 
 	log.Println("library has", len(lib.booklist), "books")
 	lib.nextrandom = rand.Intn(len(lib.booklist))

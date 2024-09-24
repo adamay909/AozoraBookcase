@@ -62,7 +62,7 @@ func (lib *Library) genRecents() (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile("recent.html", br.Bytes())
+	return lib.cache.CreateEphemeral("recent.html", br.Bytes())
 }
 
 func genAuthorPage(lib *Library, name string) (fs.File, error) {

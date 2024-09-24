@@ -300,9 +300,9 @@ func (b *Record) setCategory(ndc map[string]string) {
 			_, ok := ndc[c[:2]]
 			if ok {
 				b.Categories = append(b.Categories, [3]string{c[:1], c[:2], c})
-			} else {
+			} /*else {
 				continue
-			}
+			}*/
 
 		}
 	}
