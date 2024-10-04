@@ -34,6 +34,7 @@ type Library struct {
 	booklist      []*Record
 	booksByID     map[string][]*Record
 	booksByAuthor map[string][]*Record
+	booksByDate   []*Record
 	authorsSorted []*Record
 	posOfAuthor   map[string]int
 	indexT,

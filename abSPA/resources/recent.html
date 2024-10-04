@@ -21,9 +21,16 @@
 </div>
 
 
-	 
+<div class="navigation">
 
- <h2>新着１００</h2>
+{{ if ne .NPT "0" }}<a class="navigation" href="#recent{{.NPT}}.html">{{end}}<div class="navbutton">千冊前</div>{{ if ne .NPT "0"}}</a>{{end}}
+{{ if ne .NP "0" }}<a class="navigation" href="#recent{{.NP}}.html">{{end}}<div class="navbutton">百冊前</div>{{ if ne .NP "0"}}</a>{{end}}
+{{ if ne .NN "0" }}<a class="navigation" href="#recent{{.NN}}.html">{{end}}<div class="navbutton">百冊後</div>{{if ne .NN "0"}}</a>{{end}}
+{{ if ne .NNT "0" }}<a class="navigation" href="#recent{{.NNT}}.html" >{{end}}<div class="navbutton">千冊後</div>{{ if ne .NNT "0" }}</a>{{end}}
+	 
+</div>
+
+ <h2>着順 {{.ORD}}〜</h2>
 <div class="titlelist">
 {{ range .Books }}
 {{ $x := . }}

@@ -61,11 +61,18 @@ div.navigation a {
 }
 
 div.navbutton {
- color: darkslategrey;
+ color: grey;
  background-color: lightgrey;
+ cursor: default;
 }
 
-div.navbutton:hover {
+a div.navbutton {
+ color: darkslategrey;
+ background-color: lightgrey;
+ cursor: default;
+}
+
+a div.navbutton:hover {
  color: white;
  background-color: darkslategrey;
  cursor: pointer;
@@ -326,7 +333,7 @@ div.menuitem {
 
 
 div.cover {
- position: fixed;
+ position: absolute;
  top: 0;
  left: 0;
 height: 100%;

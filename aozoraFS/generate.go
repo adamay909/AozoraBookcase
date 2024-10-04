@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/adamay909/AozoraConvert/azrconvert"
@@ -47,17 +48,55 @@ func (lib *Library) genMainIndex() (fs.File, error) {
 	return lib.cache.CreateEphemeral("index.html", br.Bytes())
 }
 
-func (lib *Library) genRecents() (fs.File, error) {
+func (lib *Library) genRecents(name string) (f fs.File, err error) {
 
 	type PageData struct {
 		Books []*Record
+		N     string
+		NP    string
+		NN    string
+		NPT   string
+		NNT   string
+		ORD   string
+	}
+
+	n, err := strconv.Atoi(strings.TrimPrefix(strings.TrimSuffix(name, ".html"), "recent"))
+
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
 	var P PageData
-	P.Books = append(P.Books, lib.getRecents(100)...)
+	P.Books = append(P.Books, lib.getRecents(n-1)...)
+
+	np := n - 1
+	nn := n + 1
+	npt := n - 10
+	nnt := n + 10
+
+	if np < 1 {
+		np = 0
+	}
+	if (nn-1)*100 > lib.LenDistinctBooks() {
+		nn = 0
+	}
+	if npt < 1 {
+		npt = 0
+	}
+	if (nnt-1)*100 > lib.LenDistinctBooks() {
+		nnt = 0
+	}
+
+	P.N = strconv.Itoa(n)
+	P.NP = strconv.Itoa(np)
+	P.NPT = strconv.Itoa(npt)
+	P.NN = strconv.Itoa(nn)
+	P.NNT = strconv.Itoa(nnt)
+	P.ORD = strconv.Itoa((n-1)*100 + 1)
 
 	br := new(bytes.Buffer)
-	err := lib.recentT.Execute(br, P)
+	err = lib.recentT.Execute(br, P)
 	if err != nil {
 		log.Println(err)
 	}
@@ -65,7 +104,7 @@ func (lib *Library) genRecents() (fs.File, error) {
 	return lib.cache.CreateEphemeral("recent.html", br.Bytes())
 }
 
-func genAuthorPage(lib *Library, name string) (fs.File, error) {
+func (lib *Library) genAuthorPage(name string) (fs.File, error) {
 	type Page struct {
 		Books []*Record
 		NextAuthor,
@@ -93,7 +132,7 @@ func genAuthorPage(lib *Library, name string) (fs.File, error) {
 
 }
 
-func genBookPage(lib *Library, name string) (fs.File, error) {
+func (lib *Library) genBookPage(name string) (fs.File, error) {
 
 	type Page struct {
 		B *Record
@@ -149,7 +188,7 @@ func genBookPage(lib *Library, name string) (fs.File, error) {
 
 }
 
-func genCategoryPage(lib *Library, name string) (fs.File, error) {
+func (lib *Library) genCategoryPage(name string) (fs.File, error) {
 
 	type Page struct {
 		Category string
@@ -181,7 +220,7 @@ func genCategoryPage(lib *Library, name string) (fs.File, error) {
 
 }
 
-func genReadingPage(lib *Library, name string) (fs.File, error) {
+func (lib *Library) genReadingPage(name string) (fs.File, error) {
 
 	var rname string
 	var book *azrconvert.Book
@@ -193,7 +232,7 @@ func genReadingPage(lib *Library, name string) (fs.File, error) {
 		rname = name
 	}
 
-	book, err = getBookData(lib, rname)
+	book, err = lib.getBookData(rname)
 
 	var realbody string
 
@@ -233,7 +272,7 @@ func (lib *Library) GetBookRecord(name string) (*Record, error) {
 	return bk, err
 }
 
-func getBookData(lib *Library, name string) (book *azrconvert.Book, err error) {
+func (lib *Library) getBookData(name string) (book *azrconvert.Book, err error) {
 
 	book = new(azrconvert.Book)
 
@@ -256,9 +295,9 @@ func getBookData(lib *Library, name string) (book *azrconvert.Book, err error) {
 	return
 }
 
-func generateFile(lib *Library, name string) (fs.File, error) {
+func (lib *Library) generateFile(name string) (fs.File, error) {
 
-	book, _ := getBookData(lib, name)
+	book, _ := lib.getBookData(name)
 
 	var br []byte
 

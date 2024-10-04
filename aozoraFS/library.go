@@ -112,22 +112,22 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 		f, err = lib.genMainIndex()
 
 	case strings.HasPrefix(bname, "author"):
-		f, err = genAuthorPage(lib, name)
+		f, err = lib.genAuthorPage(name)
 
 	case strings.HasPrefix(bname, "book"):
-		f, err = genBookPage(lib, name)
+		f, err = lib.genBookPage(name)
 
 	case strings.HasPrefix(bname, "ndc"):
-		f, err = genCategoryPage(lib, bname)
+		f, err = lib.genCategoryPage(bname)
 
 	case strings.HasPrefix(dir, "files/files"):
-		f, err = generateFile(lib, name)
+		f, err = lib.generateFile(name)
 
 	case strings.HasPrefix(dir, "read/files"):
-		f, err = genReadingPage(lib, name)
+		f, err = lib.genReadingPage(name)
 
-	case bname == "recent.html":
-		f, err = lib.genRecents()
+	case strings.HasPrefix(bname, "recent"):
+		f, err = lib.genRecents(bname)
 
 	default:
 		err = errors.New("invalid request")

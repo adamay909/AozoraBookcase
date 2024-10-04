@@ -292,20 +292,17 @@ func (b *Record) setCategory(ndc map[string]string) {
 	}
 	codes := strings.Split(s, " ")
 	for _, c := range codes {
-		if len(c) != 3 {
-			continue
-		}
-		_, ok := ndc[c[:1]]
-		if ok {
-			_, ok := ndc[c[:2]]
+		if len(c) == 3 {
+			_, ok := ndc[c[:1]]
 			if ok {
-				b.Categories = append(b.Categories, [3]string{c[:1], c[:2], c})
-			} /*else {
-				continue
-			}*/
-
+				_, ok := ndc[c[:2]]
+				if ok {
+					b.Categories = append(b.Categories, [3]string{c[:1], c[:2], c})
+				}
+			}
 		}
 	}
+
 	for _, e := range b.Categories {
 
 		b.Category = b.Category + ndc[e[0]] + "--" + ndc[e[1]]

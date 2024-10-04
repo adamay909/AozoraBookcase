@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"log"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall/js"
 
@@ -36,7 +37,7 @@ func setupHashHandlers() {
 
 	setHashHandler("#categories", mainPages)
 
-	setHashHandler("#recent.html", mainPages)
+	setHashHandler("#recent", recentsPage)
 
 	setHashHandler("#read", readBook)
 
@@ -100,6 +101,48 @@ func setHashHandler(prefix string, f handleFunc) {
 }
 
 func mainPages(path string) {
+
+	mkpage(path, string(getPageData(strings.Split(path, `::`)[0])))
+
+	domHTML.Set("style", "writing-mode: horizontal-tb")
+
+	if elem, err := getElementById(path); err == nil {
+
+		scrollTo(elem)
+
+	} else {
+
+		domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
+	}
+
+	log.Println("spaserver: done constructing page", path)
+
+	return
+
+}
+
+func recentsPage(path string) {
+
+	globalLib.SortByAvailDate()
+
+	n, err := strconv.Atoi(strings.TrimPrefix(strings.TrimSuffix(path, ".html"), "recent"))
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if n < 1 {
+		n = 1
+	}
+
+	if (n-1)*100 > globalLib.LenDistinctBooks() {
+
+		n = globalLib.LenDistinctBooks() / 100
+
+	}
+
+	path = "recent" + strconv.Itoa(n) + ".html"
 
 	mkpage(path, string(getPageData(strings.Split(path, `::`)[0])))
 

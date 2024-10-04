@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"io/fs"
+	"log"
 	"syscall/js"
 	"time"
 )
@@ -116,6 +117,7 @@ func (s *localStorage) Write(name string, data []byte) (err error) {
 	}
 
 	js.Global().Get("localStorage").Call("setItem", name, b64enc(data))
+	log.Println(name, "saved to local storage")
 
 	return
 }

@@ -127,15 +127,11 @@ func (lib *Library) FetchLibrary() {
 
 	path, _ := url.Parse(pathString)
 
-	data := download(path)
-
-	za, _ := zipfs.ZipArchiveFromData(data)
+	za, _ := zipfs.ZipArchiveFromData(download(path))
 
 	defer za.CloseArchive()
 
-	zd := za.ReadMust("list_person_all_extended_utf8.csv")
-
-	lib.getBooklist(zd)
+	lib.getBooklist(za.ReadMust("list_person_all_extended_utf8.csv"))
 
 	lib.setupAuthorsList()
 
@@ -231,11 +227,8 @@ func (lib *Library) getBooklist(d []byte) {
 
 		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
 
-		book.WorkCopyright = cells[col["作品著作権フラグ"]]
-		book.AuthorCopyright = cells[col["人物著作権フラグ"]]
-
 		if lib.strict {
-			if book.WorkCopyright == "あり" || book.AuthorCopyright == "あり" {
+			if cells[col["作品著作権フラグ"]] == "あり" || cells[col["人物著作権フラグ"]] == "あり" {
 				continue
 			}
 		}
@@ -257,10 +250,10 @@ func (lib *Library) getBooklist(d []byte) {
 		book.TitleSort = cells[col["ソート用読み"]]
 		book.Subtitle = cells[col["副題"]]
 		book.SubtitleY = cells[col["副題読み"]]
-		book.OriginalTitle = cells[col["原題"]]
+		//book.OriginalTitle = cells[col["原題"]]
 		book.PublDate = cells[col["初出"]]
 		book.FirstAvailable = cells[col["公開日"]]
-		book.ModTime = cells[col["最終更新日"]]
+		//book.ModTime = cells[col["最終更新日"]]
 		book.AuthorID = cells[col["人物ID"]]
 		book.NameSei = cells[col["姓"]]
 		book.NameMei = cells[col["名"]]
@@ -268,8 +261,8 @@ func (lib *Library) getBooklist(d []byte) {
 		book.NameMeiY = cells[col["名読み"]]
 		book.NameSeiSort = cells[col["姓読みソート用"]]
 		book.NameMeiSort = cells[col["名読みソート用"]]
-		book.NameSeiR = cells[col["姓ローマ字"]]
-		book.NameMeiR = cells[col["名ローマ字"]]
+		//book.NameSeiR = cells[col["姓ローマ字"]]
+		//book.NameMeiR = cells[col["名ローマ字"]]
 		book.Role = cells[col["役割フラグ"]]
 		book.DoBirth = cells[col["生年月日"]]
 		book.DoDeath = cells[col["没年月日"]]
@@ -368,6 +361,19 @@ func (lib *Library) WriteBooklist(l []*Record) {
 
 func (lib *Library) getRecents(n int) []*Record {
 
+	if n*100+100 > len(lib.booksByDate) {
+		return lib.booksByDate[n*100:]
+	} else {
+		return (lib.booksByDate[n*100 : n*100+100])
+	}
+}
+
+func (lib *Library) SortByAvailDate() {
+
+	if len(lib.booksByDate) != 0 {
+		return
+	}
+
 	var list []*Record
 
 	listed := make(map[string]bool)
@@ -385,10 +391,14 @@ func (lib *Library) getRecents(n int) []*Record {
 
 	sortList(list, byAvailableDate)
 
-	if len(list) < n {
-		return list
-	}
+	lib.booksByDate = append(lib.booksByDate, list...)
 
-	return list[:n]
+}
+
+func (lib *Library) LenDistinctBooks() int {
+
+	lib.SortByAvailDate()
+
+	return len(lib.booksByDate)
 
 }
