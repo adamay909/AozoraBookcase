@@ -17,7 +17,22 @@ var handler map[string]handleFunc
 
 var prefixes []string
 
-var clicked bool
+func spaserver(event js.Value, params ...any) {
+
+	hash := percent.Decode(getHash())
+
+	for _, p := range prefixes {
+
+		if strings.HasPrefix(hash, p) {
+
+			handler[p](strings.TrimPrefix(hash, "#"))
+
+			return
+		}
+	}
+
+	return
+}
 
 func setupJS() {
 
@@ -51,37 +66,6 @@ func setupGlobalEventListeners() {
 
 	addEventListener(domWindow, "hashchange", spaserver)
 
-}
-
-func oldhash(event js.Value) string {
-
-	s := strings.Split(event.Get("oldURL").String(), "#")
-
-	if len(s) == 1 {
-		return ""
-	}
-	return s[1]
-
-}
-
-func spaserver(event js.Value, params ...any) {
-
-	hash := percent.Decode(getHash())
-
-	for _, p := range prefixes {
-
-		if strings.HasPrefix(hash, p) {
-
-			handler[p](strings.TrimPrefix(hash, "#"))
-
-			clicked = false
-
-			return
-		}
-	}
-	clicked = false
-
-	return
 }
 
 func setHashHandler(prefix string, f handleFunc) {
@@ -144,18 +128,11 @@ func recentsPage(path string) {
 
 	path = "recent" + strconv.Itoa(n) + ".html"
 
-	mkpage(path, string(getPageData(strings.Split(path, `::`)[0])))
+	mkpage(path, string(getPageData(path)))
 
 	domHTML.Set("style", "writing-mode: horizontal-tb")
 
-	if elem, err := getElementById(path); err == nil {
-
-		scrollTo(elem)
-
-	} else {
-
-		domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
-	}
+	domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
 
 	log.Println("spaserver: done constructing page", path)
 
@@ -325,17 +302,17 @@ func readFromResources(name string) []byte {
 
 }
 
-func isBookPage(path string) bool {
-
-	return strings.HasPrefix(path, "books/book_")
-
-}
-
 func mkpage(path string, data string) {
 
 	replaceBody(data)
 
 	domBody.Call("removeAttribute", "class")
+
+	addPageEventListeners(path)
+
+}
+
+func addPageEventListeners(path string) {
 
 	epubdl, err := getElementById("epubdl")
 

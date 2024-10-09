@@ -26,8 +26,10 @@ type cfinfo struct {
 
 func (s *localStorage) Open(name string) (fs.File, error) {
 
-	f := new(cacheFile)
 	var err error
+
+	f := new(cacheFile)
+
 	if !fs.ValidPath(name) {
 
 		err = &fs.PathError{Op: "open", Path: name, Err: errors.New("invalid path name")}
