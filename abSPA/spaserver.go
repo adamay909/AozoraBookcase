@@ -90,7 +90,7 @@ func mainPages(path string) {
 
 	domHTML.Set("style", "writing-mode: horizontal-tb")
 
-	if elem, err := getElementById(path); err == nil {
+	if elem, err := getElementByID(path); err == nil {
 
 		scrollTo(elem)
 
@@ -314,7 +314,7 @@ func mkpage(path string, data string) {
 
 func addPageEventListeners(path string) {
 
-	epubdl, err := getElementById("epubdl")
+	epubdl, err := getElementByID("epubdl")
 
 	if err == nil {
 
@@ -322,7 +322,7 @@ func addPageEventListeners(path string) {
 
 	}
 
-	azw3dl, err := getElementById("azw3dl")
+	azw3dl, err := getElementByID("azw3dl")
 
 	if err == nil {
 
@@ -330,7 +330,7 @@ func addPageEventListeners(path string) {
 
 	}
 
-	rndbk, err := getElementById("rndbk")
+	rndbk, err := getElementByID("rndbk")
 
 	if err == nil {
 
@@ -338,7 +338,7 @@ func addPageEventListeners(path string) {
 
 	}
 
-	queryBox, err := getElementById("query")
+	queryBox, err := getElementByID("query")
 
 	if err == nil {
 
@@ -346,7 +346,7 @@ func addPageEventListeners(path string) {
 
 	}
 
-	setbtn, err := getElementById("menubutton")
+	setbtn, err := getElementByID("menubutton")
 
 	if err == nil {
 

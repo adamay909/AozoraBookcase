@@ -85,7 +85,7 @@ func createJSFile(data []byte, name string) js.Value {
 
 }
 
-func getUrl() string {
+func getURL() string {
 
 	return domWindow.Get("location").Get("href").String()
 
@@ -138,7 +138,7 @@ func fetchData(path *url.URL) (data []byte) {
 
 }
 
-func getElementById(id string) (elem js.Value, err error) {
+func getElementByID(id string) (elem js.Value, err error) {
 
 	elem = domDocument.Call("getElementById", id)
 
@@ -225,11 +225,11 @@ func reactivateElement(elem js.Value) {
 	return
 }
 
-func createElement(tag string, innerHtml string) js.Value {
+func createElement(tag string, innerHTML string) js.Value {
 
 	newEl := domDocument.Call("createElement", tag)
 
-	newEl.Set("innerHTML", innerHtml)
+	newEl.Set("innerHTML", innerHTML)
 
 	return newEl
 

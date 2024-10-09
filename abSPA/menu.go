@@ -16,7 +16,7 @@ func settingsMenu(event js.Value, param ...any) {
 
 func handleSettings(event js.Value, param ...any) {
 
-	kidsB, _ := getElementById("kidslib")
+	kidsB, _ := getElementByID("kidslib")
 
 	kidsNew := kidsB.Get("checked").Bool()
 
@@ -39,7 +39,7 @@ func handleSettings(event js.Value, param ...any) {
 
 func removeMenu() {
 
-	mn, _ := getElementById("x-menu")
+	mn, _ := getElementByID("x-menu")
 
 	mn.Call("remove")
 
@@ -66,7 +66,7 @@ func showSettingsMenu() {
 	domBody.Call("append", elem)
 
 	if globalSettings.kids {
-		elem, _ = getElementById("kidslib")
+		elem, _ = getElementByID("kidslib")
 		elem.Call("setAttribute", "checked", true)
 	}
 
@@ -74,7 +74,7 @@ func showSettingsMenu() {
 
 func activateMenu() {
 
-	submitb, _ := getElementById("submit")
+	submitb, _ := getElementByID("submit")
 
 	addEventListener(submitb, "click", handleSettings)
 

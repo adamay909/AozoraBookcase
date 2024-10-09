@@ -45,13 +45,13 @@ func initLibrary() {
 
 	aozorafs.SetDownloader(fetchData)
 
-	SetTemplates(globalLib)
+	setTemplates(globalLib)
 
 	ci, _ := time.ParseDuration("24h")
 
 	log.Println("starting up")
 
-	log.Println("site URL is", getUrl())
+	log.Println("site URL is", getURL())
 
 	globalLib.Initialize("https://"+getHost(), "", false, true, globalSettings.kids, true, ci)
 

@@ -9,7 +9,7 @@ import (
 //go:embed resources/*
 var templateFiles embed.FS
 
-func SetTemplates(lib *aozorafs.Library) {
+func setTemplates(lib *aozorafs.Library) {
 
 	lib.ImportTemplates(templateFiles)
 
