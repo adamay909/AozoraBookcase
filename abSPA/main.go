@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"log"
 	"time"
 
@@ -12,6 +13,9 @@ var globalLib *aozorafs.Library
 var globalSettings struct {
 	kids bool
 }
+
+//go:embed resources/*
+var resourceFiles embed.FS
 
 func main() {
 
@@ -45,7 +49,7 @@ func initLibrary() {
 
 	aozorafs.SetDownloader(fetchData)
 
-	setTemplates(globalLib)
+	globalLib.ImportTemplates(resourceFiles)
 
 	ci, _ := time.ParseDuration("24h")
 

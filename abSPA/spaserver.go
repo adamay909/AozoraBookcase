@@ -294,7 +294,7 @@ func readFrom(f fs.File) []byte {
 
 func readFromResources(name string) []byte {
 
-	f, _ := templateFiles.Open("resources/" + name)
+	f, _ := resourceFiles.Open("resources/" + name)
 
 	defer f.Close()
 
