@@ -12,7 +12,6 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 // NewLibrary returns a new Library.
@@ -60,7 +59,7 @@ Initialize initalized the library lib to the given specifications.
   - strict toggles whether or not to include books that are not in the public domain.
   - checkInt specifies the interval for checking for updates to the library upstream.
 */
-func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, strict bool, checkInt time.Duration) {
+func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, strict bool) {
 
 	lib.src = src
 
@@ -70,8 +69,6 @@ func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, str
 
 	lib.setStrict(strict)
 
-	lib.checkInterval = checkInt
-
 	lib.booksByID = make(map[string][]*Record)
 
 	lib.booksByAuthor = make(map[string][]*Record)
@@ -79,8 +76,6 @@ func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, str
 	lib.posOfAuthor = make(map[string]int)
 
 	lib.Categories = ndcmap()
-
-	lib.updating = false
 
 }
 
@@ -138,27 +133,6 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 	log.Println("created", info.Name())
 
 	return
-}
-
-/*RefreshBooklist checks for updates and if necessary refreshes the database periodically as specified by lib.checkInt. If lib.checkInt <=0, then database is never refreshed. */
-func (lib *Library) RefreshBooklist() {
-
-	update := func() {
-		lib.UpdateDB()
-		lib.UpdateBooklist()
-		lib.updatePages()
-	}
-
-	if lib.checkInterval <= 0 {
-		return
-	}
-	for {
-		time.Sleep(lib.checkInterval)
-
-		if lib.UpstreamUpdated(lib.lastUpdated) {
-			update()
-		}
-	}
 }
 
 func isValidFileName(n string) bool {

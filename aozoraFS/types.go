@@ -3,13 +3,11 @@ package aozorafs
 import (
 	"io/fs"
 	"text/template"
-	"time"
 )
 
 type LibFile interface {
 	fs.File
 	Write(b []byte) (n int, err error)
-	// Sync() error
 }
 
 type LibFS interface {
@@ -45,13 +43,9 @@ type Library struct {
 	randomT,
 	searchresultT,
 	readingT *template.Template
-	updating      bool
-	kids          bool
-	strict        bool
-	lastUpdated   time.Time
-	checkInterval time.Duration
-	Categories    map[string]string
-	nextrandom    int
+	kids       bool
+	strict     bool
+	Categories map[string]string
 }
 
 // records is for storing index cards.

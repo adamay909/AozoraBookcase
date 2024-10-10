@@ -132,15 +132,7 @@ func (s *localStorage) WriteString(name string, data string) (err error) {
 
 func (s *localStorage) CreateFile(name string, data []byte) (fs.File, error) {
 
-	f := new(cacheFile)
-
-	f.name = name
-
-	f.data = data
-
-	err := s.Write(name, data)
-
-	return f, err
+	return s.CreateEphemeral(name, data)
 }
 
 func (s *localStorage) CreateEphemeral(name string, data []byte) (fs.File, error) {

@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"log"
-	"time"
 
 	aozorafs "github.com/adamay909/AozoraBookcase/aozoraFS"
 )
@@ -51,13 +50,11 @@ func initLibrary() {
 
 	globalLib.ImportTemplates(resourceFiles)
 
-	ci, _ := time.ParseDuration("24h")
-
 	log.Println("starting up")
 
 	log.Println("site URL is", getURL())
 
-	globalLib.Initialize("https://"+getHost(), "", false, true, globalSettings.kids, true, ci)
+	globalLib.Initialize("https://"+getHost(), "", false, true, globalSettings.kids, true)
 
 	globalLib.FetchLibrary()
 }

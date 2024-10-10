@@ -27,10 +27,7 @@ func (lib *Library) genMainIndex() (fs.File, error) {
 		Prefix      string
 		Files       int
 		Authors     int
-		SectionData []struct {
-			Char string
-			List []*Record
-		}
+		SectionData []Sec
 	}
 
 	var Page PageData
@@ -45,7 +42,7 @@ func (lib *Library) genMainIndex() (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral("index.html", br.Bytes())
+	return lib.cache.CreateFile("index.html", br.Bytes())
 }
 
 func (lib *Library) genRecents(name string) (f fs.File, err error) {
@@ -101,7 +98,7 @@ func (lib *Library) genRecents(name string) (f fs.File, err error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral("recent.html", br.Bytes())
+	return lib.cache.CreateFile(name, br.Bytes())
 }
 
 func (lib *Library) genAuthorPage(name string) (fs.File, error) {
@@ -128,7 +125,7 @@ func (lib *Library) genAuthorPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral(filepath.Join("authors", "author_"+authorID+".html"), br.Bytes())
+	return lib.cache.CreateFile(filepath.Join("authors", "author_"+authorID+".html"), br.Bytes())
 
 }
 
@@ -184,7 +181,7 @@ func (lib *Library) genBookPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral(filepath.Join("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
+	return lib.cache.CreateFile(filepath.Join("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
 
 }
 
@@ -201,7 +198,6 @@ func (lib *Library) genCategoryPage(name string) (fs.File, error) {
 
 	P.Books = append(P.Books, lib.FindBooksWithMatchingCategories(q)...)
 
-	//	P.Category = lib.Categories[q]
 	P.Category = lib.Categories[q[:1]]
 	if len(q) > 1 {
 		P.Category = P.Category + " : " + lib.Categories[q[:2]]
@@ -216,7 +212,7 @@ func (lib *Library) genCategoryPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral(filepath.Join("categories", "ndc_"+q+".html"), br.Bytes())
+	return lib.cache.CreateFile(filepath.Join("categories", "ndc_"+q+".html"), br.Bytes())
 
 }
 
@@ -242,7 +238,7 @@ func (lib *Library) genReadingPage(name string) (fs.File, error) {
 		realbody = book.RenderBodyInner()
 		for _, file := range book.Files {
 			name1 := filepath.Join(filepath.Dir(rname), file.Name)
-			lib.cache.CreateEphemeral(name1, file.Data)
+			lib.cache.CreateFile(name1, file.Data)
 		}
 	}
 	br := new(bytes.Buffer)
@@ -255,7 +251,7 @@ func (lib *Library) genReadingPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateEphemeral(name, []byte(text))
+	return lib.cache.CreateFile(name, []byte(text))
 }
 
 func (lib *Library) GetBookRecord(name string) (*Record, error) {
@@ -289,7 +285,7 @@ func (lib *Library) getBookData(name string) (book *azrconvert.Book, err error) 
 		book = lib.getBookFromZip(zn)
 	} else {
 		book = lib.getBook(bk)
-		lib.cache.CreateEphemeral(zn, book.RenderWebpagePackage())
+		lib.cache.CreateFile(zn, book.RenderWebpagePackage())
 	}
 
 	return
@@ -314,7 +310,7 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 	}
 
-	return lib.cache.CreateEphemeral(name, br)
+	return lib.cache.CreateFile(name, br)
 }
 
 func getID(name string) string {
