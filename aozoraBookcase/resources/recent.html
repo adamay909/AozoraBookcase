@@ -9,29 +9,42 @@
 <body>
 
  <div class="sitenavigation">
- <a href="/index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a>
-<a href="/index.html" class="navigation"><div class="sitenavbutton">作者一覧</div></a>
- <a href="/random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
-<div class="searchbox" ><form action="/search" method="post" />
-   &#x1F50D;<input type="text" name="query" />
+
+<div><a href="/index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
+
+
+<div><a href="/random.html" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a></div>
+
+<div class="searchbox" ><form action="/search" method="post" >
+   &#x1F50D;<input type="text" name="query"> 
   </form></div>
+
+<div>
+</div>
+
 </div>
 
 
+<div class="navigation">
 
+{{ if ne .NPT "0" }}<a class="navigation" href="/recent{{.NPT}}.html">{{end}}<div class="navbutton">千冊前</div>{{ if ne .NPT "0"}}</a>{{end}}
+{{ if ne .NP "0" }}<a class="navigation" href="/recent{{.NP}}.html">{{end}}<div class="navbutton">百冊前</div>{{ if ne .NP "0"}}</a>{{end}}
+{{ if ne .NN "0" }}<a class="navigation" href="/recent{{.NN}}.html">{{end}}<div class="navbutton">百冊後</div>{{if ne .NN "0"}}</a>{{end}}
+{{ if ne .NNT "0" }}<a class="navigation" href="/recent{{.NNT}}.html" >{{end}}<div class="navbutton">千冊後</div>{{ if ne .NNT "0" }}</a>{{end}}
 	 
+</div>
 
- <h2>新着１００</h2>
+ <h2>着順 {{.ORD}}〜</h2>
 <div class="titlelist">
 {{ range .Books }}
 {{ $x := . }}
 <a href="/books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
  <div class="booklink">
-  <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
-  <span class="title">{{.Title}} {{.Subtitle}}</span><br />
-	<span class="note">作者:	{{$x.FullName}}</span><br />
+  <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br>
+  <span class="title">{{.Title}} {{.Subtitle}}</span><br>
+	<span class="note">作者:	{{$x.FullName}}</span><br>
  
-  {{ with $x.Category }} <span class="note"> （{{ with $x.Kids }}児童書: {{ end }}{{.}}）</span><br />{{ end}}
+  {{ with $x.Category }} <span class="note"> （{{ with $x.Kids }}児童書: {{ end }}{{.}}）</span><br>{{ end}}
   <span class="note">（{{.KanaZukai}}）</span>
  </div>
 </a>

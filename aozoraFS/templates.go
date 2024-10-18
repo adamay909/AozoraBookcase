@@ -50,6 +50,11 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 		data := make([]byte, info.Size())
 		f.Read(data)
+
+		if info.Name() == "favicon.ico" {
+			lib.cache.CreateFile(info.Name(), data)
+		}
+
 		t := strings.Split(string(data), "\n")[0]
 
 		tn, err := templateName(t)

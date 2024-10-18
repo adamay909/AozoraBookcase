@@ -124,6 +124,9 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 	case strings.HasPrefix(bname, "recent"):
 		f, err = lib.genRecents(bname)
 
+	case strings.HasPrefix(bname, "random"):
+		f, err = lib.GenRandomBook()
+
 	default:
 		err = errors.New("invalid request")
 		return
@@ -173,6 +176,13 @@ func isValidFileName(n string) bool {
 		return true
 	}
 
+	if strings.HasPrefix(n, "recent") && strings.HasSuffix(n, ".html") {
+		return true
+	}
+
+	if strings.HasPrefix(n, "random") && strings.HasSuffix(n, ".html") {
+		return true
+	}
 	if len(strings.Split(n, "/")) > 1 {
 		log.Println("invalid request:", n)
 		return false
@@ -186,10 +196,6 @@ func isValidFileName(n string) bool {
 		return true
 	}
 	if n == "index.html" {
-		return true
-	}
-
-	if n == "recent.html" {
 		return true
 	}
 

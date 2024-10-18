@@ -1,6 +1,6 @@
 {{/* searchresult */}}
 {{ $p := .Prefix }}
-<!--DOCTYPE html-->
+<!DOCTYPE html>
 <html lang="ja">
  <head>
   <meta name="viewport" content="width=device-width">
@@ -11,15 +11,21 @@
  <body>
 
  <div class="sitenavigation">
- <a href="/index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a>
-  <a class="navigation" href="/index.html"><div class="sitenavbutton">作者一覧<br /></div></a>
-<a href="/recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a>
- <a href="/random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
-<div class="searchbox" ><form action="/search" method="post" />
-   &#x1F50D;<input type="text" name="query" />
+
+ <div><a href="/index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
+
+<div><a href="/recent1.html" class="navigation"><div class="sitenavbutton">新着順</div></a></div>
+
+<div><a href="/random.html" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a></div>
+
+<div class="searchbox" ><form action="/search" method="post" >
+   &#x1F50D;<input type="text" name="query" >
   </form></div>
+
+<div>
 </div>
 
+</div>
 
 <h1>検索結果</h1>
 
@@ -27,9 +33,9 @@
 <div class="authorlistsection">
  {{ with  not .FoundA }} 見つかりませんでした {{ end }}
  {{ range .Authors }}
-<a href="{{$p}}/authors/author_{{.AuthorID}}.html">
+<a href="/authors/author_{{.AuthorID}}.html">
 <div class="authorlistbutton">
-<span class="rt">{{.FullNameY}}</span><br />
+<span class="rt">{{.FullNameY}}</span><br>
 <span class="rb">{{.FullName}}</span>
 </div>
 </a>
@@ -41,10 +47,10 @@
  {{ with  not .FoundT }} 見つかりませんでした {{ end }}
 {{ range .Titles }}
 {{ $x := . }}
-<a href="{{$p}}/books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+<a href="/books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
  <div class="booklink">
-  <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
-	<span class="note">作者:	{{$x.FullName}}</span><br />
+  <span class="title">{{$x.Title}} {{.Subtitle}}</span><br>
+	<span class="note">作者:	{{$x.FullName}}</span><br>
  </div>
 </a>
 {{end}}
@@ -59,7 +65,8 @@
 	<a href="/categories/ndc_{{ . }}.html" class="categorylist"><div class="categorylink">{{ndcm .}}</div></a>
  {{end}}
 </div>
-</a>
 <p></p>
+
+
  </body>
 </html>

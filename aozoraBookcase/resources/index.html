@@ -8,20 +8,30 @@
 </head>
 <body>
 
+<div id="mainarea">
  <div class="sitenavigation">
+
  <div class="sitetitle">青空文庫ブラウザ</div>
-<a href="/recent.html" class="navigation"><div class="sitenavbutton">新着１００冊</div></a>
- <a href="/random" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a>
-<div class="searchbox" ><form action="/search" method="post" />
-   &#x1F50D;<input type="text" name="query" />
+
+<div><a href="recent1.html" class="navigation"><div class="sitenavbutton">新着順</div></a></div>
+
+<div><a href="/random.html" class="navigation"><div class="sitenavbutton">ランダムな一冊</div></a></div>
+
+<div class="searchbox" ><form action="/search" method="post" >
+   &#x1F50D;<input type="text" name="query" >
   </form></div>
+
+<div style="text-align: end; padding-right: 0.5em">
+<div class="sitenavbutton" id="menubutton">&#x2630;</div>
+</div>
+
 </div>
 
 <div>
 <h2>作者一覧</h2>
 <div class="navigation">
 {{ range .SectionData}}
-<a href="#authors_{{.Char}}" class="navigation"><div class="navbutton">{{.Char}}</div></a>
+<div class="navbutton"><a href="#index.html::{{.Char}}" class="navigation"><div class="navbutton">{{.Char}}</div></a></div>
 {{ end }}
 </div>
 
@@ -29,13 +39,14 @@
 <div class="authorlist">
 
  {{ range .SectionData }}
- <div id = "authors_{{.Char}}"></div>
+ <div id = "index.html::{{.Char}}"></div>
  <h2 class="al-header">{{.Char}}</h2>
 <div class="authorlistsection">
 {{ range .List }}
-<a href="/authors/author_{{.AuthorID}}.html">
+{{ $x := . }}
+<a href="authors/author_{{.AuthorID}}.html">
 <div class="authorlistbutton">
- <ruby>{{ .FullName }}<rt>{{ .FullNameY }}</rt></ruby>
+{{ range .NameParts }}  <ruby>{{ . }}<rt>{{ $x.FullNameY }}</rt></ruby>{{ end }}
 </div>
 </a>
 {{end}}
@@ -43,7 +54,9 @@
 {{ end}}
 </div>
 </div>
-<p></p>
+</div>
+
+
 </body>
 
 </html>

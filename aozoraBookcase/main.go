@@ -1,6 +1,8 @@
 package main
 
 import (
+	"embed"
+	_ "embed" //for embedding data
 	"flag"
 	"fmt"
 	"log"
@@ -10,7 +12,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
-	"time"
 
 	aozorafs "github.com/adamay909/AozoraBookcase/aozoraFS"
 )
@@ -18,7 +19,9 @@ import (
 var src, root string
 var clean, verbose, kids, strict bool
 var iface, port string
-var checkint string
+
+//go:embed resources/*
+var resourceFiles embed.FS
 
 func init() {
 
@@ -30,7 +33,6 @@ func init() {
 	flag.StringVar(&port, "p", "3333", "network interface")
 	flag.BoolVar(&kids, "children", false, "start a kid's library")
 	flag.BoolVar(&strict, "strict", true, "set library to show only public domain texts")
-	flag.StringVar(&checkint, "refresh", "24h", "interval between library refreshes.")
 
 	flag.StringVar(&src, "src", "https://localhost:8888", "root url of aozorabunko's file")
 
@@ -61,24 +63,21 @@ func main() {
 
 	mainLib := aozorafs.NewLibrary()
 
-	ci, err := time.ParseDuration(checkint)
+	fsys := NewDiskFS(filepath.Join(root, "library"))
 
-	if err != nil {
-		log.Println(err)
-	}
-	os.RemoveAll(filepath.Join(root, "library"))
+	fsys.RemoveAll()
 
-	mainLib.SetCache(NewDiskFS(filepath.Join(root, "library")))
+	mainLib.SetCache(fsys)
 
 	aozorafs.SetDownloader(DownloadFile)
 
-	aozorafs.SetHeader(GetHeader)
+	mainLib.ImportTemplates(resourceFiles)
 
-	SetTemplates(mainLib)
+	mainLib.Initialize(src, root, clean, verbose, kids, strict)
 
-	mainLib.Initialize(src, root, clean, verbose, kids, strict, ci)
+	mainLib.FetchLibrary()
 
-	mainLib.LoadBooklist()
+	mainLib.SortByAvailDate()
 
 	log.Println("Setting up library done.")
 
@@ -86,9 +85,8 @@ func main() {
 
 	http.HandleFunc("/search", SearchResultsHandler(mainLib))
 
-	http.HandleFunc("/random", RandomBookHandler(mainLib))
-
 	fmt.Println("Listening on " + iface + ":" + port)
+
 	log.Fatal(http.ListenAndServe(iface+":"+port, nil))
 
 }
@@ -102,7 +100,7 @@ func SearchResultsHandler(lib *aozorafs.Library) func(w http.ResponseWriter, r *
 		qs := r.Form["query"]
 
 		if len(qs) > 0 {
-			log.Println("searching for", qs[0])
+			log.Println("search handler:", qs[0])
 		} else {
 			return
 		}
@@ -114,6 +112,7 @@ func SearchResultsHandler(lib *aozorafs.Library) func(w http.ResponseWriter, r *
 }
 
 // RandomBook returns a random book from the library
+/*
 func RandomBookHandler(lib *aozorafs.Library) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -121,3 +120,4 @@ func RandomBookHandler(lib *aozorafs.Library) func(w http.ResponseWriter, r *htt
 		return
 	}
 }
+*/

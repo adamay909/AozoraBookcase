@@ -1,0 +1,424 @@
+{{/* defaultcss */}}
+
+body {
+}
+
+/*Site Banner Area*/
+div.sitenavigation {
+ display: flex;
+ flex-flow: row wrap;
+ justify-content: space-evenly;
+ position: static;
+ background-color: Blue;
+ color: white;
+ width: 100%;
+ padding-top: 0.5rem;
+ padding-bottom: 0.5rem;
+}
+
+div.sitenavigation a {
+ text-decoration: none;
+}
+
+div.sitetitle {
+ color: white;
+ display: inline-block;
+ font-size: 1.4rem;
+ margin-right: 2rem;
+ padding-top: 0.1rem;
+}
+
+div.sitenavbutton {
+ color: white;
+ display: inline-block;
+ padding-top: 0.7rem;
+}
+
+div.sitenavbutton:hover {
+ color: darkblue;
+ background-color:white;
+ cursor: pointer;
+}
+
+div.searchbox{
+padding-top: 0.6rem;
+}
+
+/*Sub-Navigation Bar*/
+
+div.navigation {
+ display: flex;
+ flex-flow: row wrap;
+ align-items: center;
+ justify-content: space-evenly;
+ position: sticky;
+ top: 0;
+ background-color: lightgrey;
+ width: 100%
+}
+
+div.navigation a {
+ text-decoration: none;
+}
+
+div.navbutton {
+ color: grey;
+ background-color: lightgrey;
+ cursor: default;
+}
+
+a div.navbutton {
+ color: darkslategrey;
+ background-color: lightgrey;
+ cursor: default;
+}
+
+a div.navbutton:hover {
+ color: white;
+ background-color: darkslategrey;
+ cursor: pointer;
+}
+
+/*Main Index Page*/
+
+
+div.authorlist {
+ margin-bottom: 5rem;
+}
+
+h2.al-header {
+ font-size: 1.2rem;
+}
+
+div.authorlistsection{
+ display: grid;
+ grid-template-columns: repeat(auto-fill, 18rem);
+ grid-auto-rows: max-content;
+ overflow-wrap: anywhere;
+ row-gap: 1rem;
+ column-gap: 2rem;
+}
+
+@media screen and (max-width: 900px) {
+div.authorlistsection{
+display: flex;
+flex-flow: row wrap;
+ row-gap: 0.5rem;
+ column-gap: 0.5rem;
+}
+
+div.authorlistbutton{
+ width: 8rem;
+}
+}
+
+div.authorlistsection a {
+text-decoration: none;
+color: black;
+}
+
+div.authorlistsection a:hover {
+text-decoration: none;
+background-color: MintCream;
+ cursor: pointer;
+}
+
+div.authorlistbutton{
+border-top: dotted;
+border-width: thin;
+padding: 0.4rem;
+}
+
+div.authorlistbutton > span.rt{
+font-size: 0.6rem;
+}
+
+div.authorlistbutton > span.rb{
+font-size: 1.1rem;
+}
+
+div.authorlistbutton > span.note{
+font-size: 0.4rem;
+}
+
+/*Individual Item Data*/
+
+div.data{
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ row-gap: 1rem;
+ overflow-wrap: anywhere;
+ column-gap: 1rem;
+ padding-top: 1.5rem;
+ padding-bottom: 1.5rem;
+}
+
+
+@media screen and (max-width: 900px) {
+div.data{
+ display: flex;
+ flex-flow: row wrap;
+ padding-bottom: 1.5rem;
+ padding-top: 1.5rem;
+}
+
+div.data div.dname{
+ flex: 1 0 30%;
+ text-align: right;
+ align-self: center;
+}
+
+div.data div.dtitle{
+ flex: 1 0 50%;
+ font-size: 1.5rem;
+ text-wrap: pretty;
+}
+
+div.data div.notes{
+ flex: 1 0 50%;
+ justify-self:start;
+}
+
+}
+
+
+div.data div.dname{
+ justify-self: end;
+ align-self: center;
+}
+
+div.data div.dtitle{
+ justify-self:start;
+ font-size: 1.5rem;
+}
+
+div.yomi {
+ font-size: 0.8rem;
+}
+
+div.dtitle>span.yomi{
+ font-size: 0.6rem;
+}
+
+div.data div.notes{
+ justify-self:start;
+}
+
+/*Book Page Specific*/
+
+div.dllinks {
+ margin-top: 3rem;
+}
+
+div.downloadlink {
+ display: flex;
+ justify-content: center;
+}
+
+a.dlbutton {
+ text-decoration: none;
+}
+
+div.dlbutton {
+text-align: center;
+align-self:stretch;
+border: double;
+border-radius: 1rem;
+color: black;
+background-color: lightgrey;
+width: 8rem;
+margin: 1rem;
+padding: 0.5rem 1rem 0.5rem 1rem;
+}
+
+div.dlbutton:hover {
+background-color: darkslategray;
+color: white;
+cursor: pointer;
+}
+ 
+/*Author Page Specific*/
+
+ div.titlelist{
+ display: grid;
+ grid-template-columns: repeat(auto-fill, 18rem);
+ grid-auto-rows: max-content;
+ row-gap: 1rem;
+ margin-bottom: 5rem;
+}
+
+@media screen and (max-width: 900px) {
+ div.titlelist{
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ overflow-wrap: anywhere;
+ grid-auto-rows: max-content;
+ row-gap: 0.5rem;
+ margin-bottom: 2rem;
+}
+
+}
+
+a.titlelist{
+ text-decoration: none;
+ color: black;
+}
+
+a.titlelist:hover{
+ background-color: MintCream;
+ cursor: pointer;
+}
+
+div.booklink{
+ border-left: solid thick green;
+ border-top: dotted thin green;
+ padding: 0.4rem;
+ margin-right: 1rem;
+ overflow-wrap: anywhere;
+}
+
+div.booklink>span.title{
+ font-size: 1.1rem;
+}
+div.booklink>span.yomi{
+ font-size: 0.8rem;
+}
+div.booklink>span.note{
+ font-size: 0.8rem;
+}
+
+
+/*Category Page Specific*/
+
+div.categorylist{
+ display: block;
+}
+div.categorylink{
+ border-left: solid thick green;
+ border-top: dotted thin green;
+ padding: 0.4em;
+}
+
+div.categorylink:hover{
+ background-color: MintCream;
+ cursor: pointer;
+}
+a.categorylist{
+ text-decoration: none;
+ color: black;
+}
+
+a.categorylist:hover{
+ background-color: MintCream;
+ cursor: pointer;
+}
+
+
+/*Menu Panel*/
+
+div.menupane {
+position: fixed;
+width: 25rem;
+height: 80%;
+padding: auto;
+top: 0;
+right: 0;
+border: solid black;
+background-color: white;
+z-index: 2;
+}
+
+div.menuitem {
+ margin: 0.5rem;
+}
+
+
+div.cover {
+ position: absolute;
+ top: 0;
+ left: 0;
+height: 100%;
+width: 100%;
+padding: 100%;
+z-index: 1;
+background-color: grey;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+/*Hourglass*/
+
+div.waitcover {
+ position: fixed;
+ top: 0;
+ left: 0;
+height: 100%;
+width: 100%;
+padding: 100%;
+z-index: 2;
+background-color: grey;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+div.hourglass{
+ animation: 2s infinite normal wait;
+}
+
+@keyframes wait {
+
+ 0% {
+ }
+
+ 25% {
+
+  transform: rotate(0.25turn);
+
+ }
+
+ 50% {
+
+  transform: rotate(0.5turn);
+
+ }
+
+ 75% {
+
+  transform: rotate(0.75turn);
+
+ }
+
+ 100% {
+
+  transform: rotate(1turn);
+
+ }
+
+}
+
+
+/*Reading Page*/
+div.readingPage div.sitenavigation {
+ writing-mode: horizontal-tb;
+ position: fixed;
+ height: 1.5rem;
+ width: 100%;
+}
+
+div.readingPage div.sitetitle {
+  font-size: 1rem;
+}
+
+div.readingpane {
+ position: static;
+	height: calc(100vh-1.5rem); 
+ margin-top: 3.5rem;
+ margin-bottom: 1rem;
+ line-break: normal;
+ line-height: 180%;
+ padding-right: 1rem;
+ font-family: serif, sans-serif;
+}
+

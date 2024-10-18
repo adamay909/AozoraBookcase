@@ -1,29 +1,18 @@
 package aozorafs
 
 import (
-	"bytes"
-	"log"
-
+	"io/fs"
 	"math/rand"
 )
 
-func (lib *Library) GenRandomBook() []byte {
+func (lib *Library) GenRandomBook() (fs.File, error) {
 
-	var D struct {
-		B *Record
-	}
+	bk := lib.RandomBook()
 
-	D.B = lib.RandomBook()
+	booklnk := "/books/book_" + bk.AuthorID + "_" + bk.BookID + ".html"
 
-	w := new(bytes.Buffer)
+	return lib.genBookPage(booklnk)
 
-	err := lib.randomT.Execute(w, D)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	return w.Bytes()
 }
 
 func (lib *Library) RandomBook() *Record {

@@ -77,8 +77,8 @@ func (s *diskFS) CreateEphemeral(name string, data []byte) (fs.File, error) {
 
 }
 
-func (s *diskFS) RemoveAll(name string) {
-	os.RemoveAll(name)
+func (s *diskFS) RemoveAll() {
+	os.RemoveAll(s.path)
 	return
 }
 
