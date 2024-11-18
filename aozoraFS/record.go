@@ -286,10 +286,12 @@ func (b *Record) FileName() string {
 func (b *Record) setCategory(ndc map[string]string) {
 
 	s := strings.TrimLeft(b.NDC, "NDC ")
+
 	if strings.HasPrefix(s, "K") {
 		b.Kids = true
 		s = strings.TrimLeft(s, "K ")
 	}
+
 	codes := strings.Split(s, " ")
 	for _, c := range codes {
 		if len(c) == 3 {
@@ -301,6 +303,14 @@ func (b *Record) setCategory(ndc map[string]string) {
 				}
 			}
 		}
+	}
+	return
+}
+
+func (b *Record) SetCategoryString(ndc map[string]string) {
+
+	if b.Category != "" {
+		return
 	}
 
 	for _, e := range b.Categories {
@@ -315,6 +325,8 @@ func (b *Record) setCategory(ndc map[string]string) {
 
 	}
 	b.Category = strings.TrimSuffix(b.Category, ";")
+
+	return
 }
 
 func (b *Record) isChildrensBook() bool {

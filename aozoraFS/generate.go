@@ -67,6 +67,10 @@ func (lib *Library) genRecents(name string) (f fs.File, err error) {
 	var P PageData
 	P.Books = append(P.Books, lib.getRecents(n-1)...)
 
+	for _, b := range P.Books {
+		b.SetCategoryString(lib.Categories)
+	}
+
 	np := n - 1
 	nn := n + 1
 	npt := n - 10
@@ -115,7 +119,12 @@ func (lib *Library) genAuthorPage(name string) (fs.File, error) {
 
 	sortList(lib.booksByAuthor[authorID], byTitle)
 
-	P.Books = append(P.Books, lib.booksByAuthor[authorID]...)
+	for _, b := range lib.booksByAuthor[authorID] {
+
+		b.SetCategoryString(lib.Categories)
+		P.Books = append(P.Books, b)
+	}
+	//P.Books = append(P.Books, lib.booksByAuthor[authorID]...)
 	P.NextAuthor = lib.NextAuthor(P.Books[0])
 	P.PrevAuthor = lib.PrevAuthor(P.Books[0])
 
@@ -159,6 +168,7 @@ func (lib *Library) genBookPage(name string) (fs.File, error) {
 			break
 		}
 	}
+	P.B.SetCategoryString(lib.Categories)
 
 	if k == 0 {
 		P.PrevBook = lib.LastBookBy(lib.PrevAuthor(P.B))

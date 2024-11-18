@@ -10,7 +10,10 @@ import (
 var globalLib *aozorafs.Library
 
 var globalSettings struct {
-	kids bool
+	kids    bool
+	strict  bool
+	verbose bool
+	clean   bool
 }
 
 //go:embed resources/*
@@ -19,6 +22,9 @@ var resourceFiles embed.FS
 func main() {
 
 	globalSettings.kids = false
+	globalSettings.strict = false
+	globalSettings.clean = true
+	globalSettings.verbose = true
 
 	initLibrary()
 
@@ -54,7 +60,7 @@ func initLibrary() {
 
 	log.Println("site URL is", getURL())
 
-	globalLib.Initialize("https://"+getHost(), "", false, true, globalSettings.kids, true)
+	globalLib.Initialize("https://"+getHost(), "", globalSettings.clean, globalSettings.verbose, globalSettings.kids, globalSettings.strict)
 
 	globalLib.FetchLibrary()
 }
@@ -62,7 +68,6 @@ func initLibrary() {
 func loadMainPage() {
 
 	setHash("")
-
 	setHash("index.html")
 
 }

@@ -174,6 +174,7 @@ func (lib *Library) getBooklist(d []byte) {
 		lib.booksByAuthor[book.AuthorID] = append(lib.booksByAuthor[book.AuthorID], book)
 
 	}
+
 	rows = nil
 
 	log.Println("library has", len(lib.booklist), "books")
