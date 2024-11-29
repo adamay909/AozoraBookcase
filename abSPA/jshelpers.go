@@ -6,10 +6,11 @@ import (
 	"log"
 	"mime"
 	"net/http"
-	"net/url"
-	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall/js"
+
+	str "github.com/adamay909/AozoraBookcase/stringops"
 )
 
 var (
@@ -79,9 +80,9 @@ func createJSFile(data []byte, name string) js.Value {
 
 	jsdata := uint8arrayOf(data)
 
-	blob := blobConstructor.New(arrayConstructor.New(jsdata), map[string]any{"type": mime.TypeByExtension(filepath.Ext(name))})
+	blob := blobConstructor.New(arrayConstructor.New(jsdata), map[string]any{"type": mime.TypeByExtension(str.FilepathExt(name))})
 
-	return fileConstructor.New(arrayConstructor.New(blob), filepath.Base(name))
+	return fileConstructor.New(arrayConstructor.New(blob), str.FilepathBase(name))
 
 }
 
@@ -119,13 +120,13 @@ func replaceBody(p string) {
 
 }
 
-func fetchData(path *url.URL) (data []byte) {
+func fetchData(path string) (data []byte) {
 
-	loc := path.String()
+	//	loc := path.String()
 
-	log.Println("fetching", loc)
+	log.Println("fetching", path)
 
-	r, err := http.Get(loc)
+	r, err := http.Get(path)
 
 	if err != nil {
 		log.Println(err)
@@ -287,4 +288,13 @@ func addStyle(elem js.Value, css string) {
 
 	elem.Call("setAttribute", "style", css1+css)
 
+}
+
+func writeConsoleLog(msg ...string) {
+
+	logmsg := js.Global().Get("Date").New().Call("toISOString").String() + strings.Join(msg, " ")
+
+	domWindow.Get("console").Call("log", logmsg)
+
+	return
 }

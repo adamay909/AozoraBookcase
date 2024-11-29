@@ -5,9 +5,10 @@ import (
 	"errors"
 	"io/fs"
 	"log"
-	"path/filepath"
 	"strings"
 	"text/template"
+
+	str "github.com/adamay909/AozoraBookcase/stringops"
 )
 
 func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
@@ -33,7 +34,7 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 	for k := range entry {
 
-		f, err := dir.Open(filepath.Join(dirname, entry[k].Name()))
+		f, err := dir.Open(str.FilepathJoin(dirname, entry[k].Name()))
 		defer f.Close()
 
 		if err != nil {

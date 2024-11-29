@@ -10,8 +10,9 @@ import (
 	"errors"
 	"io/fs"
 	"log"
-	"path/filepath"
 	"strings"
+
+	str "github.com/adamay909/AozoraBookcase/stringops"
 )
 
 // NewLibrary returns a new Library.
@@ -98,8 +99,8 @@ func (lib *Library) setStrict(val bool) {
 
 func createFile(lib *Library, name string) (f fs.File, err error) {
 
-	dir := filepath.Dir(name)
-	bname := filepath.Base(name)
+	dir := str.FilepathDir(name)
+	bname := str.FilepathBase(name)
 
 	switch {
 

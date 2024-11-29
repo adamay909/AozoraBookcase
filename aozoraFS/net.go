@@ -1,10 +1,8 @@
 package aozorafs
 
-import "net/url"
+var download func(path string) []byte
 
-var download func(path *url.URL) []byte
-
-func SetDownloader(f func(path *url.URL) []byte) {
+func SetDownloader(f func(path string) []byte) {
 
 	download = f
 

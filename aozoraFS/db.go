@@ -1,12 +1,11 @@
 package aozorafs
 
 import (
-	"encoding/csv"
 	"log"
-	"net/url"
 	"sort"
 	"strings"
 
+	str "github.com/adamay909/AozoraBookcase/stringops"
 	"github.com/adamay909/AozoraBookcase/zipfs"
 )
 
@@ -20,16 +19,9 @@ func (lib *Library) FetchLibrary() {
 
 	}
 
-	pathString, err := url.JoinPath(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
+	path := str.URLJoin(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
 
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	log.Println("requesting db", pathString)
-
-	path, _ := url.Parse(pathString)
+	log.Println("requesting db", path)
 
 	za, _ := zipfs.ZipArchiveFromData(download(path))
 
@@ -93,52 +85,55 @@ func (lib *Library) consolidateRecords(bookID string) {
 
 func (lib *Library) getBooklist(d []byte) {
 
-	rows := strings.Split(string(d), "\n")
-	log.Println("database has ", len(rows), "entries")
+	rows := str.NewLineReader(string(d))
 
-	headings, err := csv.NewReader(strings.NewReader(rows[0])).Read()
-	if err != nil {
-		log.Println("error reading Aozora Bunko database:", err)
-		return
+	row, eof := rows.Read()
+
+	headings := getCells(removeBOM(row))
+
+	hmap := make(map[string]int)
+
+	for i := range headings {
+
+		hmap[headings[i]] = i
+
 	}
 
-	col := make(map[string]int)
+	col := func(h string) int {
 
-	//get column number for each heading
-	for i, h := range headings {
-		col[h] = i
+		return hmap[h]
+
 	}
 
+	cells := make([]string, len(headings))
+
+	var uri string
 	var book *Record
 
 	//read into records
-	for i := 1; i < len(rows)-1; i++ {
+	for row, eof = rows.Read(); !eof; row, eof = rows.Read() {
 
-		r := rows[i]
-		cells, _ := csv.NewReader(strings.NewReader(r)).Read()
-
-		if len(cells) == 0 {
-			break
-		}
-
-		book = new(Record)
-
-		if !strings.HasPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp") {
-			continue
-		}
-
-		book.URI, _ = url.JoinPath(lib.src, strings.TrimPrefix(cells[col["XHTML/HTMLファイルURL"]], "https://www.aozora.gr.jp"))
+		cells = getCells(row)
 
 		if lib.strict {
-			if cells[col["作品著作権フラグ"]] == "あり" || cells[col["人物著作権フラグ"]] == "あり" {
+			if cells[col("作品著作権フラグ")] == "あり" || cells[col("人物著作権フラグ")] == "あり" {
 				continue
 			}
 		}
 
-		book.NDC = cells[col["分類番号"]]
+		uri = aozoraPath(cells[col("XHTML/HTMLファイルURL")])
+
+		if uri == "" {
+			continue
+		}
+
+		book = new(Record)
+
+		book.URI = str.URLJoin(lib.src, uri)
+		book.NDC = cells[col("分類番号")]
 		book.setCategory(lib.Categories)
 
-		book.KanaZukai = cells[col["文字遣い種別"]]
+		book.KanaZukai = cells[col("文字遣い種別")]
 
 		if lib.kids {
 			if !book.isChildrensBook() {
@@ -146,28 +141,28 @@ func (lib *Library) getBooklist(d []byte) {
 			}
 		}
 
-		book.BookID = cells[col["作品ID"]]
-		book.Title = cells[col["作品名"]]
-		book.TitleY = cells[col["作品名読み"]]
-		book.TitleSort = cells[col["ソート用読み"]]
-		book.Subtitle = cells[col["副題"]]
-		book.SubtitleY = cells[col["副題読み"]]
-		//book.OriginalTitle = cells[col["原題"]]
-		book.PublDate = cells[col["初出"]]
-		book.FirstAvailable = cells[col["公開日"]]
-		//book.ModTime = cells[col["最終更新日"]]
-		book.AuthorID = cells[col["人物ID"]]
-		book.NameSei = cells[col["姓"]]
-		book.NameMei = cells[col["名"]]
-		book.NameSeiY = cells[col["姓読み"]]
-		book.NameMeiY = cells[col["名読み"]]
-		book.NameSeiSort = cells[col["姓読みソート用"]]
-		book.NameMeiSort = cells[col["名読みソート用"]]
-		//book.NameSeiR = cells[col["姓ローマ字"]]
-		//book.NameMeiR = cells[col["名ローマ字"]]
-		book.Role = cells[col["役割フラグ"]]
-		book.DoBirth = cells[col["生年月日"]]
-		book.DoDeath = cells[col["没年月日"]]
+		book.BookID = cells[col("作品ID")]
+		book.Title = cells[col("作品名")]
+		book.TitleY = cells[col("作品名読み")]
+		book.TitleSort = cells[col("ソート用読み")]
+		book.Subtitle = cells[col("副題")]
+		book.SubtitleY = cells[col("副題読み")]
+		//book.OriginalTitle = cells[col("原題")]
+		book.PublDate = cells[col("初出")]
+		book.FirstAvailable = cells[col("公開日")]
+		//book.ModTime = cells[col("最終更新日")]
+		book.AuthorID = cells[col("人物ID")]
+		book.NameSei = cells[col("姓")]
+		book.NameMei = cells[col("名")]
+		book.NameSeiY = cells[col("姓読み")]
+		book.NameMeiY = cells[col("名読み")]
+		book.NameSeiSort = cells[col("姓読みソート用")]
+		book.NameMeiSort = cells[col("名読みソート用")]
+		//book.NameSeiR = cells[col("姓ローマ字")]
+		//book.NameMeiR = cells[col("名ローマ字")]
+		book.Role = cells[col("役割フラグ")]
+		book.DoBirth = cells[col("生年月日")]
+		book.DoDeath = cells[col("没年月日")]
 
 		lib.booklist = append(lib.booklist, book)
 		lib.booksByID[book.BookID] = append(lib.booksByID[book.BookID], book)
@@ -175,11 +170,8 @@ func (lib *Library) getBooklist(d []byte) {
 
 	}
 
-	rows = nil
-
-	log.Println("library has", len(lib.booklist), "books")
-
 	log.Println("finished parsing db.")
+
 	return
 }
 
@@ -225,4 +217,15 @@ func (lib *Library) LenDistinctBooks() int {
 
 	return len(lib.booksByDate)
 
+}
+
+func aozoraPath(fullpath string) string {
+
+	path := strings.TrimPrefix(fullpath, "https://www.aozora.gr.jp")
+
+	if len(path) == len(fullpath) {
+		return ""
+	}
+
+	return path
 }

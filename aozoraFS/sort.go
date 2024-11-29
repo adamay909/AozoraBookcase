@@ -31,13 +31,13 @@ func byAuthor(l []*Record) func(i, j int) bool {
 		if l[i].AuthorID < l[j].AuthorID {
 			return true
 		}
-		if l[i].AuthorID > l[j].AuthorID {
-			return false
-		}
+		//		if l[i].AuthorID > l[j].AuthorID {
+		//			return false
+		//		}
 
-		if l[i].TitleSort < l[j].TitleSort {
-			return true
-		}
+		//		if l[i].TitleSort < l[j].TitleSort {
+		//			return true
+		//		}
 		return false
 	}
 }

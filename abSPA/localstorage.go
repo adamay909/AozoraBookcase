@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"errors"
 	"io/fs"
 	"log"
@@ -44,8 +43,8 @@ func (s *localStorage) Open(name string) (fs.File, error) {
 		return f, err
 	}
 
-	f.name = name
-	f.data, err = b64dec(v.String())
+	//	f.name = name
+	//	f.data, err = b64dec(v.String())
 
 	return f, err
 }
@@ -239,12 +238,17 @@ func (info *cfinfo) Sys() any {
 
 func b64enc(in []byte) string {
 
-	return base64.StdEncoding.EncodeToString(in)
+	return string(in)
+
+	//return base64.StdEncoding.EncodeToString(in)
 
 }
 
 func b64dec(in string) ([]byte, error) {
 
-	return base64.StdEncoding.DecodeString(in)
+	var e error
+
+	return []byte(in), e
+	//base64.StdEncoding.DecodeString(in)
 
 }

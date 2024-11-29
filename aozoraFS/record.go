@@ -1,9 +1,9 @@
 package aozorafs
 
 import (
-	"path/filepath"
 	"strings"
 
+	str "github.com/adamay909/AozoraBookcase/stringops"
 	"github.com/adamay909/AozoraConvert/jptools"
 	"github.com/adamay909/AozoraConvert/runes"
 )
@@ -280,28 +280,21 @@ func (b *Record) fullNameMeta() string {
 
 // FileName returns the filename of the file associated with b.
 func (b *Record) FileName() string {
-	return strings.TrimSuffix(filepath.Base(b.URI), filepath.Ext(b.URI))
+	return strings.TrimSuffix(str.FilepathBase(b.URI), str.FilepathExt(b.URI))
 }
 
 func (b *Record) setCategory(ndc map[string]string) {
 
-	s := strings.TrimLeft(b.NDC, "NDC ")
+	s := strings.TrimPrefix(b.NDC, "NDC ")
 
 	if strings.HasPrefix(s, "K") {
 		b.Kids = true
-		s = strings.TrimLeft(s, "K ")
+		s = strings.TrimPrefix(s, "K ")
 	}
 
-	codes := strings.Split(s, " ")
-	for _, c := range codes {
+	for _, c := range strings.Split(s, " ") {
 		if len(c) == 3 {
-			_, ok := ndc[c[:1]]
-			if ok {
-				_, ok := ndc[c[:2]]
-				if ok {
-					b.Categories = append(b.Categories, [3]string{c[:1], c[:2], c})
-				}
-			}
+			b.Categories = append(b.Categories, [3]string{c[:1], c[:2], c})
 		}
 	}
 	return

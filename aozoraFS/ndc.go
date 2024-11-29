@@ -3,6 +3,8 @@ package aozorafs
 import (
 	_ "embed" //for embedding data
 	"strings"
+
+	str "github.com/adamay909/AozoraBookcase/stringops"
 )
 
 //go:embed ndc.data
@@ -12,17 +14,19 @@ func ndcmap() map[string]string {
 
 	ndc := make(map[string]string)
 
-	lines := strings.Split(ndcdata, "\n")
+	lines := str.NewLineReader(ndcdata)
 
-	for _, l := range lines {
+	for {
 
-		d := strings.Split(l, ",")
+		d, eof := lines.Read()
 
-		if len(d) != 2 {
-			continue
+		if eof {
+			break
 		}
 
-		ndc[d[0]] = d[1]
+		idx := strings.Index(d, ",")
+
+		ndc[d[:idx]] = d[idx+1:]
 
 	}
 

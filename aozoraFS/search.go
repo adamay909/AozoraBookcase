@@ -43,6 +43,8 @@ func (lib *Library) GenSearchResults(q string) []byte {
 
 func (lib *Library) search(q string) (authors, titles []*Record, categories []string) {
 
+	q = strings.TrimSpace(q)
+
 	log.Println("seach requested for :", q)
 
 	authors = lib.FindMatchingAuthors(q)

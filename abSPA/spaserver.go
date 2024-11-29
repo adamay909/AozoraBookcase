@@ -3,12 +3,11 @@ package main
 import (
 	"io/fs"
 	"log"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall/js"
 
-	"github.com/mtibben/percent"
+	str "github.com/adamay909/AozoraBookcase/stringops"
 )
 
 type handleFunc func(string)
@@ -19,7 +18,7 @@ var prefixes []string
 
 func spaserver(event js.Value, params ...any) {
 
-	hash := percent.Decode(getHash())
+	hash := str.PercentDecode(getHash())
 
 	for _, p := range prefixes {
 
@@ -146,7 +145,7 @@ func serveFile(event js.Value, params ...any) {
 
 	ext := params[1].(string)
 
-	pparts := strings.Split(strings.TrimSuffix(filepath.Base(path), filepath.Ext(path)), "_")
+	pparts := strings.Split(strings.TrimSuffix(str.FilepathBase(path), str.FilepathExt(path)), "_")
 
 	authorID, bookID := pparts[1], pparts[2]
 
@@ -163,11 +162,11 @@ func serveFileSvc(path string) {
 
 	coverAndWait(domBody, 20)
 
-	log.Println("creating", filepath.Base(path))
+	log.Println("creating", str.FilepathBase(path))
 
 	bk, _ := globalLib.GetBookRecord(path)
 
-	name := bk.Title + filepath.Ext(path)
+	name := bk.Title + str.FilepathExt(path)
 
 	saveFile(createJSFile(getPageData(path), name))
 
@@ -207,7 +206,7 @@ func search(event js.Value, params ...any) {
 
 func showSearchResult(q string) {
 
-	q = percent.Decode(strings.TrimPrefix(q, "search="))
+	q = str.PercentDecode(strings.TrimPrefix(q, "search="))
 
 	log.Println("lookin for", q)
 

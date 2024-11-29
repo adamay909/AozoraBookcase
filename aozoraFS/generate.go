@@ -5,11 +5,11 @@ import (
 	"errors"
 	"io/fs"
 	"log"
-	"net/url"
-	"path/filepath"
 	"strconv"
 	"strings"
 
+	//	str "github.com/adamay909/AozoraBookcase/stringops"
+	str "github.com/adamay909/AozoraBookcase/stringops"
 	"github.com/adamay909/AozoraConvert/azrconvert"
 )
 
@@ -134,7 +134,7 @@ func (lib *Library) genAuthorPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(filepath.Join("authors", "author_"+authorID+".html"), br.Bytes())
+	return lib.cache.CreateFile(str.FilepathJoin("authors", "author_"+authorID+".html"), br.Bytes())
 
 }
 
@@ -191,7 +191,7 @@ func (lib *Library) genBookPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(filepath.Join("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
+	return lib.cache.CreateFile(str.FilepathJoin("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
 
 }
 
@@ -222,7 +222,7 @@ func (lib *Library) genCategoryPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(filepath.Join("categories", "ndc_"+q+".html"), br.Bytes())
+	return lib.cache.CreateFile(str.FilepathJoin("categories", "ndc_"+q+".html"), br.Bytes())
 
 }
 
@@ -238,16 +238,18 @@ func (lib *Library) genReadingPage(name string) (fs.File, error) {
 		rname = name
 	}
 
+	log.Println("real file name is: ", rname)
 	book, err = lib.getBookData(rname)
 
 	var realbody string
 
 	if strings.HasSuffix(name, "mono") {
+		log.Println("requesting:", name)
 		realbody = book.RenderBodyInnerMonolithic()
 	} else {
 		realbody = book.RenderBodyInner()
 		for _, file := range book.Files {
-			name1 := filepath.Join(filepath.Dir(rname), file.Name)
+			name1 := str.FilepathJoin(str.FilepathDir(rname), file.Name)
 			lib.cache.CreateFile(name1, file.Data)
 		}
 	}
@@ -256,7 +258,7 @@ func (lib *Library) genReadingPage(name string) (fs.File, error) {
 
 	text := string(br.Bytes())
 
-	text = strings.Replace(text, "!!!###TEXT###!!!", realbody, 1)
+	text = strings.ReplaceAll(text, "!!!###TEXT###!!!", realbody)
 	if err != nil {
 		log.Println(err)
 	}
@@ -288,7 +290,7 @@ func (lib *Library) getBookData(name string) (book *azrconvert.Book, err error) 
 		return
 	}
 
-	zn := strings.TrimSuffix(name, filepath.Ext(name)) + `.zip`
+	zn := strings.TrimSuffix(name, str.FilepathExt(name)) + `.zip`
 
 	if lib.cache.Exists(zn) {
 		log.Println("generating file from local material.")
@@ -307,7 +309,7 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 	var br []byte
 
-	switch filepath.Ext(name) {
+	switch str.FilepathExt(name) {
 
 	case ".epub":
 		br = book.RenderEpub()
@@ -325,21 +327,21 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 func getID(name string) string {
 
-	dir := filepath.Dir(name)
+	dir := str.FilepathDir(name)
 	if strings.HasPrefix(dir, "read") {
 		dir = strings.ReplaceAll(dir, "read", "files")
 	}
 
 	switch {
 	case strings.HasPrefix(dir, "files/files_"):
-		name := strings.TrimSuffix(filepath.Base(name), "_u"+filepath.Ext(name))
+		name := strings.TrimSuffix(str.FilepathBase(name), "_u"+str.FilepathExt(name))
 		id := strings.Split(name, "_")
 		for len(id[0]) < 6 {
 			id[0] = "0" + id[0]
 		}
 		return id[0]
 	default:
-		name = strings.TrimSuffix(filepath.Base(name), filepath.Ext(name))
+		name = strings.TrimSuffix(str.FilepathBase(name), str.FilepathExt(name))
 		id := strings.Split(name, "_")
 		if len(id) != 2 {
 			return ""
@@ -375,11 +377,11 @@ func (lib *Library) getBookFromZip(name string) *azrconvert.Book {
 
 func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
-	path, _ := url.Parse(bk.URI)
+	//path, _ := url.Parse(bk.URI)
 
-	d := download(path)
+	d := download(bk.URI)
 	book := azrconvert.NewBook()
-	book.SetURI(path.String())
+	book.SetURI(bk.URI)
 	book.GetBookFrom(d)
 	if bk.Subtitle != "" {
 		book.SetTitle(bk.Title + "─" + bk.Subtitle + "─")

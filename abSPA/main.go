@@ -28,7 +28,7 @@ func main() {
 
 	initLibrary()
 
-	log.Println("main: done setting up library")
+	writeConsoleLog("main: done setting up library")
 
 	setupJS()
 

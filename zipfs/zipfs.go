@@ -140,6 +140,7 @@ func (z *Ziparchive) ReadMust(name string) []byte {
 	return d
 
 }
+
 func (f *Zipfile) size() int64 {
 
 	return int64(len(f.data))
