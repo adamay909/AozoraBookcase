@@ -13,10 +13,11 @@ func ItoHex(n int) string {
 	return strconv.FormatInt(int64(n), 16)
 }
 
-func HexToI(h string) (int64, error) {
+func HexToI(h string) (int, error) {
 
-	return strconv.ParseInt(h, 16, 64)
+	n, e := strconv.ParseInt(h, 16, 64)
 
+	return int(n), e
 }
 
 // digitLen returns the number of digts of n
