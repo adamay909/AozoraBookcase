@@ -10,6 +10,7 @@ import (
 	"errors"
 	"io/fs"
 	"log"
+	"net/url"
 	"path/filepath"
 	"strings"
 
@@ -63,7 +64,14 @@ Initialize initalized the library lib to the given specifications.
 */
 func (lib *Library) Initialize(src string, dir string, clean, verbose, kids, strict bool) {
 
-	lib.src = src
+	u, err := url.Parse(src)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	lib.src = u.Path
 
 	lib.root = dir
 
