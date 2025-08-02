@@ -2,11 +2,12 @@ package aozorafs
 
 import (
 	"log"
+	"path"
 	"sort"
 	"strings"
 
-	str "github.com/adamay909/AozoraBookcase/stringops"
-	"github.com/adamay909/AozoraBookcase/zipfs"
+	str "github.com/adamay909/AozoraBookcase/aozoraFS/stringops"
+	"github.com/adamay909/AozoraBookcase/aozoraFS/zipfs"
 )
 
 func (lib *Library) FetchLibrary() {
@@ -19,15 +20,15 @@ func (lib *Library) FetchLibrary() {
 
 	}
 
-	path := str.URLJoin(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
+	pathStr := path.Join(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
 
-	log.Println("requesting db", path)
+	log.Println("requesting db", pathStr)
 
-	za, _ := zipfs.ZipArchiveFromData(download(path))
+	za, _ := zipfs.ZipArchiveFromData(download(pathStr))
 
 	defer za.CloseArchive()
 
-	lib.getBooklist(za.ReadMust("list_person_all_extended_utf8.csv"))
+	lib.GetBooklist(za.ReadMust("list_person_all_extended_utf8.csv"))
 
 	lib.setupAuthorsList()
 
@@ -83,7 +84,7 @@ func (lib *Library) consolidateRecords(bookID string) {
 
 }
 
-func (lib *Library) getBooklist(d []byte) {
+func (lib *Library) GetBooklist(d []byte) {
 
 	rows := str.NewLineReader(string(d))
 
@@ -121,7 +122,8 @@ func (lib *Library) getBooklist(d []byte) {
 			}
 		}
 
-		uri = aozoraPath(cells[col("XHTML/HTMLファイルURL")])
+		//uri = aozoraPath(cells[col("XHTML/HTMLファイルURL")])
+		uri = aozoraPath(cells[col("テキストファイルURL")])
 
 		if uri == "" {
 			continue
@@ -129,7 +131,7 @@ func (lib *Library) getBooklist(d []byte) {
 
 		book = new(Record)
 
-		book.URI = str.URLJoin(lib.src, uri)
+		book.URI = path.Join(lib.src, uri)
 		book.NDC = cells[col("分類番号")]
 		book.setCategory(lib.Categories)
 

@@ -10,9 +10,10 @@ import (
 	"errors"
 	"io/fs"
 	"log"
+	"path/filepath"
 	"strings"
 
-	str "github.com/adamay909/AozoraBookcase/stringops"
+	ac "github.com/adamay909/AozoraConvert/v2"
 )
 
 // NewLibrary returns a new Library.
@@ -99,13 +100,16 @@ func (lib *Library) setStrict(val bool) {
 
 func createFile(lib *Library, name string) (f fs.File, err error) {
 
-	dir := str.FilepathDir(name)
-	bname := str.FilepathBase(name)
+	dir := filepath.Dir(name)
+	bname := filepath.Base(name)
 
 	switch {
 
 	case bname == "index.html":
 		f, err = lib.genMainIndex()
+
+	case bname == "aozora.css":
+		return lib.cache.CreateFile("aozora.css", []byte(ac.AozoraCSS))
 
 	case strings.HasPrefix(bname, "author"):
 		f, err = lib.genAuthorPage(name)
@@ -202,4 +206,8 @@ func isValidFileName(n string) bool {
 
 	log.Println("invalid request:", n)
 	return false
+}
+
+func (lib *Library) BookList() []*Record {
+	return lib.booklist
 }

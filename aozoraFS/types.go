@@ -87,6 +87,7 @@ type Record struct {
 	Kids            bool
 	Contributors    []ContribRole
 	consolidated    bool
+	TxtFileName     string
 }
 
 // ContribRole is for storing various contributors to a book.

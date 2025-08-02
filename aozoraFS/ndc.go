@@ -4,7 +4,7 @@ import (
 	_ "embed" //for embedding data
 	"strings"
 
-	str "github.com/adamay909/AozoraBookcase/stringops"
+	str "github.com/adamay909/AozoraBookcase/aozoraFS/stringops"
 )
 
 //go:embed ndc.data

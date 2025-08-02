@@ -1,11 +1,10 @@
 package aozorafs
 
 import (
+	"path/filepath"
 	"strings"
 
-	str "github.com/adamay909/AozoraBookcase/stringops"
-	"github.com/adamay909/AozoraConvert/jptools"
-	"github.com/adamay909/AozoraConvert/runes"
+	azrconvert "github.com/adamay909/AozoraConvert/v2"
 )
 
 func hasSameAuthor(a, b *Record) bool {
@@ -188,16 +187,16 @@ func isKana(s string) bool {
 	if len(s) == 0 {
 		return false
 	}
-	t := runes.Runes(s)[0]
-	return jptools.CharType(t) == jptools.Hiragana
+	t := []rune(s)[0]
+	return azrconvert.CharType(t) == azrconvert.Hiragana
 }
 
 func containsKanji(s string) bool {
 	if len(s) == 0 {
 		return false
 	}
-	for _, c := range runes.Runes(s) {
-		if jptools.CharType(c)&jptools.Kanji != 0 {
+	for _, c := range []rune(s) {
+		if azrconvert.CharType(c)&azrconvert.Kanji != 0 {
 			return true
 		}
 	}
@@ -280,7 +279,7 @@ func (b *Record) fullNameMeta() string {
 
 // FileName returns the filename of the file associated with b.
 func (b *Record) FileName() string {
-	return strings.TrimSuffix(str.FilepathBase(b.URI), str.FilepathExt(b.URI))
+	return strings.TrimSuffix(filepath.Base(b.URI), filepath.Ext(b.URI))
 }
 
 func (b *Record) setCategory(ndc map[string]string) {

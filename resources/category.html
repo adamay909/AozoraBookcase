@@ -1,0 +1,40 @@
+{{/* category */}}
+
+ <div class="sitenavigation">
+
+ <div><a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
+
+<div><a href="#recent1.html" class="navigation"><div class="sitenavbutton">新着順</div></a></div>
+
+<div> <div class="sitenavbutton" id="rndbk">ランダムな一冊</div></a></div>
+
+<div class="searchbox"> 
+   &#x1F50D;<input type="search" id="query" size="10"/>
+  </div>
+
+  <div style="text-align: end; padding-right: 0.5em">
+<div class="sitenavbutton" id="menubutton">&#x2630;</div>
+</div>
+
+
+<div>
+</div>
+
+</div>
+
+
+
+
+<h2>『{{.Category}}』に分類される本</h2>
+<div class="titlelist">
+{{ range .Books }}
+{{ $x := . }}
+<a href="#books/book_{{$x.AuthorID}}_{{$x.BookID}}.html" class="titlelist">
+ <div class="booklink">
+  <span class="yomi">{{$x.TitleY}} {{$x.SubtitleY}}</span><br />
+  <span class="title">{{$x.Title}} {{$x.Subtitle}}</span><br />
+  <span class="note">作者:{{$x.FullName}}</span><br />
+ </div>
+</a>
+{{end}}
+</div>

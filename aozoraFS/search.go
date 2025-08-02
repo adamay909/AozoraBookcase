@@ -6,8 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/adamay909/AozoraConvert/jptools"
-	"github.com/adamay909/AozoraConvert/runes"
+	azrconv "github.com/adamay909/AozoraConvert/v2"
 )
 
 func (lib *Library) GenSearchResults(q string) []byte {
@@ -59,10 +58,10 @@ func (lib *Library) search(q string) (authors, titles []*Record, categories []st
 
 func toHiragana(s string) string {
 
-	r := []rune(s)
+	var r []rune
 
-	for i, c := range r {
-		r[i] = jptools.ToHiragana(c)
+	for _, c := range s {
+		r = append(r, azrconv.ToHiragana(c))
 	}
 
 	return string(r)
@@ -71,15 +70,13 @@ func toHiragana(s string) string {
 // FindMatchingAuthors finds the authors whose names include q.
 func (lib *Library) FindMatchingAuthors(q string) (authors []*Record) {
 
-	s := runes.Runes(q)
-
 	for _, b := range lib.allAuthors() {
 
-		if runes.Contains(runes.Runes(b.FullName()), s) {
+		if strings.Contains(b.FullName(), q) {
 			authors = append(authors, b)
 		}
 
-		if runes.Contains(runes.Runes(toHiragana(b.FullNameY())), s) {
+		if strings.Contains(toHiragana(b.FullNameY()), q) {
 			authors = append(authors, b)
 		}
 	}
@@ -91,8 +88,6 @@ func (lib *Library) FindMatchingAuthors(q string) (authors []*Record) {
 // FindMatchingTitles finds the books whose title+subtitle contain q.
 func (lib *Library) FindMatchingTitles(q string) (titles []*Record) {
 
-	s := runes.Runes(q)
-
 	var listed = make(map[string]bool)
 
 	for _, b := range lib.booklist {
@@ -103,18 +98,29 @@ func (lib *Library) FindMatchingTitles(q string) (titles []*Record) {
 
 		switch {
 
-		case runes.Contains(runes.Runes(b.Title+b.Subtitle), s):
+		case strings.Contains(b.Title+b.Subtitle, q):
 			titles = append(titles, b)
 			listed[b.BookID] = true
 
-		case runes.Contains(runes.Runes(b.TitleY+b.SubtitleY), s):
+		case strings.Contains(b.TitleY+b.SubtitleY, q):
 			titles = append(titles, b)
 			listed[b.BookID] = true
 
-		case runes.Contains(runes.Runes(b.TitleSort+b.SubtitleSort), s):
+		case strings.Contains(b.TitleSort+b.SubtitleSort, q):
 			titles = append(titles, b)
 			listed[b.BookID] = true
 
+		case strings.Contains(toHiragana(b.Title+b.Subtitle), q):
+			titles = append(titles, b)
+			listed[b.BookID] = true
+
+		case strings.Contains(toHiragana(b.TitleY+b.SubtitleY), q):
+			titles = append(titles, b)
+			listed[b.BookID] = true
+
+		case strings.Contains(toHiragana(b.TitleSort+b.SubtitleSort), q):
+			titles = append(titles, b)
+			listed[b.BookID] = true
 		default:
 			continue
 		}

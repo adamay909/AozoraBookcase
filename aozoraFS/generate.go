@@ -5,12 +5,11 @@ import (
 	"errors"
 	"io/fs"
 	"log"
+	"path/filepath"
 	"strconv"
 	"strings"
 
-	//	str "github.com/adamay909/AozoraBookcase/stringops"
-	str "github.com/adamay909/AozoraBookcase/stringops"
-	"github.com/adamay909/AozoraConvert/azrconvert"
+	azrconvert "github.com/adamay909/AozoraConvert/v2"
 )
 
 func jpSortOrder() []rune {
@@ -134,7 +133,7 @@ func (lib *Library) genAuthorPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(str.FilepathJoin("authors", "author_"+authorID+".html"), br.Bytes())
+	return lib.cache.CreateFile(filepath.Join("authors", "author_"+authorID+".html"), br.Bytes())
 
 }
 
@@ -191,7 +190,7 @@ func (lib *Library) genBookPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(str.FilepathJoin("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
+	return lib.cache.CreateFile(filepath.Join("books", "book_"+authorID+"_"+bookID+".html"), br.Bytes())
 
 }
 
@@ -222,7 +221,7 @@ func (lib *Library) genCategoryPage(name string) (fs.File, error) {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(str.FilepathJoin("categories", "ndc_"+q+".html"), br.Bytes())
+	return lib.cache.CreateFile(filepath.Join("categories", "ndc_"+q+".html"), br.Bytes())
 
 }
 
@@ -238,27 +237,14 @@ func (lib *Library) genReadingPage(name string) (fs.File, error) {
 		rname = name
 	}
 
-	log.Println("real file name is: ", rname)
 	book, err = lib.getBookData(rname)
 
-	var realbody string
-
-	if strings.HasSuffix(name, "mono") {
-		log.Println("requesting:", name)
-		realbody = book.RenderBodyInnerMonolithic()
-	} else {
-		realbody = book.RenderBodyInner()
-		for _, file := range book.Files {
-			name1 := str.FilepathJoin(str.FilepathDir(rname), file.Name)
-			lib.cache.CreateFile(name1, file.Data)
-		}
-	}
 	br := new(bytes.Buffer)
 	err = lib.readingT.Execute(br, book)
 
 	text := string(br.Bytes())
 
-	text = strings.ReplaceAll(text, "!!!###TEXT###!!!", realbody)
+	text = strings.ReplaceAll(text, "!!!###TEXT###!!!", string(book.RenderMonolithicHTML()))
 	if err != nil {
 		log.Println(err)
 	}
@@ -289,16 +275,7 @@ func (lib *Library) getBookData(name string) (book *azrconvert.Book, err error) 
 	if err != nil {
 		return
 	}
-
-	zn := strings.TrimSuffix(name, str.FilepathExt(name)) + `.zip`
-
-	if lib.cache.Exists(zn) {
-		log.Println("generating file from local material.")
-		book = lib.getBookFromZip(zn)
-	} else {
-		book = lib.getBook(bk)
-		lib.cache.CreateFile(zn, book.RenderWebpagePackage())
-	}
+	book = lib.getBook(bk)
 
 	return
 }
@@ -309,13 +286,29 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 	var br []byte
 
-	switch str.FilepathExt(name) {
+	switch filepath.Ext(name) {
 
 	case ".epub":
 		br = book.RenderEpub()
 
 	case ".azw3":
 		br = book.RenderAZW3()
+
+	case ".tex":
+		br = book.RenderPackage("tex")
+
+	case ".txt":
+		br = book.RenderPackage("txt")
+
+	case ".html":
+		br = book.RenderPackage("html")
+
+	case ".json":
+		br = book.RenderPackage("json")
+
+	case ".zip":
+		bk, _ := lib.GetBookRecord(name)
+		br = download(bk.URI)
 
 	default:
 		br = book.RenderMonolithicHTML()
@@ -327,21 +320,21 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 func getID(name string) string {
 
-	dir := str.FilepathDir(name)
+	dir := filepath.Dir(name)
 	if strings.HasPrefix(dir, "read") {
 		dir = strings.ReplaceAll(dir, "read", "files")
 	}
 
 	switch {
 	case strings.HasPrefix(dir, "files/files_"):
-		name := strings.TrimSuffix(str.FilepathBase(name), "_u"+str.FilepathExt(name))
+		name := strings.TrimSuffix(filepath.Base(name), "_u"+filepath.Ext(name))
 		id := strings.Split(name, "_")
 		for len(id[0]) < 6 {
 			id[0] = "0" + id[0]
 		}
 		return id[0]
 	default:
-		name = strings.TrimSuffix(str.FilepathBase(name), str.FilepathExt(name))
+		name = strings.TrimSuffix(filepath.Base(name), filepath.Ext(name))
 		id := strings.Split(name, "_")
 		if len(id) != 2 {
 			return ""
@@ -351,46 +344,46 @@ func getID(name string) string {
 	return ""
 }
 
-func (lib *Library) getBookFromZip(name string) *azrconvert.Book {
-
-	f, err := lib.cache.Open(name)
-
-	info, err := f.Stat()
-	if err != nil {
-		log.Println(err)
-
-		return new(azrconvert.Book)
-	}
-
-	d := make([]byte, info.Size())
-
-	_, err = f.Read(d)
-
-	if err != nil {
-		log.Println(err)
-
-		return new(azrconvert.Book)
-	}
-
-	return azrconvert.NewBookFromZip(d)
-}
-
 func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
-	//path, _ := url.Parse(bk.URI)
+	book := azrconvert.NewEbookFromZip(download(bk.URI))
 
-	d := download(bk.URI)
-	book := azrconvert.NewBook()
-	book.SetURI(bk.URI)
-	book.GetBookFrom(d)
+	book.Body.ClearMetadata()
+
+	book.Body.SetTitle(bk.Title)
+
+	bk.TxtFileName = book.TxtFileName
+
 	if bk.Subtitle != "" {
+		book.Body.SetSubtitle(bk.Subtitle)
+
 		book.SetTitle(bk.Title + "─" + bk.Subtitle + "─")
 	} else {
 		book.SetTitle(bk.Title)
 	}
 	book.SetCreator(bk.FullName())
 	book.SetPublisher("青空文庫")
-	book.GenTitlePage()
+
+	for _, c := range bk.Contributors {
+
+		name := c.B.FullName()
+
+		if c.B.Role == "翻訳者" {
+			name = name + " 訳"
+		}
+
+		if c.B.Role == "校訂者" {
+			name = name + " 校訂"
+		}
+
+		if c.B.Role == "編者" {
+			name = name + " 編"
+		}
+
+		book.Body.AddContributor(name)
+
+	}
+
 	return book
 }
 
