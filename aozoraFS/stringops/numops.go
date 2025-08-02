@@ -1,4 +1,4 @@
-package aozorafs
+package stringops
 
 import (
 	"strconv"
