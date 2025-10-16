@@ -2,10 +2,8 @@ package main
 
 import (
 	"errors"
-	"io"
 	"log"
 	"mime"
-	"net/http"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -119,7 +117,8 @@ func replaceBody(p string) {
 
 }
 
-func fetchData(path string) (data []byte) {
+/*
+func _fetchData(path string) (data []byte) {
 
 	//	loc := path.String()
 
@@ -137,6 +136,7 @@ func fetchData(path string) (data []byte) {
 	return data
 
 }
+*/
 
 func getElementByID(id string) (elem js.Value, err error) {
 
