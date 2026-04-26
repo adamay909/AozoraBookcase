@@ -354,6 +354,8 @@ func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
 	bk.TxtFileName = book.TxtFileName
 
+	book.Body.SetDocID(bk.URI)
+
 	if bk.Subtitle != "" {
 		book.Body.SetSubtitle(bk.Subtitle)
 
