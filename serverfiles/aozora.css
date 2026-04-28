@@ -1,3 +1,15 @@
+body {
+ line-break: normal;
+ writing-mode: vertical-rl;
+ -epub-writing-mode: vertical-rl;
+ -webkit-writing-mode: vertical-rl;
+ -epub-line-break: normal;
+ -webkit-line-break: normal;
+ line-height: 180%;
+ padding: 1em 1em;
+ font-family: serif, sans-serif
+}
+
 p {
  margin: 0em;
 padding: 0em;
@@ -374,7 +386,7 @@ text-orientation: sideways;
 }
 
 .subsubsection {
- font-size: medium;
+ font-size: normal;
  font-weight: bold;
  list-style-type: none;
 }
