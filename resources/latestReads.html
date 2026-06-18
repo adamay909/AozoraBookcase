@@ -1,0 +1,17 @@
+{{/* latestReads */}}
+
+{{ $x := index .Books 0 }} SITEBANNER
+
+<h2>最近読んだ本</h2>
+<div class="titlelist">
+  {{ range .Books }} {{ $x := . }}
+  <a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+    <div class="booklink">
+      <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
+      <span class="title">{{.Title}} {{.Subtitle}}</span><br />
+      <span class="note">作者: {{$x.FullName}}</span><br />
+    </div>
+  </a>
+  {{end}}
+</div>
+<p></p>

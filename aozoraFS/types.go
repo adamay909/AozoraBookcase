@@ -35,17 +35,23 @@ type Library struct {
 	booksByDate   []*Record
 	authorsSorted []*Record
 	posOfAuthor   map[string]int
+	latestReads   []string            //store by id
+	favorites     map[string]struct{} //string is id
 	indexT,
 	authorT,
 	bookT,
 	categoryT,
+	favoritesT,
 	recentT,
+	latestReadT,
 	randomT,
 	searchresultT,
 	readingT *template.Template
-	kids       bool
-	strict     bool
-	Categories map[string]string
+	kids         bool
+	strict       bool
+	Categories   map[string]string
+	authorWeight map[int]string
+	totalWeight  int
 }
 
 // records is for storing index cards.

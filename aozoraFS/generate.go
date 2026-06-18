@@ -3,6 +3,7 @@ package aozorafs
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/fs"
 	"log"
 	"path/filepath"
@@ -132,7 +133,7 @@ func (lib *Library) genAuthorPage(name string) (fs.File, error) {
 	if err != nil {
 		log.Println(err)
 	}
-
+	log.Println(P.Books[0].NameSei, P.Books[0].NameMei, "has ", len(P.Books), "books")
 	return lib.cache.CreateFile(filepath.Join("authors", "author_"+authorID+".html"), br.Bytes())
 
 }
@@ -228,8 +229,6 @@ func (lib *Library) genCategoryPage(name string) (fs.File, error) {
 func (lib *Library) genReadingPage(name string) (fs.File, error) {
 
 	var rname string
-	var book *azrconvert.Book
-	var err error
 
 	if strings.HasSuffix(name, ".mono") {
 		rname = strings.TrimSuffix(name, ".mono") + ".html"
@@ -237,19 +236,102 @@ func (lib *Library) genReadingPage(name string) (fs.File, error) {
 		rname = name
 	}
 
-	book, err = lib.getBookData(rname)
+	book, _ := lib.getBookData(rname)
 
 	br := new(bytes.Buffer)
-	err = lib.readingT.Execute(br, book)
+	_ = lib.readingT.Execute(br, book)
 
 	text := string(br.Bytes())
 
-	text = strings.ReplaceAll(text, "!!!###TEXT###!!!", string(book.RenderMonolithicHTML()))
+	return lib.cache.CreateFile(name, []byte(text))
+}
+
+func (lib *Library) genLatestReadPage(name string) (fs.File, error) {
+	type Page struct {
+		Books []*Record
+	}
+
+	var P Page
+
+	for _, id := range lib.latestReads {
+		if id == "" {
+			continue
+		}
+		lib.consolidateRecords(id)
+		P.Books = append(P.Books, lib.booksByID[id][0])
+	}
+
+	if len(P.Books) == 0 {
+		P.Books = append(P.Books, lib.booksByID["056572"][0])
+	}
+	br := new(bytes.Buffer)
+	err := lib.latestReadT.Execute(br, P)
 	if err != nil {
 		log.Println(err)
 	}
 
-	return lib.cache.CreateFile(name, []byte(text))
+	return lib.cache.CreateFile(name, br.Bytes())
+
+}
+
+func (lib *Library) genFavoritesPage(name string) (fs.File, error) {
+	type Page struct {
+		Books         []*Record
+		BooksByAuthor []*Record
+		BooksByTitle  []*Record
+	}
+
+	var P Page
+
+	for id, _ := range lib.favorites {
+		lib.consolidateRecords(id)
+		P.Books = append(P.Books, lib.booksByID[id][0])
+	}
+
+	if len(P.Books) == 0 {
+		P.Books = append(P.Books, lib.booksByID["056572"][0])
+	}
+
+	sortList(P.Books, byAuthor)
+
+	for _, book := range P.Books {
+		P.BooksByAuthor = append(P.BooksByAuthor, book)
+	}
+
+	sortList(P.Books, byTitle)
+
+	for _, book := range P.Books {
+		P.BooksByTitle = append(P.BooksByTitle, book)
+	}
+
+	br := new(bytes.Buffer)
+	err := lib.favoritesT.Execute(br, P)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return lib.cache.CreateFile(name, br.Bytes())
+
+}
+
+func (lib *Library) GetMonolithicHTML(name string) []string {
+
+	var rname string
+
+	if strings.HasSuffix(name, ".mono") {
+		rname = strings.TrimSuffix(name, ".mono") + ".html"
+	} else {
+		rname = name
+	}
+
+	book, _ := lib.getBookData(rname)
+
+	if book.Body == nil {
+		fmt.Println("CONVERSION FAILED")
+		return []string{""}
+	}
+
+	return []string{string(book.RenderMonolithicHTML()), string(book.RenderNavHTML())}
 }
 
 func (lib *Library) GetBookRecord(name string) (*Record, error) {
@@ -320,6 +402,9 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 func getID(name string) string {
 
+	if strings.HasSuffix(name, ".mono") {
+		name = strings.TrimSuffix(name, ".mono") + ".html"
+	}
 	dir := filepath.Dir(name)
 	if strings.HasPrefix(dir, "read") {
 		dir = strings.ReplaceAll(dir, "read", "files")
@@ -344,9 +429,17 @@ func getID(name string) string {
 	return ""
 }
 
+func (lib *Library) GetID(name string) string {
+	return getID(name)
+}
+
 func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
 	book := azrconvert.NewEbookFromZip(download(bk.URI))
+
+	if book.Body == nil {
+		return book
+	}
 
 	book.Body.ClearMetadata()
 

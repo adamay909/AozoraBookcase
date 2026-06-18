@@ -1,23 +1,132 @@
 {{/* reading */}}
 
-<div class="readingPage">
+<div class="readingPage novertscroll" id="readingPage">
+  <div class="sitenavigation" id="navBar">
+    <a href="#index.html" class="navigation">
+      <div class="sitenavbutton">&#x1F3DB;</div>
+    </a>
+    <button class="sitenavbutton" id="openTOC">
+      <span style="display: none" id="tocLabel">目次</span>
+    </button>
+    <input
+      type="checkbox"
+      name="favorite"
+      id="favoriteToggle"
+      class="fav-toggle"
+    />
+    <label for="favoriteToggle" class="star">
+      <div class="not-starred">
+        <svg
+          viewBox="0 0 200 200"
+          style="width: 1em; height: 1em; vertical-align: -0.05em"
+        >
+          <polygon
+            points="100,10 122,78 190,78 135,118 156,185 100,145 44,185 65,118 10,78 78,78"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="10"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <div class="starred">
+        <svg
+          viewBox="0 0 200 200"
+          style="width: 1em; height: 1em; vertical-align: -0.05em"
+        >
+          <polygon
+            points="100,10 122,78 190,78 135,118 156,185 100,145 44,185 65,118 10,78 78,78"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="10"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+    </label>
+    <button class="sitenavbutton" id="readerSettings">&#x2699;</button>
+  </div>
 
- <div class="sitenavigation">
- 
- 	<a href="#index.html" class="navigation">
-		<div class="sitetitle"> 青空文庫ブラウザ</div>
-	</a>
- 
- </div>
+  <div class="vertical-reader" id="verticalReader">
+    <div class="page-window" id="pageWindow">
+      <div class="page-strip" id="pageStrip"></div>
+    </div>
 
-<div class="readingpane">
-
-!!!###TEXT###!!!
-
+    <div class="seek-bar" id="seekBar">
+      <div id="busyPaginating">
+        <label>組版作業中:<progress id="busyIndicator"></progress></label>
+      </div>
+      <div id="pageTrack">
+        <input
+          type="range"
+          id="readingPosition"
+          min="0"
+          max="1"
+          value="0"
+          name="readingPosition"
+        />
+      </div>
+      <div>
+        <span class="seek-label" id="seekLabel">— / —</span>
+      </div>
+    </div>
+  </div>
 </div>
 
+<div id="readerSettingsMenu">
+  <div class="settinggroup">
+    <div class="label">
+      <label for="fontSizes">フォントの大きさ</label>
+    </div>
+    <div class="rs-option">
+      <input
+        type="range"
+        min="0"
+        max="2"
+        value="1"
+        class="chooser"
+        id="fontSizes"
+        list="fontSizeMarker"
+      />
+      <datalist id="fontSizeMarker">
+        <option value="0" label="小"></option>
+        <option value="1" label="中"></option>
+        <option value="2" label="大"></option>
+      </datalist>
+    </div>
+  </div>
+
+  <div class="settinggroup">
+    <div class="label">
+      <label for="lineHeight">行間</label>
+    </div>
+    <div class="rs-option">
+      <input
+        type="range"
+        min="0"
+        max="2"
+        value="1"
+        class="chooser"
+        id="lineHeight"
+        list="lineHeightSizeMarker"
+      />
+      <datalist id="lineHeightMarker">
+        <option value="0" label="小"></option>
+        <option value="1" label="中"></option>
+        <option value="2" label="大"></option>
+      </datalist>
+    </div>
+  </div>
+
+  <div class="settingsgroup">
+    <div>&nbsp;</div>
+    <button id="showDebugInfo" style="color: gray; display: none">
+      デバグ情報
+    </button>
+    <div id="debugInfo"></div>
+  </div>
+  <div class="settinggroup commit">
+    <button id="cancel">キャンセル</button>
+    <button id="doit">決定</button>
+  </div>
 </div>
-
-
-
-

@@ -1,53 +1,42 @@
 {{/* recent */}}
 
-
- <div class="sitenavigation">
-
-<div><a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
-
-
-<div> <div class="sitenavbutton" id="rndbk">ランダムな一冊</div></div>
-
-<div>
-</div>
-
-<div class="searchbox"> 
-   &#x1F50D;<input type="search" id="query" size="10"/>
-  </div>
-
-<div style="text-align: end; padding-right: 0.5em">
-<div class="sitenavbutton" id="menubutton">&#x2630;</div>
-</div>
-
-<div>
-</div>
-
-</div>
-
+SITEBANNER
 
 <div class="navigation">
-
-{{ if ne .NPT "0" }}<a class="navigation" href="#recent{{.NPT}}.html">{{end}}<div class="navbutton">千冊前</div>{{ if ne .NPT "0"}}</a>{{end}}
-{{ if ne .NP "0" }}<a class="navigation" href="#recent{{.NP}}.html">{{end}}<div class="navbutton">百冊前</div>{{ if ne .NP "0"}}</a>{{end}}
-{{ if ne .NN "0" }}<a class="navigation" href="#recent{{.NN}}.html">{{end}}<div class="navbutton">百冊後</div>{{if ne .NN "0"}}</a>{{end}}
-{{ if ne .NNT "0" }}<a class="navigation" href="#recent{{.NNT}}.html" >{{end}}<div class="navbutton">千冊後</div>{{ if ne .NNT "0" }}</a>{{end}}
-	 
+  {{ if ne .NPT "0" }}<a class="navigation" href="#recent{{.NPT}}.html"
+    >{{end}}
+    <div class="navbutton">千冊前</div>
+    {{ if ne .NPT "0"}}</a
+  >{{end}} {{ if ne .NP "0" }}<a class="navigation" href="#recent{{.NP}}.html"
+    >{{end}}
+    <div class="navbutton">百冊前</div>
+    {{ if ne .NP "0"}}</a
+  >{{end}} {{ if ne .NN "0" }}<a class="navigation" href="#recent{{.NN}}.html"
+    >{{end}}
+    <div class="navbutton">百冊後</div>
+    {{if ne .NN "0"}}</a
+  >{{end}} {{ if ne .NNT "0" }}<a class="navigation" href="#recent{{.NNT}}.html"
+    >{{end}}
+    <div class="navbutton">千冊後</div>
+    {{ if ne .NNT "0" }}</a
+  >{{end}}
 </div>
 
- <h2>着順 {{.ORD}}〜</h2>
+<h2>新着順 {{.ORD}}〜</h2>
 <div class="titlelist">
-{{ range .Books }}
-{{ $x := . }}
-<a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
- <div class="booklink">
-  <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
-  <span class="title">{{.Title}} {{.Subtitle}}</span><br />
-	<span class="note">作者:	{{$x.FullName}}</span><br />
- 
-  <span class="note"> （{{ with $x.Kids }}児童書: {{ end }}{{.Category}}）</span><br />
-  <span class="note">（{{.KanaZukai}}）</span>
- </div>
-</a>
-{{end}}
+  {{ range .Books }} {{ $x := . }}
+  <a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+    <div class="booklink">
+      <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
+      <span class="title">{{.Title}} {{.Subtitle}}</span><br />
+      <span class="note">作者: {{$x.FullName}}</span><br />
+
+      <span class="note">
+        （{{ with $x.Kids }}児童書: {{ end }}{{.Category}}）</span
+      ><br />
+      <span class="note">（{{.KanaZukai}}）</span>
+    </div>
+  </a>
+  {{end}}
 </div>
 <p></p>

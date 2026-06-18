@@ -36,6 +36,7 @@ func (lib *Library) FetchLibrary() {
 }
 
 func (lib *Library) setupAuthorsList() {
+	lib.authorsSorted = make([]*Record, 0, len(lib.booksByAuthor))
 
 	for _, e := range lib.booksByAuthor {
 		lib.authorsSorted = append(lib.authorsSorted, e[0])
@@ -53,40 +54,32 @@ func (lib *Library) setupAuthorsList() {
 }
 
 func (lib *Library) consolidateRecords(bookID string) {
-
 	if lib.booksByID[bookID][0].consolidated {
-
 		return
 	}
-
 	for _, l := range lib.booksByID[bookID] {
-
 		lib.booksByID[bookID][0].Contributors = append(lib.booksByID[bookID][0].Contributors, ContribRole{l.Role, l.AuthorID, l})
 	}
-
 	sort.Slice(lib.booksByID[bookID][0].Contributors, byRole(lib.booksByID[bookID][0].Contributors))
-
 	for k, e := range lib.booksByID[bookID] {
-
 		e.consolidated = true
-
 		if k == 0 {
 			continue
 		}
-
 		e.Contributors = nil
-
 		e.Contributors = append(e.Contributors, lib.booksByID[bookID][0].Contributors...)
-
 	}
-
 	return
-
 }
 
 func (lib *Library) GetBooklist(d []byte) {
 
 	rows := str.NewLineReader(string(d))
+
+	t := len(strings.Split(string(d), "\n"))
+
+	lib.booksByID = make(map[string][]*Record, t)
+	lib.booksByAuthor = make(map[string][]*Record, t)
 
 	row, eof := rows.Read()
 
@@ -230,4 +223,41 @@ func aozoraPath(fullpath string) string {
 	}
 
 	return path
+}
+
+func (lib *Library) LatestReads() []string {
+	return lib.latestReads
+}
+
+func (lib *Library) SetLatestReads(list []string) {
+	lib.latestReads = nil
+	lib.latestReads = append(lib.latestReads, list...)
+}
+
+func (lib *Library) SetFavorites(list []string) {
+	lib.favorites = make(map[string]struct{})
+	for _, item := range list {
+		lib.favorites[item] = struct{}{}
+	}
+}
+
+func (lib *Library) AddFavorite(id string) {
+	lib.favorites[id] = struct{}{}
+}
+
+func (lib *Library) RemoveFavorite(id string) {
+	delete(lib.favorites, id)
+}
+
+func (lib *Library) FavoriteList() []string {
+	list := make([]string, len(lib.favorites))
+	for id, _ := range lib.favorites {
+		list = append(list, id)
+	}
+	return list
+}
+
+func (lib *Library) IsFavorite(id string) bool {
+	_, ok := lib.favorites[id]
+	return ok
 }

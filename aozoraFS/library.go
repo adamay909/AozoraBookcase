@@ -33,22 +33,11 @@ func (lib *Library) Open(name string) (f fs.File, err error) {
 	if !isValidFileName(name) {
 		name = "index.html"
 	}
+	f, err = createFile(lib, name)
 
-	if !lib.cache.Exists(name) {
-
-		log.Println(name, "does not exist")
-
-		f, err = createFile(lib, name)
-
-		if err != nil {
-			log.Println(err)
-		}
-
-	} else {
-		f, err = lib.cache.Open(name)
-
+	if err != nil {
+		log.Println(err)
 	}
-
 	return f, err
 
 }
@@ -134,6 +123,12 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 	case strings.HasPrefix(dir, "read/files"):
 		f, err = lib.genReadingPage(name)
 
+	case strings.HasSuffix(bname, "latestReads.html"):
+		f, err = lib.genLatestReadPage(bname)
+
+	case strings.HasSuffix(bname, "favorites.html"):
+		f, err = lib.genFavoritesPage(bname)
+
 	case strings.HasPrefix(bname, "recent"):
 		f, err = lib.genRecents(bname)
 
@@ -189,6 +184,14 @@ func isValidFileName(n string) bool {
 		return true
 	}
 
+	if strings.HasSuffix(n, "latestReads.html") {
+		return true
+	}
+
+	if strings.HasSuffix(n, "favorites.html") {
+		return true
+	}
+
 	if strings.HasPrefix(n, "recent") && strings.HasSuffix(n, ".html") {
 		return true
 	}
@@ -196,6 +199,11 @@ func isValidFileName(n string) bool {
 	if strings.HasPrefix(n, "random") && strings.HasSuffix(n, ".html") {
 		return true
 	}
+
+	if strings.HasSuffix(n, "about.html") {
+		return true
+	}
+
 	if len(strings.Split(n, "/")) > 1 {
 		log.Println("invalid request:", n)
 		return false

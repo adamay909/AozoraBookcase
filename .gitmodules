@@ -1,0 +1,3 @@
+[submodule "verticalpaginator"]
+	path = verticalpaginator
+	url = git@github.com:adamay909/verticalpaginator.git

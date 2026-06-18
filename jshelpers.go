@@ -18,7 +18,12 @@ var (
 	domWindow,
 	domDocument,
 	domHTML,
-	domBody js.Value
+	domMainBody,
+	domTemplate,
+	domNavTemplate,
+	domLoading,
+	domBody,
+	domError js.Value
 )
 
 func init() {
@@ -37,7 +42,18 @@ func init() {
 
 	domHTML = domDocument.Get("documentElement")
 
+	domMainBody, _ = getElementByID("mainbody")
+
+	domTemplate, _ = getElementByID("documentContent")
+
+	domNavTemplate, _ = getElementByID("documentTOC")
+
+	domLoading, _ = getElementByID("loading")
+
+	domError, _ = getElementByID("error")
+
 	domBody = domDocument.Get("body")
+
 }
 
 func uint8arrayOf(data []byte) js.Value {
@@ -60,11 +76,11 @@ func saveFile(file js.Value) {
 
 	link.Set("download", file.Get("name"))
 
-	domBody.Call("appendChild", link)
+	domMainBody.Call("appendChild", link)
 
 	link.Call("click")
 
-	domBody.Call("removeChild", link)
+	domMainBody.Call("removeChild", link)
 
 	domWindow.Get("URL").Call("revokeObjectURL", href)
 
@@ -95,6 +111,12 @@ func getHost() string {
 
 }
 
+func getPathname() string {
+
+	return domWindow.Get("location").Get("pathname").String()
+
+}
+
 func getHash() string {
 
 	return domWindow.Get("location").Get("hash").String()
@@ -111,32 +133,11 @@ func setHash(h string) {
 
 func replaceBody(p string) {
 
-	domBody.Set("innerHTML", p)
+	domMainBody.Set("innerHTML", p)
 
 	return
 
 }
-
-/*
-func _fetchData(path string) (data []byte) {
-
-	//	loc := path.String()
-
-	log.Println("fetching", path)
-
-	r, err := http.Get(path)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	data, _ = io.ReadAll(r.Body)
-
-	return data
-
-}
-*/
 
 func getElementByID(id string) (elem js.Value, err error) {
 
@@ -181,7 +182,7 @@ func addEventListener(elem js.Value, eventType string, f func(event js.Value, ar
 
 		f(margs[0], params...)
 		return true
-	}), true)
+	}), false)
 
 	return
 }
@@ -247,7 +248,7 @@ func coverElement(elem js.Value, opacity int) {
 
 func uncoverElement(elem js.Value) {
 
-	covers := getElementsByClassName(domBody, "cover")
+	covers := getElementsByClassName(domMainBody, "cover")
 
 	//just in case we covered elem multiple times
 
@@ -259,16 +260,24 @@ func uncoverElement(elem js.Value) {
 
 }
 
-func coverScreen(opacity int) {
+func coverScreen() {
 
-	coverElement(domBody, opacity)
+	domLoading.Call("setAttribute", "style", "display: flex")
 
 }
 
 func uncoverScreen() {
 
-	uncoverElement(domBody)
+	domLoading.Call("setAttribute", "style", "display: none")
 
+}
+
+func hideErrorMsg() {
+	domError.Call("setAttribute", "style", "display: none")
+}
+
+func showErrorMsg() {
+	domError.Call("setAttribute", "style", "display: flex")
 }
 
 func coverAndWait(elem js.Value, opacity int) {
@@ -296,4 +305,40 @@ func writeConsoleLog(msg ...string) {
 	domWindow.Get("console").Call("log", logmsg)
 
 	return
+}
+
+// ensureScript injects a script but only if it is not already present.
+func ensureScript(src string) {
+	doc := js.Global().Get("document")
+
+	existing := doc.Call("querySelector", "script[src='"+src+"']")
+	if !existing.IsNull() {
+		return
+	}
+
+	cb := js.FuncOf(func(this js.Value, args []js.Value) any {
+		return nil
+	})
+
+	script := doc.Call("createElement", "script")
+	script.Set("src", src)
+	script.Set("onload", cb)
+	doc.Get("head").Call("appendChild", script)
+}
+
+func eventTargetID(e js.Value, selector string) string {
+	elem := eventTargetElem(e, selector)
+	if isInvalid(elem) {
+		return ""
+	}
+	return elem.Get("id").String()
+}
+
+func eventTargetElem(e js.Value, selector string) js.Value {
+	elem := e.Get("target").Call("closest", selector)
+	return elem
+}
+
+func isInvalid(e js.Value) bool {
+	return e.IsUndefined() || e.IsNull()
 }

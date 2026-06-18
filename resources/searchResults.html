@@ -1,65 +1,40 @@
-{{/* searchresult */}}
+{{/* searchresult */}} 
 
- <div class="sitenavigation">
-
- <div><a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
-
-<div><a href="#recent1.html" class="navigation"><div class="sitenavbutton">新着順</div></a></div>
-
-<div> <div class="sitenavbutton" id="rndbk">ランダムな一冊</div></div>
-
-<div class="searchbox"> 
-   &#x1F50D;<input type="search" id="query" size="10"/>
-  </div>
-
-<div style="text-align: end; padding-right: 0.5em">
-<div class="sitenavbutton" id="menubutton">&#x2630;</div>
-</div>
-
-<div>
-</div>
-
-</div>
-
-
+SITEBANNER
 
 <h1>検索結果</h1>
 
 <h2>一致する作者:</h2>
 <div class="authorlistsection">
- {{ with  not .FoundA }} 見つかりませんでした {{ end }}
- {{ range .Authors }}
-<a href="#authors/author_{{.AuthorID}}.html">
-<div class="authorlistbutton">
-<span class="rt">{{.FullNameY}}</span><br />
-<span class="rb">{{.FullName}}</span>
-</div>
-</a>
-{{end}}
+  {{ with not .FoundA }} 見つかりませんでした {{ end }} {{ range .Authors }}
+  <a href="#authors/author_{{.AuthorID}}.html">
+    <div class="authorlistbutton">
+      <span class="rt">{{.FullNameY}}</span><br />
+      <span class="rb">{{.FullName}}</span>
+    </div>
+  </a>
+  {{end}}
 </div>
 
 <h2 style="margin-top: 2em">一致する作品:</h2>
 <div class="titlelist">
- {{ with  not .FoundT }} 見つかりませんでした {{ end }}
-{{ range .Titles }}
-{{ $x := . }}
-<a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
- <div class="booklink">
-  <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
-	<span class="note">作者:	{{$x.FullName}}</span><br />
- </div>
-</a>
-{{end}}
+  {{ with not .FoundT }} 見つかりませんでした {{ end }} {{ range .Titles }} {{
+  $x := . }}
+  <a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+    <div class="booklink">
+      <span class="title">{{$x.Title}} {{.Subtitle}}</span><br />
+      <span class="note">作者: {{$x.FullName}}</span><br />
+    </div>
+  </a>
+  {{end}}
 </div>
 
-
-
-<h2 style="margin-top:2em">一致する分類:</h2>
+<h2 style="margin-top: 2em">一致する分類:</h2>
 <div class="categorylist">
- {{ with  not .FoundC }} 見つかりませんでした {{ end }}
-{{ range .Categories }}
-	<a href="#categories/ndc_{{ . }}.html" class="categorylist"><div class="categorylink">{{ndcm .}}</div></a>
- {{end}}
+  {{ with not .FoundC }} 見つかりませんでした {{ end }} {{ range .Categories }}
+  <a href="#categories/ndc_{{ . }}.html" class="categorylist"
+    ><div class="categorylink">{{ndcm .}}</div></a
+  >
+  {{end}}
 </div>
-</a>
 <p></p>

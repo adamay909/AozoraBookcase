@@ -1,41 +1,124 @@
- <div class="sitenavigation">
+<div class="aboutPage" style="width: calc(min(40em, 90vw))">
+  <button id="closeAbout1">戻る</button>
 
- <div><a href="#index.html" class="navigation"><div class="sitetitle">青空文庫ブラウザ</div></a></div>
+  <h1>このサイトについて</h1>
+  <p>
+    <a href="https://www.aozora.gr.jp/">青空文庫</a
+    >で公開されている作品の検索、読書、およびいくつかのファイル形式への変換をするためのサイトです。Epub3、AZW3（キンドル用）、LaTeXへの変換ができます。
+  </p>
+  <h2>使い方：電子ブック用ファイル</h2>
+  <ul>
+    <li>
+      本の探し方はほぼ自明と思われますが、特徴として各作品のページから、関連書物（同作家、同翻訳者、同NDC分類）にリンクされています。単純な検索も右上の検索ボックスからできます。
+    </li>
+    <li>
+      電子書籍リーダー用ファイル形式はEPUBとキンドル用のAZW3です。各作品のページにダウンロード用ボタンがあります。
+    </li>
+    <li>
+      MacOS、iOSの場合はEPUBをダウンロードしブック（Books）で開けば読めます。Androidの場合はEPUBでダウンロードした上Playブックで開けば読めます。
+    </li>
+    <li>
+      残念ながらキンドルのブラウザではこのサイトは機能しないので、パソコンからAZW3形式のファイルを転送する必要があります。リーダー機器への転送は<a
+        href="https://calibre-ebook.com/ja"
+        >Calibre</a
+      >の使用をおすすめします。Calibreを使ってEPUB、AZW3を読むことも可能です。
+    </li>
+    <li>
+      その他のダウンロードオプションとして、LaTeX、青空文庫注記風テキストファイル、HTML、およびJSONを提供しています。これらは直接読むというよりは、更にファイルを加工したい時のためです。詳しくは<a
+        href="https://github.com/adamay909/AozoraConvert/v2"
+        >GitHubレポジトリ</a
+      >の説明をご覧ください。
+    </li>
+  </ul>
 
-<div><a href="#recent1.html" class="navigation"><div class="sitenavbutton">新着順</div></a></div>
+  <h2>読書機能について</h2>
+  <ul>
+    <li>
+      単純なブラウザ内での読書機能もあります。縦書き、ふりがな付きで、ページ分割されるので、ページ単位で読めます。長いテキストの場合、ページ分割に少し時間がかかる場合があります。
+      読書に特化したアプリやデバイスほどの機能はありませんが、ただ単に読むだけならリーダーアプリを使う必要はないかもしれません。
+    </li>
+    <li>
+      読書ページの上方にある星マークをクリックすることでお気に入りリストに入れられます。お気に入りから外したい場合も同様に星マークをクリックすればできます。
+    </li>
+    <li>
+      フォントサイズはブラウザの設定に従いますが、読書ページの右上の設定メニューを使って、多少変えられます。行間も多少変えられます。
+    </li>
+    <li>
+      タブレットなどで横置き、縦置きを切り替えるとレイアウトが崩れる可能性が高いです。その場合はフォントサイズを変えるなどして、強制的にページ分割をやり直してください。
+    </li>
+    <li>
+      目次を表示するよう努力しますが、これはもとの青空文庫のテキストの状態によります。目次の構築には見出しを利用しますが、人間の目には明らかに見出しでも、見出しとテキストで注記されていなければ目次の項目には含まれません。
+    </li>
+    <li>
+      ページサイズは16pxのフォントで最大14行ｘ40文字程度（単行本の１ページに相当）になるように設定してあります。たとえ大画面でも読みにくくなるだけなのでページサイズはそれ以上にはなりません。
+    </li>
+    <li>
+      表紙ページが赤い枠で囲まれている場合がありますが、それはページ分割のときに内容が余白にはみ出すページができてしまったことを示します。はみ出しても読めるように設定してあるので問題ないはずですが、どのページではみ出しているのか知りたい場合は読書ページの設定メニューに「デバグ情報」というボタンができるのでそれを押してください。overflowの項目にpageNNと並ぶリストがはみ出しのあるページです。なおNNはゼロからなので、ページ番号になおすには１を足してください（例えばpage17は18ページです）。もし見えていない語句がある場合はお知らせください。
+    </li>
+  </ul>
 
-<div> <div class="sitenavbutton" id="rndbk">ランダムな一冊</div></div>
+  　　
+  <h2>プライバシー</h2>
+  <ul>
+    <li>
+      読書アプリとしての使いやすさを考慮して、以下のデータをサイトデータとしてデバイス上に保存します：最近読んだ本のリスト、各本のテキストデータ及び読書位置、お気に入りリスト。各リストの長さは２００冊以内です。実際にどれくらいの期間データが保存されるかなどはブラウザの設定に左右されます。Safariはかなり積極的に使用していないデータを削除するようです。
+    </li>
+    <li>
+      手動で削除したい場合は設定メニューからできます。これらのデータが外部に送られることは一切ありません。
+    </li>
 
-<div class="searchbox"> 
-   &#x1F50D;<input type="search" id="query" size="10"/>
-  </div>
+    <li>
+      起動時に書籍情報を取得したあとは、外部との通信はテキストデータをダウンロードするのみです。
+    </li>
+  </ul>
 
-<div style="text-align: end; padding-right: 0.5em">
-<div class="sitenavbutton" id="menubutton">&#x2630;</div>
+  <h2>本の著作権</h2>
+  　　
+  <ul>
+    <li>
+      書籍情報と、各作品は<a href="https://www.aozora.gr.jp/">青空文庫</a
+      >によって公開されているものであり、このサイトは青空文庫の皆様のご尽力の上に成り立っています。
+    </li>
+
+    <li>
+      このサイトでアクセスできる本は、青空文庫に収録されているもののうち、著作権が切れているものとクリエイティブ・コモンズ「表示
+      2.1
+      日本」（あるいはそれ以降のもの）でライセンスされているものです。どちらであるかは各本の最後にある書籍情報で確認してください。著作権が切れている場合、このサイトで作成される各フォーマットのファイルもパブリックドメインです。クリエイティブ・コモンズの場合はそれのライセンス条件に従ってください。
+    </li>
+  </ul>
+  <h2>その他</h2>
+  <ul>
+    <li>
+      新着情報は<a href="https://bsky.app/profile/aozorabookcase.bsky.social"
+        >BlueSky</a
+      >でお知らせします。コメントなどもそちらへどうぞ。
+    </li>
+
+    <li>
+      費用と労力を個人で負担できる範囲内での提供です。課金したり、広告を掲載するような予定はありません。
+    </li>
+  </ul>
+  <h2>技術的な仕様</h2>
+  <ul>
+    <li>
+      このサイトはいわゆる<a
+        href="https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%83%9A%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3"
+        >シングルページアプリケーション</a
+      >です。各ページの構築及びEPUB/AZW3、その他の形式への変換はすべてブラウザ内で行われます。
+    </li>
+    <li>
+      コードはGo、それをWebAssemblyにコンパイルしたものです。ソースコードはGitHubで公開しています：<a
+        href="https://github.com/adamay909/AozoraBookcase"
+        >https://github.com/adamay909/AozoraBookcase</a
+      >。
+    </li>
+    <li>
+      AozoraBookcase. Copyright (C) 2024 Masahiro Yamada. Licensed under
+      AGPL-3.0. Source code available at
+      <a href="https://github.com/adamay909/AozoraBookcase"
+        >https://github.com/adamay909/AozoraBookcase</a
+      >.
+    </li>
+  </ul>
+  <button id="closeAbout2" style="margin: 2em">戻る</button>
 </div>
-<div>
-</div>
-
-</div>
-<div style="max-width: 60em">
-
-<h1>このサイトについて</h1>
-<p><a href="https://www.aozora.gr.jp/">青空文庫</a>で公開されている作品の検索および電子書籍リーダー用ファイル形式への変換をするためのサイトです。</p>
-<p>本の探し方はほぼ自明と思われますが、特徴として各作品のページから、関連書物（同作家、同翻訳者、同NDC分類）にリンクされています。単純な検索も右上の検索ボックスからできます。</p>
-<p>単純なブラウザ内での読書機能もあります。縦書き、ふりがな付きですが、基本的には本屋でパラパラっと中身を見る程度の利用を想定しています。全文を１ページで表示するため、文庫本で数ページ程度の文章なら読めるかもしれませんが、長文には向きません。</p>
-<p>電子書籍リーダー用ファイル形式はEPUBとキンドル用のAZW3です。各作品のページにダウンロード用ボタンがあります。</p>
-<p>MacOS、iOSの場合はEPUBをダウンロードしブック（Books）で開けば読めます。Androidの場合はEPUBでダウンロードした上Playブックで開けば読めます。</p>
-<p>残念ながらキンドルのブラウザではこのサイトは機能しないので、パソコンからAZW3形式のファイルを転送する必要があります。リーダー機器への転送は<a href="https://calibre-ebook.com/ja">Calibre</a>の使用をおすすめします。Calibreを使ってEPUB、AZW3を読むことも可能です。</p>
-<p>その他のダウンロードオプションとして、LaTeX、青空文庫注記風テキストファイル、HTML、およびJSONを提供しています。これらは直接読むというよりは、更にファイルを加工したい時のためです。詳しくは<a href="https://github.com/adamay909/AozoraConvert/v2">https://github.com/adamay909/AozoraConvert/v2</a>をご覧ください。</p>
-<p>書籍情報と、各作品は<a href="https://www.aozora.gr.jp/">青空文庫</a>によって公開されているものであり、このサイトは青空文庫の皆様のご尽力の上に成り立っています。</p>
-
-<p>新着情報は<a href="https://bsky.app/profile/aozorabookcase.bsky.social">https://bsky.app/profile/aozorabookcase.bsky.social</a>でお知らせします。コメントなどもそちらへどうぞ。
-
-<h2>技術的な仕様</h2>
-<p>このサイトはいわゆる<a href="https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%83%9A%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">シングルページアプリケーション</a>です。各ページの構築及びEPUB/AZW3、その他の形式への変換はすべてブラウザ内で行われます。</p>
-<p>コードはGo、それをWebAssemblyにコンパイルしたものです。ソースコードはGitHubで公開しています：<a href="https://github.com/adamay909/AozoraBookcase">https://github.com/adamay909/AozoraBookcase</a>。</p>
-<p>AozoraBookcase. Copyright (C) 2024 Masahiro Yamada. Licensed under AGPL-3.0. Source code available at <a href="https://github.com/adamay909/AozoraBookcase">https://github.com/adamay909/AozoraBookcase</a>.</p>
-
-
-</div>
-

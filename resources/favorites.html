@@ -1,0 +1,40 @@
+{{/* favorites */}}
+
+{{ $x := index .Books 0 }} SITEBANNER
+
+<input type="checkbox" id="orderToggle" class="toggle" />
+
+<label for="orderToggle">
+  <div class="togglebutton">
+    <span class="titlesort">作者順</span
+    ><span class="authorsort">タイトル順</span>に並べ替える
+  </div>
+</label>
+
+<h2 class="authorsort">お気に入り（作者順）</h2>
+<h2 class="titlesort">お気に入り（タイトル順）</h2>
+
+<div class="titlelist authorsort">
+  {{ range .BooksByAuthor }} {{ $x := . }}
+  <a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+    <div class="booklink">
+      <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
+      <span class="title">{{.Title}} {{.Subtitle}}</span><br />
+      <span class="note">作者: {{$x.FullName}}</span><br />
+    </div>
+  </a>
+  {{end}}
+</div>
+
+<div class="titlelist titlesort">
+  {{ range .BooksByTitle }} {{ $x := . }}
+  <a href="#books/book_{{.AuthorID}}_{{.BookID}}.html" class="titlelist">
+    <div class="booklink">
+      <span class="yomi">{{.TitleY}} {{.SubtitleY}}</span><br />
+      <span class="title">{{.Title}} {{.Subtitle}}</span><br />
+      <span class="note">作者: {{$x.FullName}}</span><br />
+    </div>
+  </a>
+  {{end}}
+</div>
+<p></p>

@@ -1,7 +1,6 @@
 package aozorafs
 
 import (
-	"bytes"
 	"errors"
 	"io/fs"
 	"log"
@@ -14,11 +13,6 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 	entry, err := dir.ReadDir(".")
 
-	if len(entry) != 1 {
-		log.Println("templates must be inside a single subdirectory")
-		return
-	}
-
 	if err != nil {
 		log.Println(err)
 		return
@@ -30,6 +24,17 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 		log.Println("templates must be inside a single subdirectory")
 		return
 	}
+
+	f, err := dir.Open(filepath.Join(dirname, "banner.html"))
+	defer f.Close()
+	if err != nil {
+		log.Println("can't find default banner!")
+		return
+	}
+	info, _ := f.Stat()
+	data := make([]byte, info.Size())
+	f.Read(data)
+	banner := string(data)
 
 	for k := range entry {
 
@@ -126,59 +131,44 @@ func (lib *Library) ImportTemplates(dir fs.ReadDirFS) {
 
 		//Now define the templates
 
+		templStr := strings.ReplaceAll(string(data), `SITEBANNER`, banner)
+
 		switch tn {
 
-		case "defaultcss":
-			buf := new(bytes.Buffer)
-
-			err := template.Must(template.New("css").Parse(string(data))).Execute(buf, "")
-			if err != nil {
-				log.Println(err)
-			}
-			_, err = lib.cache.CreateEphemeral("ebooks.css", buf.Bytes())
-			if err != nil {
-				log.Println(err)
-			}
-
-		case "readingpanecss":
-			buf := new(bytes.Buffer)
-
-			err := template.Must(template.New("css").Parse(string(data))).Execute(buf, "")
-			if err != nil {
-				log.Println(err)
-			}
-			_, err = lib.cache.CreateEphemeral("readingpane.css", buf.Bytes())
-			if err != nil {
-				log.Println(err)
-			}
-
 		case "randombook":
-			lib.randomT = template.Must(template.New("random.html").Funcs(funcMap).Parse(string(data)))
+			lib.randomT = template.Must(template.New("random.html").Funcs(funcMap).Parse(templStr))
 
 		case "index":
-			lib.indexT = template.Must(template.New("index.html").Parse(string(data)))
+			lib.indexT = template.Must(template.New("index.html").Parse(templStr))
 
 		case "recent":
-			lib.recentT = template.Must(template.New("recent.html").Parse(string(data)))
+			lib.recentT = template.Must(template.New("recent.html").Parse(templStr))
 
 		case "author":
-			lib.authorT = template.Must(template.New("author.html").Parse(string(data)))
+			lib.authorT = template.Must(template.New("author.html").Parse(templStr))
 
 		case "book":
-			lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(string(data)))
+			lib.bookT = template.Must(template.New("book.html").Funcs(funcMap).Parse(templStr))
 
 		case "category":
-			lib.categoryT = template.Must(template.New("category.html").Parse(string(data)))
+			lib.categoryT = template.Must(template.New("category.html").Parse(templStr))
 
 		case "reading":
-			lib.readingT = template.Must(template.New("reading.html").Parse(string(data)))
+			lib.readingT = template.Must(template.New("reading.html").Parse(templStr))
+
+		case "latestReads":
+			lib.latestReadT = template.Must(template.New("latestReads.html").Parse(templStr))
+
+		case "favorites":
+			lib.favoritesT = template.Must(template.New("favorites.html").Parse(templStr))
 
 		case "search":
 
 		case "searchresult":
-			lib.searchresultT = template.Must(template.New("searchresult.html").Funcs(funcMap).Parse(string(data)))
+			lib.searchresultT = template.Must(template.New("searchresult.html").Funcs(funcMap).Parse(templStr))
 
 		default:
+			log.Println("template", tn, "found but don't know what to do with it")
 
 		}
 

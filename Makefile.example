@@ -1,0 +1,16 @@
+build:
+	rm -Rf dist/*
+	GOOS=js GOARCH=wasm go build -o dist/bookcase.wasm
+	cp -f /usr/lib/go/lib/wasm/wasm_exec.js dist/ 
+	cp src/*.html dist/
+	cp src/*.css dist/
+	cp src/*.js dist/
+	cp verticalpaginator/*.js dist/
+	cp verticalpaginator/*.css dist/
+
+deploy: build
+	if [[ "${AZSPADIR}x" == "x" ]]; 	then 	echo "Specify spa's root folder using the environment variable AZSPADIR"; exit 1; fi
+	cp -f dist/* ${AZSPADIR}/
+	cp -f ${AZSPADIR}/aozorabookcase.html ${AZSPADIR}/index.html
+	echo "done!"
+

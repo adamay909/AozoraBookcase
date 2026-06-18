@@ -1,6 +1,26 @@
+:root {
+  --mediumFont: 1rem;
+  --smallFont: calc(var(--mediumFont) * 0.8);
+  --xsmallFont: calc(var(--mediumFont) * 0.64);
+  --xxsmallFont: calc(var(--mediumFont) * 0.5);
+  --largeFont: calc(var(--mediumFont) * 1.25);
+  --xlargeFont: calc(var(--mediumFont) * 1.56);
+  --xxlargeFont: calc(var(--mediumFont) * 2);
+  --mediumLH: 1.9;
+  --narrowLH: 1.75;
+  --wideLH: 2.1;
+}
+
+#pageWindow {
+ /*text-align: justify;*/
+ font-size: 1rem;
+ line-height: 1.9;
+}
+
 p {
  margin: 0em;
 padding: 0em;
+/*line-height: 1.9;*/
 }
 
 ruby {
@@ -15,12 +35,25 @@ ruby.left {
  ruby-position: under;
 }
 
+rt {
+}
+
 figure {
  writing-mode: horizontal-tb;
+ display: flex;
+ flex-direction: column;
+ place-items: center;
+ width: var(--viewerWidth);
+ height: var(--viewerHeight); 
+}
+
+figcaption {
+ font-size: var(--smallFont);
 }
 
 .metadata{
- margin-left: 6em;
+ line-height: 1.5;
+ height: 100%;
 }
 
 .alignBottom {
@@ -198,11 +231,11 @@ figure {
 }
 
 .kunten {
- font-size: x-small;
+ font-size: 0.64em; /*var(--xsmallFont);*/
 }
 
 .okurigana {
- font-size: x-small;
+ font-size: 0.64em /*var(--xsmallFont);*/
 }
 
 .underline {
@@ -241,27 +274,28 @@ figure {
  font-style: italic;
 }
 
-.illustration {
-}
-
-
-
 .italic {
  font-style: italic;
 }
 
 .illustration {
- height: 100%;
- width: 100%;
+ width: calc(var(--viewerWidth) * 0.8);
+ height: calc(var(--viewerHeight) * 0.8);
+ object-fit: scale-down;
+}
+
+.inlineImage {
+ width: 1.56em;
  object-fit: scale-down;
 }
 
 .warichu {
  display: inline-block;
+ text-align: start;
  vertical-align: text-bottom; 
  line-height: 1.2;
- font-size: small;
- width: 2em;
+ font-size: 0.5em; /*var(--xxsmallFont);*/
+ width: auto;
 }
 
 /*For Mozilla's Gecko engine.
@@ -273,7 +307,9 @@ figure {
 }
 
 .horizontal {
+ writing-mode: horizontal-tb;
  text-orientation: upright;
+ line-height: 1.25em;
 }
 
 .sideways {
@@ -293,17 +329,24 @@ text-orientation: sideways;
 }
 
 .superscript {
+ font-size: 0.64em; /*var(--xsmallFont) */
 }
 
 .subscript {
+ font-size: 0.64em; /*var(--xsmallFont);*/
 }
+
 
 .centering {
- margin-right: 35%;
+ display: grid;
+ place-items: center;
+ width: 100%;
+ height: 100%;
 }
 
+
 .pageBreak {
- break-before: always;
+/* break-before: always;*/
 }
 
 .emphRight {
@@ -362,43 +405,101 @@ text-orientation: sideways;
 }
 
 .section {
- font-size: x-large;
+ font-size: 1.56em;
  font-weight: bold;
  list-style-type: none;
 }
 
 .subsection {
- font-size: large;
+ font-size: 1.25em;
  font-weight: bold;
  list-style-type: none;
 }
 
 .subsubsection {
- font-size: medium;
+ font-size: 1em;
  font-weight: bold;
  list-style-type: none;
 }
 
 .annotation {
- font-size: small;
+ font-size: 0.8em; /*var(--smallFont);*/
 }
 
 h1.title {
- font-size: xx-large;
+ font-size: 2em;
  margin-top: 1em;
 }
 
 h2.subtitle {
- font-size: x-large;
+ font-size: 1.56em;
  margin-top: 2em;
 }
 
+h1.title + h2.subtitle {
+ margin-right: 0.5em;
+}
+
 h2.contributor {
- font-size: x-large;
+ font-size: 1.56em;
  text-align:  end;
 }
 
-footer {
- page-break-before: always;
+h1.title + h2.contributor {
+ margin-right: 2em;
+}
+
+h2.subtitle + h2.contributor {
+ margin-right: 2em;
+}
+
+.small {
+ font-size: 0.8em; /*var(--smallFont);*/
+}
+
+.x-small {
+ font-size: 0.64em;
+}
+
+.xx-small {
+ font-size: 0.5em;
+}
+
+.large {
+ font-size: 1.25em;
+}
+
+.x-large {
+ font-size: 1.56em;
+}
+
+.xx-large {
+ font-size: 2em;
+}
+
+.xxx-large {
+ font-size: 2.5em;
+}
+
+.vpSplit1 {
+ text-align-last: justify;
+}
+
+.vpSplit2 {
+ text-indent: 0;
+}
+
+ol {
+ margin-left: 2rem;
+ margin-bottom: 2rem;
+ list-style-type: none;
+}
+
+li {
+ text-align-last: start;
+}
+
+li::marker {
+ content: none;
 }
 
