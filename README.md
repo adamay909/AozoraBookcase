@@ -38,6 +38,6 @@ GoからWebAssemblyにコンパイルしており、バイナリが巨大（9MB�
 
 ### EPUB/AZW3/その他フォーマットへの 変換ライブラリ
 
-変換に使うコードはもともとコマンドラインツールとして作ったもので、別途[https://github.com/adamay909/AozoraConvert](https://github.com/adamay909/AozoraConvert)で公開しています。本アプリで使用しているのレポジトリ内のv2の方です。
+変換に使うコードはもともとコマンドラインツールとして作ったもので、別途[https://github.com/adamay909/AozoraConvert](https://github.com/adamay909/AozoraConvert)で公開しています。本アプリで使用しているのはレポジトリ内のv2の方です。
 
 
