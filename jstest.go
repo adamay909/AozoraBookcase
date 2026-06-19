@@ -7,29 +7,31 @@ import (
 )
 
 // Thanks to Google Gemini for this
-func fetchData(url string) []byte {
+func fetchData(url string) (data []byte, err error) {
+
+	var result []js.Value
 
 	fetchPromise := domWindow.Call("fetch", url)
 
-	result, err := jsAwait(fetchPromise)
+	result, err = jsAwait(fetchPromise)
 	if err != nil {
-		panic("file download failed")
+		return
 	}
 
 	response := result[0]
 	if !response.Get("ok").Bool() {
-		panic("HTTP error: " + strconv.Itoa(response.Get("status").Int()))
+		err = errors.New("HTTP error: " + strconv.Itoa(response.Get("status").Int()))
+		return
 	}
 
 	bytesPromise := response.Call("bytes")
 	bytesResult, err := jsAwait(bytesPromise)
 	if err != nil {
-		panic("file download filed")
+		return
 	}
 
-	data := make([]byte, bytesResult[0].Get("length").Int())
-	js.CopyBytesToGo(data, bytesResult[0])
-	return data
+	data = bytesOf(bytesResult[0])
+	return
 }
 
 // await the resolution of promise. Err is non-nil when promise

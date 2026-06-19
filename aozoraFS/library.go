@@ -227,3 +227,7 @@ func isValidFileName(n string) bool {
 func (lib *Library) BookList() []*Record {
 	return lib.booklist
 }
+
+func (lib *Library) URL() string {
+	return lib.src
+}

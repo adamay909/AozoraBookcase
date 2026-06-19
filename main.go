@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"log"
+	"path"
 	"strings"
 
 	aozorafs "github.com/adamay909/AozoraBookcase/aozoraFS"
@@ -23,15 +24,16 @@ var globalSettings struct {
 var resourceFiles embed.FS
 
 func main() {
+	/*
+		defer func() {
 
-	defer func() {
-
-		if r := recover(); r != nil {
-			log.Println("something WRONG")
-			showErrorMsg()
-			return
-		}
-	}()
+			if r := recover(); r != nil {
+				log.Println("something WRONG")
+				showErrorMsg()
+				return
+			}
+		}()
+	*/
 	globalSettings.kids = false
 	globalSettings.strict = false
 	globalSettings.clean = true
@@ -96,7 +98,26 @@ func initLibrary() {
 
 	globalLib.Initialize("https://"+getHost()+getPathname(), "", globalSettings.clean, globalSettings.verbose, globalSettings.kids, globalSettings.strict)
 
-	globalLib.FetchLibrary()
+	var libdata []byte
+	mustDownload := newVersionAvailable()
+
+	if !mustDownload {
+		rawdata, err := jsAwait(domWindow.Call("loadFileFromIDB", "librarydata.zip"))
+		if err != nil {
+			mustDownload = true
+		} else {
+			libdata = bytesOf(rawdata[0])
+			log.Println("loaded from indexDB")
+		}
+	}
+	if mustDownload {
+		libdata = globalLib.FetchLibraryData()
+		log.Println("fetched from server")
+		jsAwait(domWindow.Call("saveFileToIDB", "librarydata.zip", uint8arrayOf(libdata)))
+	}
+
+	//globalLib.FetchLibrary()
+	globalLib.ConstructLibrary(libdata)
 
 	setupFavorites()
 }
@@ -117,4 +138,28 @@ func setupFavorites() {
 			globalLib.SetFavorites(list)
 		}
 	}()
+}
+
+// check for updated library db
+func newVersionAvailable() bool {
+	src := globalLib.URL()
+	log.Println("check for updated library")
+	pathStr := path.Join(src, "sha512.sum")
+	sum, err := fetchData(pathStr)
+	if err != nil {
+		log.Println("can't download sum")
+		return true
+	}
+
+	defer func() {
+		jsAwait(domWindow.Call("saveFileToIDB", "sha512.sum", string(sum)))
+	}()
+
+	oldsumjs, err := jsAwait(domWindow.Call("loadFileFromIDB", "sha512.sum"))
+	if err != nil {
+		log.Println("can't find old sum")
+		return true
+	}
+	oldsum := oldsumjs[0].String()
+	return oldsum != string(sum)
 }

@@ -66,6 +66,12 @@ func uint8arrayOf(data []byte) js.Value {
 
 }
 
+func bytesOf(v js.Value) []byte {
+	data := make([]byte, v.Length())
+	js.CopyBytesToGo(data, v)
+	return data
+}
+
 func saveFile(file js.Value) {
 
 	href := domWindow.Get("URL").Call("createObjectURL", file)

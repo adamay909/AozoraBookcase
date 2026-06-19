@@ -10,29 +10,25 @@ import (
 	"github.com/adamay909/AozoraBookcase/aozoraFS/zipfs"
 )
 
-func (lib *Library) FetchLibrary() {
+func (lib *Library) ConstructLibrary(data []byte) {
+	za, _ := zipfs.ZipArchiveFromData(data)
+	defer za.CloseArchive()
+	lib.GetBooklist(za.ReadMust("list_person_all_extended_utf8.csv"))
+	lib.setupAuthorsList()
+	return
+}
+
+func (lib *Library) FetchLibraryData() []byte {
 
 	log.Println("getting library catalog information")
-
-	if lib.kids {
-
-		log.Println("children's books library")
-
-	}
 
 	pathStr := path.Join(lib.src, "/index_pages", "list_person_all_extended_utf8.zip")
 
 	log.Println("requesting db", pathStr)
 
-	za, _ := zipfs.ZipArchiveFromData(download(pathStr))
+	data, _ := download(pathStr)
 
-	defer za.CloseArchive()
-
-	lib.GetBooklist(za.ReadMust("list_person_all_extended_utf8.csv"))
-
-	lib.setupAuthorsList()
-
-	return
+	return data
 }
 
 func (lib *Library) setupAuthorsList() {

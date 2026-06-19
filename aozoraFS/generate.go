@@ -390,7 +390,7 @@ func (lib *Library) generateFile(name string) (fs.File, error) {
 
 	case ".zip":
 		bk, _ := lib.GetBookRecord(name)
-		br = download(bk.URI)
+		br, _ = download(bk.URI)
 
 	default:
 		br = book.RenderMonolithicHTML()
@@ -435,7 +435,8 @@ func (lib *Library) GetID(name string) string {
 
 func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
-	book := azrconvert.NewEbookFromZip(download(bk.URI))
+	data, _ := download(bk.URI)
+	book := azrconvert.NewEbookFromZip(data)
 
 	if book.Body == nil {
 		return book
