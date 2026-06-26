@@ -1,4 +1,6 @@
+//Generated file. Do not edit as it will be overwritten.
+
 package main
 
-//go:generate ./scripts/generate.sh
-const revHash = "a87acd9"
+const revHash = "7a3e0c0"
+
