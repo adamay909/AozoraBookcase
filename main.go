@@ -113,7 +113,7 @@ func initLibrary() {
 	if mustDownload {
 		libdata = globalLib.FetchLibraryData()
 		log.Println("fetched from server")
-		jsAwait(domWindow.Call("saveFileToIDB", "librarydata.zip", uint8arrayOf(libdata)))
+		//		jsAwait(domWindow.Call("saveFileToIDB", "librarydata.zip", uint8arrayOf(libdata))) //no point. depend on browser cache
 	}
 
 	//globalLib.FetchLibrary()
@@ -142,6 +142,7 @@ func setupFavorites() {
 
 // check for updated library db
 func newVersionAvailable() bool {
+	return true //just depend on browser cache!!
 	src := globalLib.URL()
 	log.Println("check for updated library")
 	pathStr := path.Join(src, "sha512.sum")

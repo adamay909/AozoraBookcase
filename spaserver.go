@@ -334,6 +334,7 @@ func showAbout() {
 
 	elem, _ := getElementByID("about")
 	data := string(readFromResources("about.html"))
+	data = strings.ReplaceAll(data, "REV", revHash)
 	elem.Set("innerHTML", data)
 	elem.Set("style", "display: block")
 	elem.Call("scrollTo", "0", "0")

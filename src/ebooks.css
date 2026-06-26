@@ -876,6 +876,11 @@ text-align: justify;
  content: "・"
 }
 
+#rev {
+ text-align: end;
+ color: grey;
+}
+
 .menupane button {
  font-size: inherit;
  font-family: inherit;
