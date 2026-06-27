@@ -206,10 +206,11 @@ func showMore() {
 
 func readBook(path string) {
 
+	log.Println("requested book path", path)
 	go readBookSvc(path)
-
-	return
 }
+
+var oForce = false
 
 func readBookSvc(path string) {
 	/*
@@ -235,7 +236,15 @@ func readBookSvc(path string) {
 	mkpage(path, string(getPageData(path)))
 
 	found, _ := jsAwait(domWindow.Call("fileExists", bookid))
-	if !found[0].Bool() {
+
+	force := oForce
+	if force {
+		jsAwait(domWindow.Call("deleteFile", bookid))
+		jsAwait(domWindow.Call("deleteFile", bookid+"page"))
+	}
+	oForce = false
+
+	if force || !found[0].Bool() {
 		log.Println("requesting raw data")
 		data := getBookText(path)
 		htmldata = data[0]
@@ -500,9 +509,15 @@ func buttonClickHandler(event js.Value, params ...any) {
 		showAbout()
 	case "closeAbout1", "closeAbout2":
 		closeAbout()
-
 	case "more":
 		showMore()
+	case "forceRefresh":
+		confirmed := domWindow.Call("confirm", "このテキストのデータは読書位置を含め一旦消去されます。よろしいですか？")
+		if !confirmed.Bool() {
+			return
+		}
+		oForce = true
+		readBook(strings.TrimPrefix(path, "#"))
 	}
 }
 

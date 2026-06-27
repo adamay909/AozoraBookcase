@@ -73,4 +73,4 @@ window.clearIDB = clearIDB
 window.reloaded = reloaded
 window.eventTargetID = eventTargetID
 window.eventTargetElem = eventTargetElem
-
+window.deleteFile = deleteFile
