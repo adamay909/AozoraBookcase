@@ -504,6 +504,10 @@ func buttonClickHandler(event js.Value, params ...any) {
 		setHash("")
 		setHash("index.html")
 	case "clearStorage":
+		confirmed := domWindow.Call("confirm", "すべてのデータが消去され初期状態に戻ります。よろしいですか？")
+		if !confirmed.Bool() {
+			return
+		}
 		clearStorage()
 	case "showAbout":
 		showAbout()
@@ -555,6 +559,7 @@ func removeFromList(original []string, item string) (resp []string) {
 
 func clearStorage() {
 	go func() {
-		jsAwait(domWindow.Call("clearIDB"))
+		jsAwait(domWindow.Call("clearData"))
+		domWindow.Get("location").Call("reload")
 	}()
 }

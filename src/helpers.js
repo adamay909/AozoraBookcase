@@ -66,6 +66,24 @@ const elem = e.target.closest(selector)
  }
  return elem
 }
+
+async function clearData() {
+
+    localStorage.clear();//we don't use localStorage but just in case.
+
+    sessionStorage.clear();//ditto
+  
+    await clearIDB();//clear indexDB
+
+    const CACHE = "azbookcase"; //clear service worker cache
+    await  caches.delete(CACHE);
+
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(r => r.unregister())); //unregister service workers
+
+}
+
+
 window.loadFileFromIDB = loadFileFromIDB
 window.saveFileToIDB = saveFileToIDB
 window.fileExists = fileExists
@@ -74,3 +92,4 @@ window.reloaded = reloaded
 window.eventTargetID = eventTargetID
 window.eventTargetElem = eventTargetElem
 window.deleteFile = deleteFile
+window.clearData = clearData
