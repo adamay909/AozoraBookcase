@@ -78,7 +78,11 @@ func setHashHandler(prefix string, f handleFunc) {
 }
 
 func mainPages(path string) {
-	mkpage(path, string(getPageData(strings.Split(path, `::`)[0])))
+	data, err := getPageData(strings.Split(path, `::`)[0])
+	if err != nil {
+		return
+	}
+	mkpage(path, string(data))
 	domHTML.Set("style", "writing-mode: horizontal-tb")
 	if elem, err := getElementByID(path); err == nil {
 		scrollTo(elem)
@@ -100,7 +104,11 @@ func latestReads(name string) {
 			list = cleanUpList(rawlist)
 		}
 		globalLib.SetLatestReads(list)
-		mkpage(name, string(getPageData(name)))
+		data, err := getPageData(name)
+		if err != nil {
+			return
+		}
+		mkpage(name, string(data))
 	}()
 }
 
@@ -115,7 +123,11 @@ func showFavorites(name string) {
 			list = cleanUpList(rawlist)
 		}
 		globalLib.SetFavorites(list)
-		mkpage(name, string(getPageData(name)))
+		data, err := getPageData(name)
+		if err != nil {
+			return
+		}
+		mkpage(name, string(data))
 	}()
 }
 
@@ -133,7 +145,11 @@ func recentsPage(path string) {
 		n = globalLib.LenDistinctBooks() / 100
 	}
 	path = "recent" + strconv.Itoa(n) + ".html"
-	mkpage(path, string(getPageData(path)))
+	data, err := getPageData(path)
+	if err != nil {
+		return
+	}
+	mkpage(path, string(data))
 	domHTML.Set("style", "writing-mode: horizontal-tb")
 	domWindow.Call("scrollTo", map[string]any{"top": 0, "left": 0})
 	log.Println("spaserver: done constructing page", path)
@@ -155,7 +171,13 @@ func serveFileSvc(path string) {
 
 	log.Println("creating", filepath.Base(path))
 
-	data := getPageData(path)
+	data, err := getPageData(path)
+
+	if err != nil {
+		domWindow.Call("alert", "データをダウンロードできません")
+		uncoverScreen()
+		return
+	}
 
 	bk, _ := globalLib.GetBookRecord(path)
 
@@ -233,7 +255,12 @@ func readBookSvc(path string) {
 		return
 	}
 
-	mkpage(path, string(getPageData(path)))
+	data, err := getPageData(path)
+	if err != nil {
+		domWindow.Call("alert", "データをダウンロードできません")
+		return
+	}
+	mkpage(path, string(data))
 
 	found, _ := jsAwait(domWindow.Call("fileExists", bookid))
 
@@ -246,7 +273,13 @@ func readBookSvc(path string) {
 
 	if force || !found[0].Bool() {
 		log.Println("requesting raw data")
-		data := getBookText(path)
+		data, err := getBookText(path)
+		if err != nil {
+			domWindow.Call("alert", "データをダウンロードできません")
+			domWindow.Get("history").Call("back")
+			uncoverScreen()
+			return
+		}
 		htmldata = data[0]
 		navdata = data[1]
 		domTemplate.Set("innerHTML", htmldata)
@@ -285,7 +318,7 @@ func readBookSvc(path string) {
 	return
 }
 
-func getBookText(name string) []string {
+func getBookText(name string) ([]string, error) {
 
 	return globalLib.GetMonolithicHTML(name)
 
@@ -391,16 +424,17 @@ func sortPrefixes(s []string) {
 	return
 }
 
-func getPageData(path string) []byte {
+func getPageData(path string) ([]byte, error) {
 
-	f, _ := globalLib.Open(path)
+	f, err := globalLib.Open(path)
 
-	defer f.Close()
-
+	if err != nil {
+		return []byte{}, err
+	}
 	fc := f.(*cacheFile)
 	defer fc.Close()
 
-	return readFrom(fc)
+	return readFrom(fc), err
 
 }
 

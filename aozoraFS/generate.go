@@ -314,7 +314,7 @@ func (lib *Library) genFavoritesPage(name string) (fs.File, error) {
 
 }
 
-func (lib *Library) GetMonolithicHTML(name string) []string {
+func (lib *Library) GetMonolithicHTML(name string) ([]string, error) {
 
 	var rname string
 
@@ -324,14 +324,19 @@ func (lib *Library) GetMonolithicHTML(name string) []string {
 		rname = name
 	}
 
-	book, _ := lib.getBookData(rname)
+	book, err := lib.getBookData(rname)
+
+	if err != nil {
+		log.Println("could not retrieve data", err)
+		return []string{""}, err
+	}
 
 	if book.Body == nil {
 		fmt.Println("CONVERSION FAILED")
-		return []string{""}
+		return []string{""}, errors.New("conversion failed")
 	}
 
-	return []string{string(book.RenderMonolithicHTML()), string(book.RenderNavHTML())}
+	return []string{string(book.RenderMonolithicHTML()), string(book.RenderNavHTML())}, err
 }
 
 func (lib *Library) GetBookRecord(name string) (*Record, error) {
@@ -357,14 +362,24 @@ func (lib *Library) getBookData(name string) (book *azrconvert.Book, err error) 
 	if err != nil {
 		return
 	}
-	book = lib.getBook(bk)
+	book, err = lib.getBook(bk)
 
+	if err != nil {
+		err = errors.New("book file not found")
+		return
+	}
 	return
 }
 
 func (lib *Library) generateFile(name string) (fs.File, error) {
 
-	book, _ := lib.getBookData(name)
+	book, err := lib.getBookData(name)
+
+	if err != nil {
+		log.Println("are we online?")
+		var f fs.File
+		return f, err
+	}
 
 	var br []byte
 
@@ -433,13 +448,16 @@ func (lib *Library) GetID(name string) string {
 	return getID(name)
 }
 
-func (lib *Library) getBook(bk *Record) *azrconvert.Book {
+func (lib *Library) getBook(bk *Record) (*azrconvert.Book, error) {
 
-	data, _ := download(bk.URI)
+	data, err := download(bk.URI)
+	if err != nil {
+		return new(azrconvert.Book), err
+	}
 	book := azrconvert.NewEbookFromZip(data)
 
 	if book.Body == nil {
-		return book
+		return book, errors.New("conversion failed")
 	}
 
 	book.Body.ClearMetadata()
@@ -480,7 +498,7 @@ func (lib *Library) getBook(bk *Record) *azrconvert.Book {
 
 	}
 
-	return book
+	return book, err
 }
 
 func (lib *Library) GetRecordWithID(authorid, bookid string) *Record {

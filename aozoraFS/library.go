@@ -140,6 +140,9 @@ func createFile(lib *Library, name string) (f fs.File, err error) {
 		return
 	}
 
+	if err != nil {
+		return
+	}
 	info, _ := f.Stat()
 	log.Println("created", info.Name())
 

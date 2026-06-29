@@ -8,8 +8,12 @@ build:
 	cp src/*.html dist/
 	cp src/*.css dist/stylesheets/
 	cp src/*.js dist/scripts/
+	cp src/*.ico dist/
 	cp verticalpaginator/*.js dist/scripts/
 	cp verticalpaginator/*.css dist/stylesheets/
+	./scripts/manifest.sh
+	cp src/serviceWorkers/*.js dist/
+	cp dist/aozorabookcase.html dist/index.html
 
 deploy: build
 	if [[ "${AZSPADIR}x" == "x" ]]; 	then 	echo "Specify spa's root folder using the environment variable AZSPADIR"; exit 1; fi

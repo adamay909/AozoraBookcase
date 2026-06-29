@@ -24,6 +24,11 @@ func fetchData(url string) (data []byte, err error) {
 		return
 	}
 
+	if response.Get("status").Int() == 404 {
+		err = errors.New("HTTP error: " + strconv.Itoa(response.Get("status").Int()))
+		return
+	}
+
 	bytesPromise := response.Call("bytes")
 	bytesResult, err := jsAwait(bytesPromise)
 	if err != nil {
