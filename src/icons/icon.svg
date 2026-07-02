@@ -3,7 +3,7 @@
 
 <svg
    id="svg6549"
-   sodipodi:docname="book-open.svg"
+   sodipodi:docname="new.svg"
    inkscape:export-ydpi="36"
    inkscape:export-filename="icon192.png"
    viewBox="0 0 511.99998 512.00001"
@@ -92,7 +92,7 @@
      showgrid="false"
      borderopacity="1.0"
      inkscape:current-layer="layer1"
-     inkscape:cx="137.63328"
+     inkscape:cx="137.88582"
      inkscape:cy="287.13586"
      fit-margin-top="0"
      fit-margin-right="0"
@@ -244,6 +244,82 @@
            inkscape:connector-curvature="0" />
       </g>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-size:14.4953px;line-height:1.25;font-family:'M PLUS 1';-inkscape-font-specification:'M PLUS 1, @wght=600';font-variant-ligatures:none;font-variation-settings:'wght' 600;stroke-width:0.603971"
+       x="277.14798"
+       y="457.55038"
+       id="text1"
+       transform="scale(1.0446607,0.95724863)"><tspan
+         id="tspan1"
+         style="stroke-width:0.603971"
+         sodipodi:role="line"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28.9906px;line-height:1.25;font-family:'M PLUS 1';-inkscape-font-specification:'M PLUS 1, @wght=600';font-variant-ligatures:none;font-variation-settings:'wght' 600;stroke-width:0.603971"
+       x="272.87726"
+       y="447.4837"
+       id="text2"
+       transform="scale(1.0446607,0.95724863)"><tspan
+         id="tspan2"
+         style="stroke-width:0.603971"
+         x="272.87726"
+         y="447.4837"
+         sodipodi:role="line" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:43.4859px;line-height:1.25;font-family:'M PLUS 1';-inkscape-font-specification:'M PLUS 1, @wght=600';font-variant-ligatures:none;font-variation-settings:'wght' 600;stroke-width:0.603971"
+       x="273.79242"
+       y="479.51407"
+       id="text3"
+       transform="scale(1.0446607,0.95724863)"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="stroke-width:0.603971"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:43.4859px;line-height:1.25;font-family:'M PLUS 1';-inkscape-font-specification:'M PLUS 1, @wght=300';font-variant-ligatures:none;font-variation-settings:'wght' 300;stroke-width:0.603971"
+       x="390.62701"
+       y="482.56458"
+       id="text4"
+       transform="scale(1.0446607,0.95724863)"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="stroke-width:0.603971"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:59.7478px;line-height:1.25;font-family:'Noto Serif CJK JP';-inkscape-font-specification:'Noto Serif CJK JP, @wght=300';font-variant-ligatures:none;font-variation-settings:'wght' 300;stroke-width:0.603971;fill:#0756cf;fill-opacity:1.0"
+       x="387.88156"
+       y="491.71613"
+       id="text7"
+       transform="scale(1.0446607,0.95724863)"><tspan
+         sodipodi:role="line"
+         id="tspan7"
+         style="stroke-width:0.603971;fill:#0756cf;fill-opacity:1.0"
+         x="387.88156"
+         y="491.71613">青</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.603971;fill:#0756cf;fill-opacity:1.0"
+         x="387.88156"
+         y="566.40088"
+         id="tspan8">空</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:59.7478px;line-height:1.25;font-family:'Noto Serif CJK JP';-inkscape-font-specification:'Noto Serif CJK JP, @wght=300';font-variant-ligatures:none;font-variation-settings:'wght' 300;fill:#0756cf;fill-opacity:1;stroke-width:0.603971"
+       x="267.38635"
+       y="493.24139"
+       id="text9"
+       transform="scale(1.0446607,0.95724861)"><tspan
+         sodipodi:role="line"
+         id="tspan9"
+         style="fill:#0756cf;fill-opacity:1;stroke-width:0.603971"
+         x="267.38635"
+         y="493.24139">書</tspan><tspan
+         sodipodi:role="line"
+         style="fill:#0756cf;fill-opacity:1;stroke-width:0.603971"
+         x="267.38635"
+         y="567.92615"
+         id="tspan10">庫</tspan></text>
   </g>
   <metadata
      id="metadata1">
