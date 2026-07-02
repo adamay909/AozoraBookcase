@@ -1,0 +1,53 @@
+{
+  "name": "青空書庫",
+  "description": "青空文庫のテキストを読んだり変換する",
+  "start_url": "/",
+  "display": "minimal-ui",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/iconMaskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/Screenshot1.png",
+      "sizes": "1897x1266",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/Screenshot2.png",
+      "sizes": "1897x1266",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/Screenshot3.png",
+      "sizes": "1897x1266",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/Screenshot_m1.png",
+      "sizes": "1079x2130",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}
