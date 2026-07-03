@@ -278,6 +278,12 @@ func uncoverScreen() {
 
 }
 
+func hideSplashscreen() {
+	log.Println("hide splash")
+	elem, _ := getElementByID("splashscreen")
+	elem.Call("setAttribute", "style", "display: none")
+}
+
 func hideErrorMsg() {
 	domError.Call("setAttribute", "style", "display: none")
 }

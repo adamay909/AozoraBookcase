@@ -63,6 +63,8 @@ func main() {
 
 	log.Println("main: done setting up JS")
 
+	hideSplashscreen()
+
 	setHash("")
 	if hash != "" {
 		setHash(strings.TrimPrefix(hash, "#"))
@@ -71,8 +73,6 @@ func main() {
 	}
 
 	//	loadMainPage()
-
-	uncoverScreen()
 
 	<-make(chan bool) //prevent exiting
 
