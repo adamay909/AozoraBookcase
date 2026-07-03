@@ -8,7 +8,9 @@ build:
 	cp src/*.html dist/
 	cp src/*.css dist/stylesheets/
 	cp src/*.js dist/scripts/
-	cp src/*.ico dist/
+	cp -Rf src/icons dist/
+	cp -Rf src/screenshots dist/
+	cp src/manifest.json dist/
 	cp verticalpaginator/*.js dist/scripts/
 	cp verticalpaginator/*.css dist/stylesheets/
 	./scripts/manifest.sh
