@@ -2,7 +2,7 @@
   "name": "青空書庫",
   "description": "青空文庫のテキストを読んだり変換する",
   "start_url": "/",
-  "display": "minimal-ui",
+  "display": "standalone",
   "orientation": "portrait",
   "icons": [
     {

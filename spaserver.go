@@ -23,7 +23,7 @@ func setupJS() {
 	setupInputListener()
 	setupHashHandlers()
 	setupHashListeners()
-
+	setupKeyboardListeners()
 }
 
 func spaserver(event js.Value, params ...any) {
@@ -596,4 +596,24 @@ func clearStorage() {
 		jsAwait(domWindow.Call("clearData"))
 		domWindow.Get("location").Call("reload")
 	}()
+}
+
+func setupKeyboardListeners() {
+
+	addEventListener(domWindow, "keydown", keyboardHandler)
+}
+
+func keyboardHandler(event js.Value, param ...any) {
+
+	target := event.Get("target").Call("closest", "input")
+	if !target.IsNull() {
+		return
+	}
+
+	key := event.Get("key").String()
+
+	switch key {
+	case "Backspace":
+		js.Global().Get("history").Call("back")
+	}
 }
