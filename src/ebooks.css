@@ -662,6 +662,12 @@ background-color: var(--main-reading-bg);
  accent-color: lightgrey;
 }
 
+.range-labels {
+ display: flex;
+ justify-content: space-between;
+ font-size: 0.75em;
+}
+
 datalist  {
  display: flex;
  width: 160px;

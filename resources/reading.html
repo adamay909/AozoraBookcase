@@ -78,21 +78,23 @@
     <div class="label">
       <label for="fontSizes">フォントの大きさ</label>
     </div>
-    <div class="rs-option">
-      <input
-        type="range"
-        min="0"
-        max="2"
-        value="1"
-        class="chooser"
-        id="fontSizes"
-        list="fontSizeMarker"
-      />
-      <datalist id="fontSizeMarker">
-        <option value="0" label="小"></option>
-        <option value="1" label="中"></option>
-        <option value="2" label="大"></option>
-      </datalist>
+    <div class="selector">
+      <div class="rs-option">
+        <input
+          type="range"
+          min="0"
+          max="2"
+          value="1"
+          class="chooser"
+          id="fontSizes"
+          list="fontSizeMarker"
+        />
+      </div>
+      <div class="range-labels">
+        <div>小</div>
+        <div>中</div>
+        <div>大</div>
+      </div>
     </div>
   </div>
 
@@ -100,42 +102,49 @@
     <div class="label">
       <label for="lineHeight">行間</label>
     </div>
-    <div class="rs-option">
-      <input
-        type="range"
-        min="0"
-        max="2"
-        value="1"
-        class="chooser"
-        id="lineHeight"
-        list="lineHeightMarker"
-      />
-      <datalist id="lineHeightMarker">
-        <option value="0" label="小"></option>
-        <option value="1" label="中"></option>
-        <option value="2" label="大"></option>
-      </datalist>
+    <div class="selector">
+      <div class="rs-option">
+        <input
+          type="range"
+          min="0"
+          max="2"
+          value="1"
+          class="chooser"
+          id="lineHeight"
+          list="lineHeightMarker"
+        />
+      </div>
+      <div class="range-labels">
+        <div>小</div>
+        <div>中</div>
+        <div>大</div>
+      </div>
     </div>
   </div>
-  
+
   <div class="settinggroup">
-   <div class="label">  
-	<label for="wakelock">フルスクリーン中の画面自動ロックを阻止<br>   （フルスクリーン切り替えは読書ページのどこかをクリック/タップ）</label>
-   </div>
-    <div class="rs-option">
-      <input
-        type="range"
-        min="0"
-        max="1"
-        value="1"
-        class="chooser"
-        id="wakelock"
-        list="wakeheight"
-      />
-      <datalist id="lineHeightSizeMarker">
-        <option value="0" label="しない"></option>
-        <option value="1" label="する"></option>
-      </datalist>
+    <div class="label">
+      <label for="wakelock"
+        >フルスクリーン中の画面自動ロックを阻止<br />
+        （フルスクリーン切り替えは読書ページのどこかをクリック/タップ）</label
+      >
+    </div>
+    <div class="selector">
+      <div class="rs-option">
+        <input
+          type="range"
+          min="0"
+          max="1"
+          value="1"
+          class="chooser"
+          id="wakelock"
+          list="wakeMarker"
+        />
+      </div>
+      <div class="range-labels">
+        <div>しない</div>
+        <div>する</div>
+      </div>
     </div>
   </div>
   <div class="settinggroup">
@@ -147,7 +156,7 @@
   </div>
   <div class="settinggroup commit">
     <div>&nbsp;</div>
-   <button id="forceRefresh" style="width:8em">組版をやり直す</button>
+    <button id="forceRefresh" style="width: 8em">組版をやり直す</button>
   </div>
   <div class="settinggroup commit">
     <button id="cancel">キャンセル</button>
