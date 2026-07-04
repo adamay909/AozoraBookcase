@@ -12,6 +12,10 @@ https://aozora.orihasam.com/
 
 これはAWSのS3の静的ウエブサイト機能を利用したものです。EPUB等への変換はすべてローカルブラウザ内で行われます。
 
+## アプリとしてインストール
+
+このサイトはPWAとして機能するように設計されています。ChromeやSafariのメニューから「デスクトップに追加」を選択するとアプリリストに追加され、他のアプリとほぼ同等の使い心地で使えます。
+
 ## 実装に必要なもの
 
 - 青空文庫のサイトのコピー：[https://github.com/aozorabunko/aozorabunko](https://github.com/aozorabunko/aozorabunko)のクローンでOK。実際に使うのは  
