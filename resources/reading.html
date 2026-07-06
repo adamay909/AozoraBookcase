@@ -46,6 +46,7 @@
     </label>
     <button class="sitenavbutton" id="readerSettings">&#x2699;</button>
   </div>
+  <div class="book-title" id="bookTitle"></div>
 
   <div class="vertical-reader" id="verticalReader">
     <div class="page-window" id="pageWindow">
@@ -126,7 +127,7 @@
     <div class="label">
       <label for="wakelock"
         >フルスクリーン中の画面自動ロックを阻止<br />
-        （フルスクリーン切り替えは読書ページのどこかをクリック/タップ）</label
+		<span class="menunote">（フルスクリーン切り替えは読書ページのどこかをクリック/タップ）</span></label
       >
     </div>
     <div class="selector">
@@ -147,17 +148,20 @@
       </div>
     </div>
   </div>
-  <div class="settinggroup">
+
+  <div class="settinggroup" id="debuggroup" style="display: none">
     <div>&nbsp;</div>
-    <button id="showDebugInfo" style="color: gray; display: none">
+    <button id="showDebugInfo" style="color: gray;">
       デバグ情報
     </button>
-    <div id="debugInfo"></div>
   </div>
+  <div id="debugInfo"></div>
+
   <div class="settinggroup commit">
     <div>&nbsp;</div>
     <button id="forceRefresh" style="width: 8em">組版をやり直す</button>
   </div>
+
   <div class="settinggroup commit">
     <button id="cancel">キャンセル</button>
     <button id="doit">決定</button>

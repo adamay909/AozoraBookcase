@@ -106,6 +106,7 @@ body {
   color: var(--banner-fg);
  }
 
+
 /*for mobile*/
 .siteNavMenu {
  display: none;
@@ -556,7 +557,7 @@ background-color: var(--main-reading-bg);
 
 .readingPage .sitenavigation {
   writing-mode: horizontal-tb;
-  height: 21px;
+  height: 28x;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -578,6 +579,16 @@ background-color: var(--main-reading-bg);
   border: 0px;
   display: inline-flex;
   font-family: inherit;
+}
+
+.book-title {
+ font-size: var(--smallFont);
+ color: var(--main-fg);
+ opacity: 0.7;
+ display: flex;
+ justify-content: center;
+ height: 1.5em;
+ margin-top:0.5em;
 }
 
 #openTOC {
@@ -626,6 +637,7 @@ background-color: var(--main-reading-bg);
  display: none;
  position: fixed;
  width: 100%;
+ height: 80%;
  top: 0;
  left: 0;
  color: var(--main-fg);
@@ -666,6 +678,10 @@ background-color: var(--main-reading-bg);
  display: flex;
  justify-content: space-between;
  font-size: 0.75em;
+}
+
+.menunote {
+ font-size: 0.7em;
 }
 
 datalist  {
