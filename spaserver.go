@@ -549,6 +549,8 @@ func buttonClickHandler(event js.Value, params ...any) {
 		closeAbout()
 	case "more":
 		showMore()
+	case "reloadLibrary":
+		reloadLibrary()
 	case "forceRefresh":
 		confirmed := domWindow.Call("confirm", "このテキストのデータは読書位置を含め一旦消去されます。よろしいですか？")
 		if !confirmed.Bool() {
@@ -616,4 +618,17 @@ func keyboardHandler(event js.Value, param ...any) {
 	case "Backspace":
 		js.Global().Get("history").Call("back")
 	}
+}
+
+func reloadLibrary() {
+	coverScreen()
+	setHash("")
+	go func() {
+		libdata := globalLib.FetchLibraryData()
+		log.Println("fetched from server")
+		globalLib.ConstructLibrary(libdata)
+		setupFavorites()
+		setHash("index.html")
+		uncoverScreen()
+	}()
 }
