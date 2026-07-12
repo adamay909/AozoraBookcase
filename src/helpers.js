@@ -41,14 +41,6 @@ async function clearIDB() {
  await idbKeyval.clear()
 }
 
-function reloaded() {
-const navigationEntries = window.performance.getEntriesByType('navigation');
-
-if (navigationEntries.length > 0 && navigationEntries[0].type === 'reload') {
-    return true;
-}
-return false
-}
 
 //given event e, return closest element that meets selector
 function eventTargetID(e, selector) {
@@ -88,7 +80,6 @@ window.loadFileFromIDB = loadFileFromIDB
 window.saveFileToIDB = saveFileToIDB
 window.fileExists = fileExists
 window.clearIDB = clearIDB
-window.reloaded = reloaded
 window.eventTargetID = eventTargetID
 window.eventTargetElem = eventTargetElem
 window.deleteFile = deleteFile

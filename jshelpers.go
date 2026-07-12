@@ -354,3 +354,12 @@ func eventTargetElem(e js.Value, selector string) js.Value {
 func isInvalid(e js.Value) bool {
 	return e.IsUndefined() || e.IsNull()
 }
+
+func reloaded() bool {
+	navEntries := js.Global().Get("performance").Call("getEntriesByType", "navigation")
+	if navEntries.Get("length").Int() == 0 {
+		return false
+	}
+	return navEntries.Call("at", 0).Get("type").String() == "reload"
+
+}

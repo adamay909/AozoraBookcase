@@ -43,8 +43,7 @@ func main() {
 	globalSettings.jis0213 = false
 
 	var hash string
-	reloaded := domWindow.Call("reloaded").Bool()
-	if !reloaded {
+	if !reloaded() {
 		hash = domWindow.Get("location").Get("hash").String()
 		log.Println("hash is:", hash, "len:", len(hash))
 	}
